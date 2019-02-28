@@ -1,7 +1,7 @@
 import cocos
 import pyglet
 
-from toolbox.layer import Layer
+from views.common.layer import Layer
 
 
 class Transition(Layer):

@@ -1,6 +1,6 @@
 import cocos
 
-from toolbox.layer import Layer
+from views.common.layer import Layer
 
 
 class Dialog(Layer):

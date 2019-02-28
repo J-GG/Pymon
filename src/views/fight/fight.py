@@ -5,9 +5,11 @@ import cocos
 from cocos.actions import *
 
 from toolbox.i18n import I18n
-from views.common.Dialog import Dialog
+from views.common.dialog import Dialog
 from .background import Background
 from .fade import Fade
+from .hud import HUD
+from .opponent_hud import OpponentHUD
 from .opponent_pokemon import OpponentPokemon
 from .pokemon import Pokemon
 from .transition import Transition
@@ -94,3 +96,19 @@ class FightScene(cocos.scene.Scene):
             + (ScaleTo(2, FightScene.ZOOM_OUT_DURATION) | MoveTo((460, 370), FightScene.ZOOM_OUT_DURATION))
         )
         self.add(self._pokemon)
+
+        self.do(
+            Delay(FightScene.TRANSITION_DURATION + FightScene.TRAVELING_DURATION)
+            + CallFunc(self._start)
+        )
+
+    def _start(self):
+        """Show the pokemon information and let the player choose an action."""
+
+        self._opponent_hud = OpponentHUD()
+        self._opponent_hud.do(FadeOut(0) + FadeIn(0.5))
+        self.add(self._opponent_hud, z=50)
+
+        self._hud = HUD()
+        self._hud.do(FadeOut(0) + FadeIn(0.5))
+        self.add(self._hud, z=50)
