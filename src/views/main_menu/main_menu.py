@@ -10,7 +10,7 @@ class MainMenuScene(cocos.scene.Scene):
     starting a new game and continuing an existing one."""
 
     def __init__(self):
-        super(MainMenuScene, self).__init__()
+        super().__init__()
 
         self._background = Background()
         self.add(self._background)

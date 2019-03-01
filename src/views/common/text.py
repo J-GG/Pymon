@@ -17,7 +17,7 @@ class Text(cocos.cocosnode.CocosNode):
     characters["q"] = ("q", True)
 
     def __init__(self, text):
-        super(Text, self).__init__()
+        super().__init__()
 
         self._width = 0
         self._opacity = 255

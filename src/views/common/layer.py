@@ -6,7 +6,7 @@ class Layer(cocos.layer.Layer):
      modified."""
 
     def __init__(self):
-        super(Layer, self).__init__()
+        super().__init__()
         self._opacity = 255
 
     @property

@@ -8,9 +8,8 @@ class OpponentHUD(Layer):
     """The information about the opponent pokemon: name, level, HP"""
 
     def __init__(self):
-        super(OpponentHUD, self).__init__()
+        super().__init__()
 
-        super(OpponentHUD, self).__init__()
         self._name = Text("Bulbasaur")
         self._name.position = 400 - self._name.width, 370
         self.add(self._name, z=1)

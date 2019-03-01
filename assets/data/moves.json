@@ -1,0 +1,32 @@
+[
+  {
+    "id": "TACKLE",
+    "type": "NORMAL",
+    "category": "PHYSICAL",
+    "power": 40,
+    "accuracy": 100,
+    "defaultPp": 35
+  },
+  {
+    "id": "GROWL",
+    "type": "GRASS",
+    "category": "STATUS",
+    "accuracy": 100,
+    "defaultPp": 40
+  },
+  {
+    "id": "VINE_WHIP",
+    "type": "GRASS",
+    "category": "PHYSICAL",
+    "power": 45,
+    "accuracy": 100,
+    "defaultPp": 25
+  },
+  {
+    "id": "POISON_POWDER",
+    "type": "POISON",
+    "category": "STATUS",
+    "accuracy": 75,
+    "defaultPp": 35
+  }
+]

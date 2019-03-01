@@ -36,7 +36,7 @@ class BattleScene(cocos.scene.Scene):
     ZOOM_OUT_DURATION = 1
 
     def __init__(self):
-        super(BattleScene, self).__init__()
+        super().__init__()
 
         transition_class = getattr(importlib.import_module("cocos.scenes.transitions"),
                                    random.choice(BattleScene.BATTLE_TRANSITIONS))

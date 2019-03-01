@@ -1,9 +1,9 @@
-from toolbox.singleton import Singleton
 from views.intro.intro import IntroScene
 
 
-class IntroController(metaclass=Singleton):
+class IntroController:
     """Manages the introduction of the game."""
 
-    def show_itro(self):
+    @staticmethod
+    def show_itro():
         IntroScene()

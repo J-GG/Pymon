@@ -11,7 +11,7 @@ class Background(cocos.layer.Layer):
     BATTLE_BACKGROUND = ["bridge.png", "cave.jpg", "city.png", "clearing.png", "forest.png", "meadow.jpg"]
 
     def __init__(self):
-        super(Background, self).__init__()
+        super().__init__()
 
         self._background = cocos.sprite.Sprite('battle/backgrounds/{0}'.format((Background.BATTLE_BACKGROUND[3])))
         self.add(self._background)

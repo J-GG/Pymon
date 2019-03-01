@@ -9,7 +9,7 @@ class IntroScene(cocos.scene.Scene):
     """The scene displaying the introduction of the game."""
 
     def __init__(self):
-        super(IntroScene, self).__init__()
+        super().__init__()
 
         self._background = Background()
         self.add(self._background)

@@ -1,0 +1,2 @@
+class PokemonSpeciesException(Exception):
+    pass

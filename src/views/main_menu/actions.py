@@ -1,7 +1,7 @@
 import cocos
 
 from controllers.battle import BattleController
-from toolbox.key_enum import KeyEnum
+from views.common.key_enum import KeyEnum
 
 
 class Actions(cocos.layer.Layer):
@@ -12,7 +12,7 @@ class Actions(cocos.layer.Layer):
     is_event_handler = True
 
     def __init__(self):
-        super(Actions, self).__init__()
+        super().__init__()
 
         self._new_game_off = cocos.sprite.Sprite('main_menu/new_game_off.gif')
         self._new_game_off.position = (320, 120)

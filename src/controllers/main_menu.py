@@ -1,9 +1,9 @@
-from toolbox.singleton import Singleton
 from views.main_menu.main_menu import MainMenuScene
 
 
-class MainMenuController(metaclass=Singleton):
+class MainMenuController:
     """Manages the main menu."""
 
-    def show_menu(self):
+    @staticmethod
+    def show_menu():
         MainMenuScene()

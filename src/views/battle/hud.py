@@ -8,7 +8,7 @@ class HUD(Layer):
     """The information about the player's pokemon: name, level, HP, XP"""
 
     def __init__(self):
-        super(HUD, self).__init__()
+        super().__init__()
         self._name = Text("Pikachu")
         self._name.position = 450 - self._name.width, 230
         self.add(self._name, z=1)

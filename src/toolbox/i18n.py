@@ -11,4 +11,10 @@ class I18n(metaclass=Singleton):
         self._config_parser.read("../conf/i18n_en.conf")
 
     def get(self, key):
+        """Get the translation for the given key.
+
+        :param key: The key of the translation.
+        :return: The translated text.
+        """
+        
         return self._config_parser["TRANSLATIONS"][key]

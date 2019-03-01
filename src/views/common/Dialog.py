@@ -7,7 +7,7 @@ class Dialog(Layer):
     """Show a text to a user."""
 
     def __init__(self):
-        super(Dialog, self).__init__()
+        super().__init__()
 
         self._background = cocos.sprite.Sprite('common/dialog_background.png', anchor=(0, 0))
         self._background.position = (0, 0)

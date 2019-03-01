@@ -1,8 +1,8 @@
 import cocos
 from cocos.actions import *
 
-from toolbox.key_enum import KeyEnum
 from views.battle.actions_enum import ActionEnum
+from views.common.key_enum import KeyEnum
 from views.common.layer import Layer
 
 
@@ -12,7 +12,7 @@ class Actions(Layer):
     is_event_handler = True
 
     def __init__(self, selected=ActionEnum.FIGHT):
-        super(Actions, self).__init__()
+        super().__init__()
         self._selected = selected
 
         self._isVisible = False
