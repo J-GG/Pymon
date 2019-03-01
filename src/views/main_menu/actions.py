@@ -1,6 +1,6 @@
 import cocos
 
-from controllers.fight import FightController
+from controllers.battle import BattleController
 from toolbox.key_enum import KeyEnum
 
 
@@ -45,6 +45,6 @@ class Actions(cocos.layer.Layer):
         elif key == KeyEnum.DOWN.value:
             self._choice = 1
         elif key == KeyEnum.ENTER.value:
-            FightController().show_fight()
+            BattleController().battle()
 
         self._update_screen()

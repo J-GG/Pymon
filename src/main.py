@@ -3,7 +3,7 @@ import os
 import cocos
 import pyglet
 
-from controllers.main_menu import MainMenuController
+from controllers.intro import IntroController
 
 if __name__ == '__main__':
     working_dir = os.path.dirname(os.path.realpath(__file__))
@@ -12,4 +12,4 @@ if __name__ == '__main__':
 
     cocos.director.director.init()
 
-    MainMenuController().show_menu()
+    IntroController().show_itro()

@@ -1,4 +1,5 @@
 import cocos
+from cocos.scenes.transitions import *
 
 from .actions import Actions
 from .background import Background
@@ -17,4 +18,4 @@ class MainMenuScene(cocos.scene.Scene):
         self._actions = Actions()
         self.add(self._actions)
 
-        cocos.director.director.run(self)
+        cocos.director.director.replace(FadeTransition(self))
