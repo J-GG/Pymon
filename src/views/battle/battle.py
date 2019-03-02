@@ -35,8 +35,11 @@ class BattleScene(cocos.scene.Scene):
     TRAVELING_DURATION = 2
     ZOOM_OUT_DURATION = 1
 
-    def __init__(self):
+    def __init__(self, players_pokemon, opponents_pokemon):
         super().__init__()
+
+        self._players_pokemon = players_pokemon
+        self._opponents_pokemon = opponents_pokemon
 
         transition_class = getattr(importlib.import_module("cocos.scenes.transitions"),
                                    random.choice(BattleScene.BATTLE_TRANSITIONS))
@@ -69,10 +72,10 @@ class BattleScene(cocos.scene.Scene):
                         + FadeOut(0)
                         + Delay(BattleScene.ZOOM_OUT_DURATION - 0.2)
                         )
-        self._dialog.text = I18n().get("BATTLE.WILD").format("Bulbasaur")
+        self._dialog.text = I18n().get("BATTLE.WILD").format(self._opponents_pokemon.nickname)
         self.add(self._dialog, z=50)
 
-        self._opponent_pokemon = OpponentPokemon()
+        self._opponent_pokemon = OpponentPokemon(self._opponents_pokemon)
         self._opponent_pokemon.scale = 2
         self._opponent_pokemon.position = (720, 400)
         self._opponent_pokemon.do(Delay(BattleScene.TRANSITION_DURATION * 2 / 3)
@@ -90,7 +93,7 @@ class BattleScene(cocos.scene.Scene):
                       )
         self.add(self._fade, z=100)
 
-        self._pokemon = Pokemon()
+        self._pokemon = Pokemon(self._players_pokemon)
         self._pokemon.scale = 2.5
         self._pokemon.position = (150, 150)
         self._pokemon.do(
@@ -107,22 +110,22 @@ class BattleScene(cocos.scene.Scene):
     def _start(self):
         """Show the pokemon information."""
 
-        self._opponent_hud = OpponentHUD()
+        self._opponent_hud = OpponentHUD(self._opponents_pokemon)
         self._opponent_hud.do(FadeOut(0) + FadeIn(0.5))
         self.add(self._opponent_hud, z=50)
 
-        self._hud = HUD()
+        self._hud = HUD(self._players_pokemon)
         self._hud.do(FadeOut(0) + FadeIn(0.5))
         self.add(self._hud, z=50)
 
-        self._dialog.text = I18n().get("BATTLE.WHAT_WILL_DO").format("Pikachu")
+        self._dialog.text = I18n().get("BATTLE.WHAT_WILL_DO").format(self._players_pokemon.nickname)
         self._dialog.do(FadeIn(0.5))
 
         self._actions = Actions()
         self._actions.do(FadeOut(0) + FadeIn(0.5))
         self.add(self._actions)
 
-        self._moves = Moves()
+        self._moves = Moves(self._players_pokemon)
         self.add(self._moves)
 
         self.show_actions()

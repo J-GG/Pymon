@@ -10,50 +10,53 @@ class Moves(Layer):
 
     is_event_handler = True
 
-    def __init__(self, selected=0):
+    def __init__(self, pokemon, selected=0):
         super().__init__()
         self._selected = selected
 
         self._isVisible = False
         self._actions = dict()
         self._selections = dict()
-        for attack in range(4):
-            self._actions[attack] = cocos.sprite.Sprite('img/battle/moves/fight_blue.png')
-            self._actions[attack].position = 567 + self._actions[attack].width, 250 - 40 * attack
-            name = cocos.text.Label("Accupressure", font_size=9, anchor_x="left", anchor_y="center",
+        for index, move in enumerate(pokemon.moves):
+            self._actions[index] = cocos.sprite.Sprite('img/battle/moves/{0}.png'.format(move.move.type.name.lower()))
+            self._actions[index].position = 567 + self._actions[index].width, 250 - 40 * index
+            name = cocos.text.Label(move.move.name, font_size=9, anchor_x="left", anchor_y="center",
                                     color=(0, 0, 0, 255), bold=True)
             name.position = (-57, 8)
-            self._actions[attack].add(name)
-            pp = cocos.text.Label("PP 22/23", font_size=9, anchor_x="left", anchor_y="center", bold=True)
+            self._actions[index].add(name)
+            pp = cocos.text.Label("PP {0}/{1}".format(move.current_pp, move.pp),
+                                  font_size=9, anchor_x="left", anchor_y="center", bold=True)
             pp.position = (-15, -8)
-            self._actions[attack].add(pp)
-            type = cocos.sprite.Sprite('img/battle/type/water.png')
+            self._actions[index].add(pp)
+            type = cocos.sprite.Sprite('img/common/types/{0}.png'.format(move.move.type.name.lower()))
             type.position = (-35, -8)
             type.scale = 0.9
-            self._actions[attack].add(type)
-            self.add(self._actions[attack])
+            self._actions[index].add(type)
+            self.add(self._actions[index])
 
-            self._selections[attack] = cocos.sprite.Sprite('img/battle/moves/selected_fight_blue.png')
-            self._selections[attack].position = 567 + self._actions[attack].width, 250 - 40 * attack
-            name = cocos.text.Label("Accupressure", font_size=9, anchor_x="left", anchor_y="center",
+            self._selections[index] = cocos.sprite.Sprite(
+                'img/battle/moves/selected_{0}.png'.format(move.move.type.name.lower()))
+            self._selections[index].position = 567 + self._actions[index].width, 250 - 40 * index
+            name = cocos.text.Label(move.move.name, font_size=9, anchor_x="left", anchor_y="center",
                                     color=(0, 0, 0, 255), bold=True)
             name.position = (-57, 8)
-            self._selections[attack].add(name)
-            pp = cocos.text.Label("PP 22/23", font_size=9, anchor_x="left", anchor_y="center", bold=True)
+            self._selections[index].add(name)
+            pp = cocos.text.Label("PP {0}/{1}".format(move.current_pp, move.pp),
+                                  font_size=9, anchor_x="left", anchor_y="center", bold=True)
             pp.position = (-15, -8)
-            self._selections[attack].add(pp)
-            type = cocos.sprite.Sprite('img/battle/type/water.png')
+            self._selections[index].add(pp)
+            type = cocos.sprite.Sprite('img/common/types/{0}.png'.format(move.move.type.name.lower()))
             type.position = (-35, -8)
             type.scale = 0.9
-            self._selections[attack].add(type)
-            self._selections[attack].visible = False
-            self.add(self._selections[attack])
+            self._selections[index].add(type)
+            self._selections[index].visible = False
+            self.add(self._selections[index])
 
-        self._actions[len(self._actions)] = cocos.sprite.Sprite('img/battle/moves/fight_return.png')
+        self._actions[len(self._actions)] = cocos.sprite.Sprite('img/battle/moves/return.png')
         self._actions[len(self._actions) - 1].position = 615 + self._actions[len(self._actions) - 1].width, 90
         self.add(self._actions[len(self._actions) - 1])
 
-        self._selections[len(self._selections)] = cocos.sprite.Sprite('img/battle/moves/selected_fight_return.png')
+        self._selections[len(self._selections)] = cocos.sprite.Sprite('img/battle/moves/selected_return.png')
         self._selections[len(self._selections) - 1].position = self._actions[len(self._actions) - 1].position
         self._selections[len(self._selections) - 1].visible = False
         self.add(self._selections[len(self._selections) - 1])
@@ -62,7 +65,7 @@ class Moves(Layer):
         self._selections[self._selected].visible = True
 
     def _update_selection(self):
-        for action in range(5):
+        for action in range(len(self._actions)):
             self._actions[action].visible = True
             self._selections[action].visible = False
 
@@ -87,10 +90,10 @@ class Moves(Layer):
             return event_handled
 
     def toggle_apparition(self):
-        for action in range(5):
+        for action in range(len(self._actions)):
             offset = self._selections[action].width if self._isVisible else -self._selections[action].width
-            self._actions[action].do(Delay(0.5 - (0.1 * action)) + MoveBy((offset, 0), 0.2))
-            self._selections[action].do(Delay(0.5 - (0.1 * action)) + MoveBy((offset, 0), 0.2))
+            self._actions[action].do(Delay(0.1 * len(self._actions) - (0.1 * action)) + MoveBy((offset, 0), 0.2))
+            self._selections[action].do(Delay(0.1 * len(self._actions) - (0.1 * action)) + MoveBy((offset, 0), 0.2))
 
         self._isVisible = not self._isVisible
 

@@ -33,7 +33,7 @@ class Pokemon:
         self._nickname = nickname
         self._level = level
         self._moves = moves
-        self._experience = experience if experience else floor(species.experienceFunction.get_xp_for_level(level))
+        self._experience = experience if experience else floor(species.experience_function.get_xp_for_level(level))
         self._update_experience_for_next_level()
 
         if iv:
@@ -161,13 +161,23 @@ class Pokemon:
 
         :param experience: The number of experience points of the pokemon.
         """
+
         self._experience = experience
+
+    @property
+    def experience_for_next_level(self):
+        """Get the number of experience points needed to reach the next level.
+
+        :return: The number of experience points needed to reach the
+        next level.
+        """
+        return self._experience_for_next_level
 
     def _update_experience_for_next_level(self):
         """Determine the experience needed to reach the next level.
         """
 
-        self._experience_for_next_level = floor(self.species.experience_function.function(self.level + 1))
+        self._experience_for_next_level = floor(self.species.experience_function.get_xp_for_level(self.level + 1))
 
     def gain_experience(self, experience_gained):
         """Increase the number of experience points of the pokemon.
@@ -193,10 +203,10 @@ class Pokemon:
         """
 
         for stat in StatEnum:
-            stat_value = stat.function(self.level, self.species.baseStats[stat.name], self.iv[stat.name])
+            stat_value = stat.get_stat(self.level, self.species.base_stats[stat.name], self._iv[stat.name])
             if stat.name in self.current_stats and stat.name in self.stats:
                 self.current_stats[stat.name] += stat_value - self.stats[stat.name]
             else:
                 self.current_stats[stat.name] = stat_value
 
-            self.stats[stat.name] = stat.function(self.level, self.species.baseStats[stat.name], self.iv[stat.name])
+            self.stats[stat.name] = stat.get_stat(self.level, self.species.base_stats[stat.name], self._iv[stat.name])
