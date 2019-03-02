@@ -18,7 +18,7 @@ class Moves(Layer):
         self._actions = dict()
         self._selections = dict()
         for attack in range(4):
-            self._actions[attack] = cocos.sprite.Sprite('battle/moves/fight_blue.png')
+            self._actions[attack] = cocos.sprite.Sprite('img/battle/moves/fight_blue.png')
             self._actions[attack].position = 567 + self._actions[attack].width, 250 - 40 * attack
             name = cocos.text.Label("Accupressure", font_size=9, anchor_x="left", anchor_y="center",
                                     color=(0, 0, 0, 255), bold=True)
@@ -27,13 +27,13 @@ class Moves(Layer):
             pp = cocos.text.Label("PP 22/23", font_size=9, anchor_x="left", anchor_y="center", bold=True)
             pp.position = (-15, -8)
             self._actions[attack].add(pp)
-            type = cocos.sprite.Sprite('battle/type/water.png')
+            type = cocos.sprite.Sprite('img/battle/type/water.png')
             type.position = (-35, -8)
             type.scale = 0.9
             self._actions[attack].add(type)
             self.add(self._actions[attack])
 
-            self._selections[attack] = cocos.sprite.Sprite('battle/moves/selected_fight_blue.png')
+            self._selections[attack] = cocos.sprite.Sprite('img/battle/moves/selected_fight_blue.png')
             self._selections[attack].position = 567 + self._actions[attack].width, 250 - 40 * attack
             name = cocos.text.Label("Accupressure", font_size=9, anchor_x="left", anchor_y="center",
                                     color=(0, 0, 0, 255), bold=True)
@@ -42,18 +42,18 @@ class Moves(Layer):
             pp = cocos.text.Label("PP 22/23", font_size=9, anchor_x="left", anchor_y="center", bold=True)
             pp.position = (-15, -8)
             self._selections[attack].add(pp)
-            type = cocos.sprite.Sprite('battle/type/water.png')
+            type = cocos.sprite.Sprite('img/battle/type/water.png')
             type.position = (-35, -8)
             type.scale = 0.9
             self._selections[attack].add(type)
             self._selections[attack].visible = False
             self.add(self._selections[attack])
 
-        self._actions[len(self._actions)] = cocos.sprite.Sprite('battle/moves/fight_return.png')
+        self._actions[len(self._actions)] = cocos.sprite.Sprite('img/battle/moves/fight_return.png')
         self._actions[len(self._actions) - 1].position = 615 + self._actions[len(self._actions) - 1].width, 90
         self.add(self._actions[len(self._actions) - 1])
 
-        self._selections[len(self._selections)] = cocos.sprite.Sprite('battle/moves/selected_fight_return.png')
+        self._selections[len(self._selections)] = cocos.sprite.Sprite('img/battle/moves/selected_fight_return.png')
         self._selections[len(self._selections) - 1].position = self._actions[len(self._actions) - 1].position
         self._selections[len(self._selections) - 1].visible = False
         self.add(self._selections[len(self._selections) - 1])

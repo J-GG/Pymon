@@ -9,7 +9,7 @@ class Fade(Layer):
     def __init__(self):
         super().__init__()
 
-        self._background = cocos.sprite.Sprite('battle/fade.jpg', anchor=(0, 0))
+        self._background = cocos.sprite.Sprite('img/battle/fade.jpg', anchor=(0, 0))
         self._background.position = (0, 0)
         self._background.opacity = 0
         self.add(self._background)

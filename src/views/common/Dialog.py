@@ -9,7 +9,7 @@ class Dialog(Layer):
     def __init__(self):
         super().__init__()
 
-        self._background = cocos.sprite.Sprite('common/dialog_background.png', anchor=(0, 0))
+        self._background = cocos.sprite.Sprite('img/common/dialog_background.png', anchor=(0, 0))
         self._background.position = (0, 0)
         self.add(self._background)
 

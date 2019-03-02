@@ -3,6 +3,7 @@ import json
 from models.move import Move
 from models.move_category_enum import MoveCategoryEnum
 from models.type_enum import TypeEnum
+from toolbox.init import PATH
 
 """This module is meant to load the data regarding the moves available in the 
 game.
@@ -20,7 +21,7 @@ MOVE_ACCURACY = "accuracy"
 MOVE_DEFAULT_PP = "defaultPp"
 
 moves = dict()
-with open("../assets/data/moves.json") as file:
+with open(PATH + "/assets/data/moves.json") as file:
     json_moves = json.load(file)
     for move in json_moves:
         id = move[MOVE_ID]

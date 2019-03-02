@@ -1,28 +1,23 @@
 from toolbox.i18n import I18n
-from .exceptions.move_exception import MoveException
 
 
 class Move:
     """A move in the game."""
 
-    def __init__(self, id, type, category, power, accuracy, default_pp):
+    def __init__(self, id, moveType, category, power, accuracy, default_pp):
         """Creates a move.
 
         :param id: The id of the move.
-        :param type: The ``EnumType`` indicating the type of the move.
+        :param moveType: The ``EnumType`` indicating the type of the move.
         :param category: The ``MoveCategoryEnum`` indicating the category of
         the move.
         :param power: The power of the move.
         :param accuracy: The accuracy of the move (out of 100).
         :param default_pp: The default PP of the move.
         """
-
-        if accuracy < 0 or accuracy > 100:
-            raise MoveException("Incorrect accuracy: expected between "
-                                "0 and 100 but got {0}".format(accuracy))
-
+        
         self._id = id
-        self._type = type
+        self._type = moveType
         self._category = category
         self._power = power
         self._accuracy = accuracy

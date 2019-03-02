@@ -1,5 +1,4 @@
 from toolbox.i18n import I18n
-from .exceptions.pokemon_species_exception import PokemonSpeciesException
 
 
 class PokemonSpecies:
@@ -19,10 +18,6 @@ class PokemonSpecies:
         experience necessary to reach a certain level.
         An instance of ``ExperienceFunctionEnum``
         """
-
-        if len(type) > 2:
-            raise PokemonSpeciesException("Too many types: 1 or 2 expected but "
-                                          "got {0}".format(len(type)))
 
         self._id = id
         self._type = type

@@ -4,6 +4,7 @@ from models.experience_function_enum import ExperienceFunctionEnum
 from models.pokemon_species import PokemonSpecies
 from models.stat_enum import StatEnum
 from models.type_enum import TypeEnum
+from toolbox.init import PATH
 from .moves import moves
 
 """This module is meant to load the data regarding the pokemon available in the 
@@ -22,7 +23,7 @@ POKEMON_EXPERIENCE_FUNCTION = "experienceFunction"
 POKEMON_MOVES_BY_LVL_UP = "movesByLvlUp"
 
 pokemons = dict()
-with open("../assets/data/pokemon.json") as file:
+with open(PATH + "/assets/data/pokemon.json") as file:
     json_pokemon = json.load(file)
     for pokemon in json_pokemon:
         id = pokemon[POKEMON_ID]

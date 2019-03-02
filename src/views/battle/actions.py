@@ -19,14 +19,14 @@ class Actions(Layer):
         self._actions = dict()
         self._selections = dict()
         for action in ActionEnum:
-            self._actions[action.name] = cocos.sprite.Sprite('battle/actions/action.png')
+            self._actions[action.name] = cocos.sprite.Sprite('img/battle/actions/action.png')
             self._actions[action.name].position = 617 + self._actions[action.name].width, 100 + 40 * action.value
             self._actions[action.name].scale = 1.2
             label = cocos.text.Label(action.name, font_size=8, anchor_x="center", anchor_y="center")
             self._actions[action.name].add(label)
             self.add(self._actions[action.name])
 
-            self._selections[action.name] = cocos.sprite.Sprite('battle/actions/selected_action.png')
+            self._selections[action.name] = cocos.sprite.Sprite('img/battle/actions/selected_action.png')
             self._selections[action.name].position = self._actions[action.name].position
             self._selections[action.name].scale = self._actions[action.name].scale
             self._selections[action.name].add(label)

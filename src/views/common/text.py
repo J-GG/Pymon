@@ -30,7 +30,7 @@ class Text(cocos.cocosnode.CocosNode):
                 c = Text.characters[c][0]
             elif c.isupper():
                 c = c.lower() + "_maj"
-            self._sprites.append(cocos.sprite.Sprite('common/font/{0}.png'.format(c)))
+            self._sprites.append(cocos.sprite.Sprite('img/common/font/{0}.png'.format(c)))
             self._sprites[index].position = self._width, (self._sprites[index].height - 11) / 2 - y_offset
             self._width += self._sprites[index].width
             self.add(self._sprites[index])

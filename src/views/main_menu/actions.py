@@ -14,19 +14,19 @@ class Actions(cocos.layer.Layer):
     def __init__(self):
         super().__init__()
 
-        self._new_game_off = cocos.sprite.Sprite('main_menu/new_game_off.gif')
+        self._new_game_off = cocos.sprite.Sprite('img/main_menu/new_game_off.gif')
         self._new_game_off.position = (320, 120)
         self.add(self._new_game_off)
 
-        self._new_game_on = cocos.sprite.Sprite('main_menu/new_game_on.gif')
+        self._new_game_on = cocos.sprite.Sprite('img/main_menu/new_game_on.gif')
         self._new_game_on.position = (320, 120)
         self.add(self._new_game_on)
 
-        self._load_game_off = cocos.sprite.Sprite('main_menu/load_game_off.gif')
+        self._load_game_off = cocos.sprite.Sprite('img/main_menu/load_game_off.gif')
         self._load_game_off.position = (320, 320)
         self.add(self._load_game_off)
 
-        self._load_game_on = cocos.sprite.Sprite('main_menu/load_game_on.gif')
+        self._load_game_on = cocos.sprite.Sprite('img/main_menu/load_game_on.gif')
         self._load_game_on.position = (320, 320)
         self.add(self._load_game_on)
 
