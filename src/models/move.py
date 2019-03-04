@@ -1,5 +1,7 @@
+from models.stat_enum import StatEnum
 from toolbox.i18n import I18n
-
+from .move_category_enum import MoveCategoryEnum
+import random
 
 class Move:
     """A move in the game."""
@@ -15,7 +17,7 @@ class Move:
         :param accuracy: The accuracy of the move (out of 100).
         :param default_pp: The default PP of the move.
         """
-        
+
         self._id = id
         self._type = moveType
         self._category = category
@@ -92,3 +94,18 @@ class Move:
         """
 
         return self._default_pp
+
+    def effects(self, attacker, defender):
+        effects = dict()
+
+        effects["STATS"] = dict()
+        if self._category == MoveCategoryEnum.PHYSICAL:
+            attack = attacker.current_stats[StatEnum.ATTACK.name]
+            defense = defender.current_stats[StatEnum.DEFENSE.name]
+        else:
+            attack = attacker.current_stats[StatEnum.SPECIAL_ATTACK.name]
+            defense = defender.current_stats[StatEnum.SPECIAL_ATTACK.name]
+
+        effects["STATS"][StatEnum.HP.name] = -round(((2*attacker.level/5 + 2)*self._power*attack/defense/50+5) * random.uniform(0.85, 1))
+
+        return effects

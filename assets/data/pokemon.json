@@ -1,39 +1,83 @@
 [
-	{
-		"id": "BULBASAUR",
-		"type": ["GRASS", "POISON"],
-		"baseStats": {
-			"HP": 45,
-			"ATTACK": 49,
-			"DEFENSE": 49,
-			"SPECIAL_ATTACK": 65,
-			"SPECIAL_DEFENSE": 65,
-			"SPEED": 65
-		},
-		"baseExperience": 64,
-		"experienceFunction": "FAST",
-		"movesByLvlUp":{
-				"1": ["TACKLE", "GROWL"],
-				"5": ["VINE_WHIP"],
-				"14": ["POISON_POWDER"]
-		}
-	},
-	{
-		"id": "IVYSAUR",
-		"type": ["GRASS", "POISON"],
-		"baseStats": {
-			"HP": 60,
-			"ATTACK": 62,
-			"DEFENSE": 63,
-			"SPECIAL_ATTACK": 80,
-			"SPECIAL_DEFENSE": 80,
-			"SPEED": 60
-		},
-		"baseExperience": 142,
-		"experienceFunction": "MEDIUM_SLOW",
-		"movesByLvlUp":{
-				"1": ["TACKLE", "GROWL", "VINE_WHIP"],
-				"14": ["POISON_POWDER"]
-		}
-	}
+  {
+    "id": "BULBASAUR",
+    "type": [
+      "GRASS",
+      "POISON"
+    ],
+    "baseStats": {
+      "HP": 45,
+      "ATTACK": 49,
+      "DEFENSE": 49,
+      "SPECIAL_ATTACK": 65,
+      "SPECIAL_DEFENSE": 65,
+      "SPEED": 45
+    },
+    "baseExperience": 64,
+    "experienceFunction": "FAST",
+    "movesByLvlUp": {
+      "1": [
+        "TACKLE",
+        "GROWL"
+      ],
+      "5": [
+        "VINE_WHIP"
+      ],
+      "14": [
+        "POISON_POWDER"
+      ]
+    }
+  },
+  {
+    "id": "IVYSAUR",
+    "type": [
+      "GRASS",
+      "POISON"
+    ],
+    "baseStats": {
+      "HP": 60,
+      "ATTACK": 62,
+      "DEFENSE": 63,
+      "SPECIAL_ATTACK": 80,
+      "SPECIAL_DEFENSE": 80,
+      "SPEED": 60
+    },
+    "baseExperience": 142,
+    "experienceFunction": "MEDIUM_SLOW",
+    "movesByLvlUp": {
+      "1": [
+        "TACKLE",
+        "GROWL",
+        "VINE_WHIP"
+      ],
+      "14": [
+        "POISON_POWDER"
+      ]
+    }
+  },
+  {
+    "id": "PIKACHU",
+    "type": [
+      "ELECTRIC"
+    ],
+    "baseStats": {
+      "HP": 35,
+      "ATTACK": 55,
+      "DEFENSE": 40,
+      "SPECIAL_ATTACK": 50,
+      "SPECIAL_DEFENSE": 50,
+      "SPEED": 90
+    },
+    "baseExperience": 112,
+    "experienceFunction": "MEDIUM_FAST",
+    "movesByLvlUp": {
+      "1": [
+        "TAIL_WHIP",
+        "THUNDER_SHOCK"
+      ],
+      "5": [
+        "GROWL"
+      ]
+    }
+  }
 ]

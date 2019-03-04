@@ -35,11 +35,11 @@ class BattleScene(cocos.scene.Scene):
     TRAVELING_DURATION = 2
     ZOOM_OUT_DURATION = 1
 
-    def __init__(self, players_pokemon, opponents_pokemon):
+    def __init__(self, players_pokemon, opponent_pokemon):
         super().__init__()
 
         self._players_pokemon = players_pokemon
-        self._opponents_pokemon = opponents_pokemon
+        self._opponent_pokemon = opponent_pokemon
 
         transition_class = getattr(importlib.import_module("cocos.scenes.transitions"),
                                    random.choice(BattleScene.BATTLE_TRANSITIONS))
@@ -72,19 +72,19 @@ class BattleScene(cocos.scene.Scene):
                         + FadeOut(0)
                         + Delay(BattleScene.ZOOM_OUT_DURATION - 0.2)
                         )
-        self._dialog.text = I18n().get("BATTLE.WILD").format(self._opponents_pokemon.nickname)
+        self._dialog.text = I18n().get("BATTLE.WILD").format(self._opponent_pokemon.nickname)
         self.add(self._dialog, z=50)
 
-        self._opponent_pokemon = OpponentPokemon(self._opponents_pokemon)
-        self._opponent_pokemon.scale = 2
-        self._opponent_pokemon.position = (720, 400)
-        self._opponent_pokemon.do(Delay(BattleScene.TRANSITION_DURATION * 2 / 3)
-                                  + MoveBy((250, 0), BattleScene.TRAVELING_DURATION)
-                                  + MoveTo((720, 400), 0)
-                                  + (ScaleTo(1, BattleScene.ZOOM_OUT_DURATION) | MoveBy((-180, -75),
-                                                                                        BattleScene.ZOOM_OUT_DURATION))
-                                  )
-        self.add(self._opponent_pokemon)
+        self._opponent_pokemonLayer = OpponentPokemon(self._opponent_pokemon)
+        self._opponent_pokemonLayer.scale = 2
+        self._opponent_pokemonLayer.position = (720, 400)
+        self._opponent_pokemonLayer.do(Delay(BattleScene.TRANSITION_DURATION * 2 / 3)
+                                       + MoveBy((250, 0), BattleScene.TRAVELING_DURATION)
+                                       + MoveTo((720, 400), 0)
+                                       + (ScaleTo(1, BattleScene.ZOOM_OUT_DURATION) | MoveBy((-180, -75),
+                                                                                             BattleScene.ZOOM_OUT_DURATION))
+                                       )
+        self.add(self._opponent_pokemonLayer)
 
         self._fade = Fade()
         self._fade.do(Delay(BattleScene.TRANSITION_DURATION + BattleScene.TRAVELING_DURATION / 2)
@@ -110,7 +110,7 @@ class BattleScene(cocos.scene.Scene):
     def _start(self):
         """Show the pokemon information."""
 
-        self._opponent_hud = OpponentHUD(self._opponents_pokemon)
+        self._opponent_hud = OpponentHUD(self._opponent_pokemon)
         self._opponent_hud.do(FadeOut(0) + FadeIn(0.5))
         self.add(self._opponent_hud, z=50)
 
@@ -139,3 +139,22 @@ class BattleScene(cocos.scene.Scene):
         """Ask the player to choose a move for the pokemon."""
 
         self._moves.toggle_apparition()
+
+    def move_selected(self, move):
+        """The player selected a move. It is transmitted to the controller.
+
+        :param move: The selected move
+        """
+
+        from controllers.battle import BattleController
+        BattleController().uses_move(self._players_pokemon, self._opponent_pokemon, move)
+
+    def round(self, first_attacker, second_attacker):
+        self._moves.toggle_apparition()
+
+        self._dialog.text = I18n().get("BATTLE.MOVE_USED").format(first_attacker["pokemon"].nickname,
+                                                                  first_attacker["move"].move.name)
+        if first_attacker["pokemon"] == self._players_pokemon:
+            self._opponent_hud.update_hp()
+
+        self._moves.update_moves()

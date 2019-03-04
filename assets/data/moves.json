@@ -9,7 +9,7 @@
   },
   {
     "id": "GROWL",
-    "type": "GRASS",
+    "type": "NORMAL",
     "category": "STATUS",
     "accuracy": 100,
     "defaultPp": 40
@@ -28,5 +28,20 @@
     "category": "STATUS",
     "accuracy": 75,
     "defaultPp": 35
+  },
+  {
+    "id": "TAIL_WHIP",
+    "type": "NORMAL",
+    "category": "STATUS",
+    "accuracy": 100,
+    "defaultPp": 30
+  },
+  {
+    "id": "THUNDER_SHOCK",
+    "type": "ELECTRIC",
+    "category": "SPECIAL",
+    "power": 40,
+    "accuracy": 100,
+    "defaultPp": 30
   }
 ]

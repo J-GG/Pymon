@@ -3,13 +3,22 @@ import cocos
 from models.stat_enum import StatEnum
 from views.common.layer import Layer
 from views.common.text import Text
+from cocos.actions import *
+from .hp_bar_color_enum import HPBarColorEnum
 
 
 class OpponentHUD(Layer):
-    """The information about the opponent pokemon: name, level, HP"""
+    """The information about the opponent pokemon: name, level, HP
+
+    Attributes:
+        - HP_BAR_SIZE: The size in pixels of the HP bar.
+    """
+
+    HP_BAR_SIZE = 48
 
     def __init__(self, pokemon):
         super().__init__()
+        self._pokemon = pokemon
 
         self._name = Text(pokemon.nickname)
         self._name.position = 400 - self._name.width, 370
@@ -27,15 +36,48 @@ class OpponentHUD(Layer):
         self._hp_bar.position = 395, 358
         self.add(self._hp_bar)
 
-        self._hp_bar_content = []
-        hp_bar_size = 48 * pokemon.current_stats[StatEnum.HP.name] // pokemon.stats[StatEnum.HP.name]
-        if hp_bar_size * 100 // 48 > 50:
-            bar_color = "green"
-        elif hp_bar_size * 100 // 48 < 20:
-            bar_color = "red"
-        else:
-            bar_color = "yellow"
-        for i in range(48):
-            self._hp_bar_content.append(cocos.sprite.Sprite('img/battle/hud/hp_bar_{0}.png'.format(bar_color)))
-            self._hp_bar_content[i].position = 378 + i, 358
-            self.add(self._hp_bar_content[i], z=1)
+        for color in HPBarColorEnum:
+            if 100 * pokemon.current_stats[StatEnum.HP.name] // pokemon.stats[StatEnum.HP.name] <= color.upper_limit:
+                self._bar_color = color
+                break
+
+        self._hp_bar_size = OpponentHUD.HP_BAR_SIZE * pokemon.current_stats[StatEnum.HP.name] // pokemon.stats[StatEnum.HP.name]
+
+        self._hp_bar_content = {color: [] for color in HPBarColorEnum}
+        for i in range(OpponentHUD.HP_BAR_SIZE):
+            for color in HPBarColorEnum:
+                hp_pixel = cocos.sprite.Sprite('img/battle/hud/hp_bar_{0}.png'.format(color.name))
+                hp_pixel.position = 378 + i, 358
+                hp_pixel.visible = True if color == self._bar_color and i <= self._hp_bar_size else False
+                self._hp_bar_content[color].append(hp_pixel)
+
+                self.add(self._hp_bar_content[color][i], z=1)
+
+    def update_hp(self):
+        """Update the size and the color of the HP bar.
+        """
+
+        new_hp_bar_size = OpponentHUD.HP_BAR_SIZE * self._pokemon.current_stats[StatEnum.HP.name] // self._pokemon.stats[StatEnum.HP.name]
+
+        for pixel_index in range(self._hp_bar_size-1, -1, -1):
+            if pixel_index > new_hp_bar_size:
+                self.do(Delay(self._hp_bar_size*0.05-0.05*pixel_index) + CallFunc(self.hide_hp_pixel, pixel_index))
+
+        self._hp_bar_size = new_hp_bar_size
+
+    def hide_hp_pixel(self, pixel_index):
+        """Hide the pixel whose the index is specified and changes the color
+        of the HP bar if necessary.
+
+        :param pixel_index: the index of the current pixel.
+        """
+
+        self._hp_bar_content[self._bar_color][pixel_index].visible = False
+        for color in HPBarColorEnum:
+            if pixel_index * 100 // OpponentHUD.HP_BAR_SIZE <= color.upper_limit:
+                if color != self._bar_color:
+                    self._bar_color = color
+                    for i in range(pixel_index):
+                        for c in HPBarColorEnum:
+                            self._hp_bar_content[c][i].visible = True if c == self._bar_color else False
+                break
