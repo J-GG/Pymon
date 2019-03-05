@@ -12,7 +12,12 @@
     "type": "NORMAL",
     "category": "STATUS",
     "accuracy": 100,
-    "defaultPp": 40
+    "defaultPp": 40,
+    "effects": {
+      "stats": {
+        "ATTACK": -1
+      }
+    }
   },
   {
     "id": "VINE_WHIP",
@@ -34,7 +39,12 @@
     "type": "NORMAL",
     "category": "STATUS",
     "accuracy": 100,
-    "defaultPp": 30
+    "defaultPp": 30,
+    "effects": {
+      "stats": {
+        "DEFENSE": -1
+      }
+    }
   },
   {
     "id": "THUNDER_SHOCK",

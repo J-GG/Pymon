@@ -27,7 +27,7 @@ class HUD(Layer):
         self.add(self._hp_bar)
 
         self._hp_bar_content = []
-        hp_bar_size = 48 * pokemon.current_stats[StatEnum.HP] // pokemon.stats[StatEnum.HP]
+        hp_bar_size = 48 * pokemon.hp // pokemon.stats[StatEnum.HP]
         if hp_bar_size * 100 // 48 > 50:
             bar_color = "green"
         elif hp_bar_size * 100 // 48 < 20:
@@ -39,7 +39,7 @@ class HUD(Layer):
             self._hp_bar_content[i].position = 427 + i, 218
             self.add(self._hp_bar_content[i], z=1)
 
-        self._hp = Text("{0}/{1}".format(pokemon.current_stats[StatEnum.HP], pokemon.stats[StatEnum.HP]))
+        self._hp = Text("{0}/{1}".format(pokemon.hp, pokemon.stats[StatEnum.HP]))
         self._hp.position = 427, 206
         self.add(self._hp, z=1)
 

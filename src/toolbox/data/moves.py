@@ -2,6 +2,8 @@ import json
 
 from models.move import Move
 from models.move_category_enum import MoveCategoryEnum
+from models.move_effects import MoveEffects
+from models.staged_stat_enum import StagedStatEnum
 from models.type_enum import TypeEnum
 from toolbox.init import PATH
 
@@ -19,6 +21,9 @@ MOVE_CATEGORY = "category"
 MOVE_POWER = "power"
 MOVE_ACCURACY = "accuracy"
 MOVE_DEFAULT_PP = "defaultPp"
+MOVE_EFFECTS = "effects"
+MOVE_STATS = "stats"
+MOVE_STATUS = "status"
 
 moves = dict()
 with open(PATH + "/assets/data/moves.json") as file:
@@ -30,5 +35,12 @@ with open(PATH + "/assets/data/moves.json") as file:
         power = move[MOVE_POWER] if MOVE_POWER in move else None
         accuracy = move[MOVE_ACCURACY] if MOVE_ACCURACY in move else None
         default_pp = move[MOVE_DEFAULT_PP]
+        effects = None
+        if MOVE_EFFECTS in move:
+            effects_node = move[MOVE_EFFECTS]
+            effects_stats = {StagedStatEnum[name]: value for name, value in effects_node[MOVE_STATS].items()}
+            effects_status = effects_node[MOVE_STATUS] if MOVE_STATUS in effects_node else None
 
-        moves[id] = Move(id, type, category, power, accuracy, default_pp)
+            effects = MoveEffects(effects_stats, effects_status)
+
+        moves[id] = Move(id, type, category, power, accuracy, default_pp, effects)

@@ -175,4 +175,12 @@ class BattleScene(cocos.scene.Scene):
             if first_attacker["pokemon"] == self._players_pokemon:
                 self._opponent_hud.update_hp()
 
+            for staged_stat, stage in effects.staged_stats.items():
+                if stage > 0:
+                    text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
+                        first_attacker["pokemon"].nickname, staged_stat.value[0]))
+                elif stage < 0:
+                    text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
+                        second_attacker["pokemon"].nickname, staged_stat.value[0]))
+
         self._dialog.set_text(text)

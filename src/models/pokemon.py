@@ -1,6 +1,7 @@
 from math import floor
 from random import randint
 
+from models.staged_stat_enum import StagedStatEnum
 from models.stat_enum import StatEnum
 
 
@@ -14,7 +15,7 @@ class Pokemon:
     vary depending on the situation.
     """
 
-    def __init__(self, species, nickname, level, moves, experience=None, iv=None):
+    def __init__(self, species, nickname, level, moves, hp=None, experience=None, iv=None):
         """Creates a new pokemon.
 
         :param species: The species of the pokemon. An instance of
@@ -23,6 +24,7 @@ class Pokemon:
         :param level: The level of the pokemon.
         :param moves: The moves the pokemon has learned. A list of 4
         ``LearnedMove``.
+        :param hp: The current HP of the pokemon.
         :param experience: The experience points of the pokemon. If None, it's
         determined based on the level.
         :param iv: The IV of the pokemon. A dictionary assigning a value from
@@ -44,8 +46,12 @@ class Pokemon:
                 self._iv[stat] = randint(0, 31)
 
         self._stats = dict()
-        self._current_stats = dict()
         self._update_stats()
+        self._hp = hp if hp else self._stats[StatEnum.HP]
+
+        self._staged_stats = dict()
+        for staged_stat in StagedStatEnum:
+            self._staged_stats[staged_stat] = 0
 
     @property
     def species(self):
@@ -93,22 +99,22 @@ class Pokemon:
         self._level = level
 
     @property
-    def current_stats(self):
-        """Get the current stats of the pokemon.
+    def staged_stats(self):
+        """Get the staged stats of the pokemon.
 
-        :return: A dictionary of all stats with their current value.
+        :return: A dictionary of all staged stats with their value.
         """
 
-        return self._current_stats
+        return self._staged_stats
 
-    @current_stats.setter
-    def current_stats(self, current_stats):
-        """Set the current stats of the pokemon.
+    @staged_stats.setter
+    def staged_stats(self, staged_stats):
+        """Set the stages stats of the pokemon.
 
-        :param current_stats: The current stats of the pokemon.
+        :param staged_stats: The staged stats of the pokemon.
         """
 
-        self._current_stats = current_stats
+        self._staged_stats = staged_stats
 
     @property
     def moves(self):
@@ -127,6 +133,24 @@ class Pokemon:
         """
 
         self._moves = moves
+
+    @property
+    def hp(self):
+        """Get the current HP of the pokemon.
+
+        :return: The current HP of the pokemon.
+        """
+
+        return self._hp
+
+    @hp.setter
+    def hp(self, hp):
+        """Set the current HP of the pokemon.
+
+        :param hp: The current HP of the pokemon.
+        """
+
+        self._hp = hp
 
     @property
     def stats(self):
@@ -195,18 +219,16 @@ class Pokemon:
             self._update_experience_for_next_level()
 
     def _update_stats(self):
-        """Update the stats and the current stats based on the level, the base
-        stats and the IV of the pokemon.
+        """Update the stats based on the level, the base stats and the IV of
+        the pokemon.
 
-        The current stats increases proportionally to the old current stats and
-        the stats
+        The HP increases proportionally to the old HP.
         """
 
-        for stat in StatEnum:
-            stat_value = stat.get_stat(self.level, self.species.base_stats[stat], self._iv[stat])
-            if stat in self.current_stats and stat in self.stats:
-                self.current_stats[stat] += stat_value - self.stats[stat]
-            else:
-                self.current_stats[stat] = stat_value
+        old_hp_stat = self._stats[StatEnum.HP] if StatEnum.HP in self._stats else None
 
-            self.stats[stat] = stat.get_stat(self.level, self.species.base_stats[stat], self._iv[stat])
+        for stat in StatEnum:
+            self._stats[stat] = stat.get_stat(self._level, self._species.base_stats[stat], self._iv[stat])
+
+        self._hp = self._hp + old_hp_stat - self._stats[StatEnum.HP] if old_hp_stat and self._hp else self._stats[
+            StatEnum.HP]

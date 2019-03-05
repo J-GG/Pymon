@@ -2,6 +2,7 @@ import random
 
 from models.learned_move import LearnedMove
 from models.pokemon import Pokemon
+from models.staged_stat_enum import StagedStatEnum
 from models.stat_enum import StatEnum
 from toolbox.data.moves import moves
 from toolbox.data.pokemon import pokemons
@@ -36,16 +37,25 @@ class BattleController(metaclass=Singleton):
         if players_move.current_pp == 0:
             print("Can't choose this move")
 
-        players_move_effects = players_move.move.effects(players_pokemon, opponent_pokemon)
+        players_used_move_effects = players_move.move.effects(players_pokemon, opponent_pokemon)
 
-        for stat, value in players_move_effects.stats.items():
-            opponent_pokemon.current_stats[stat] = opponent_pokemon.current_stats[stat] + value
+        opponent_pokemon.hp = opponent_pokemon.hp + players_used_move_effects.hp
+
+        for staged_stat, value in players_used_move_effects.staged_stats.items():
+            if value > 0:
+                players_pokemon.staged_stats[staged_stat] = min(6, players_pokemon.staged_stats[staged_stat] + value)
+            elif value < 0:
+                opponent_pokemon.staged_stats[staged_stat] = max(-6, players_pokemon.staged_stats[staged_stat] + value)
 
         players_move.current_pp = players_move.current_pp - 1 if players_move.current_pp > 0 else 0
 
-        player_attacker = {"pokemon": players_pokemon, "move": players_move, "effects": players_move_effects}
+        player_attacker = {"pokemon": players_pokemon, "move": players_move, "effects": players_used_move_effects}
         opponent_attacker = {"pokemon": opponent_pokemon, "move": random.choice(opponent_pokemon.moves), "effects": []}
-        if players_pokemon.current_stats[StatEnum.SPEED] > opponent_pokemon.current_stats[StatEnum.SPEED]:
+        player_speed = players_pokemon.stats[StatEnum.SPEED] * StagedStatEnum.SPEED.get_multiplier(
+            players_pokemon.staged_stats[StagedStatEnum.SPEED])
+        opponent_speed = opponent_pokemon.stats[StatEnum.SPEED] * StagedStatEnum.SPEED.get_multiplier(
+            opponent_pokemon.staged_stats[StagedStatEnum.SPEED])
+        if player_speed > opponent_speed:
             first_attacker, second_attacker = player_attacker, opponent_attacker
         else:
             first_attacker, second_attacker = opponent_attacker, player_attacker
