@@ -4,6 +4,7 @@ import random
 import cocos
 from cocos.actions import *
 
+from models.move_effectiveness_enum import MoveEffectivenessEnum
 from toolbox.i18n import I18n
 from views.common.dialog import Dialog
 from .actions import Actions
@@ -72,7 +73,7 @@ class BattleScene(cocos.scene.Scene):
                         + FadeOut(0)
                         + Delay(BattleScene.ZOOM_OUT_DURATION - 0.2)
                         )
-        self._dialog.text = I18n().get("BATTLE.WILD").format(self._opponent_pokemon.nickname)
+        self._dialog.set_text(I18n().get("BATTLE.WILD").format(self._opponent_pokemon.nickname))
         self.add(self._dialog, z=50)
 
         self._opponent_pokemonLayer = OpponentPokemon(self._opponent_pokemon)
@@ -118,7 +119,7 @@ class BattleScene(cocos.scene.Scene):
         self._hud.do(FadeOut(0) + FadeIn(0.5))
         self.add(self._hud, z=50)
 
-        self._dialog.text = I18n().get("BATTLE.WHAT_WILL_DO").format(self._players_pokemon.nickname)
+        self._dialog.set_text(I18n().get("BATTLE.WHAT_WILL_DO").format(self._players_pokemon.nickname))
         self._dialog.do(FadeIn(0.5))
 
         self._actions = Actions()
@@ -151,10 +152,27 @@ class BattleScene(cocos.scene.Scene):
 
     def round(self, first_attacker, second_attacker):
         self._moves.toggle_apparition()
-
-        self._dialog.text = I18n().get("BATTLE.MOVE_USED").format(first_attacker["pokemon"].nickname,
-                                                                  first_attacker["move"].move.name)
-        if first_attacker["pokemon"] == self._players_pokemon:
-            self._opponent_hud.update_hp()
-
         self._moves.update_moves()
+
+        text = []
+        text.append(I18n().get("BATTLE.MOVE_USED").format(first_attacker["pokemon"].nickname,
+                                                          first_attacker["move"].move.name))
+        effects = first_attacker["effects"]
+
+        if effects.failed:
+            text.append(I18n().get("BATTLE.FAILED"))
+        else:
+            if effects.critical_hit:
+                text.append(I18n().get("BATTLE.CRITICAL_HIT"))
+
+            if effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.NO_EFFECT:
+                text.append(I18n().get("BATTLE.NO_EFFECT"))
+            elif effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.NOT_EFFECTIVE or effects.effectiveness == MoveEffectivenessEnum.VERY_INEFFECTIVE:
+                text.append(I18n().get("BATTLE.NOT_EFFECTIVE"))
+            elif effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.SUPER_EFFECTIVE or effects.effectiveness == MoveEffectivenessEnum.EXTREMELY_EFFECTIVE:
+                text.append(I18n().get("BATTLE.SUPER_EFFECTIVE"))
+
+            if first_attacker["pokemon"] == self._players_pokemon:
+                self._opponent_hud.update_hp()
+
+        self._dialog.set_text(text)

@@ -1,7 +1,10 @@
+import random
+
 from models.stat_enum import StatEnum
 from toolbox.i18n import I18n
 from .move_category_enum import MoveCategoryEnum
-import random
+from .move_effects import MoveEffects
+
 
 class Move:
     """A move in the game."""
@@ -96,16 +99,24 @@ class Move:
         return self._default_pp
 
     def effects(self, attacker, defender):
-        effects = dict()
+        failed = random.randint(1, 100) > self._accuracy
+        effectiveness = None
+        critical_multiplier = None
+        stats = dict()
 
-        effects["STATS"] = dict()
         if self._category == MoveCategoryEnum.PHYSICAL:
-            attack = attacker.current_stats[StatEnum.ATTACK.name]
-            defense = defender.current_stats[StatEnum.DEFENSE.name]
+            attack = attacker.current_stats[StatEnum.ATTACK]
+            defense = defender.current_stats[StatEnum.DEFENSE]
         else:
-            attack = attacker.current_stats[StatEnum.SPECIAL_ATTACK.name]
-            defense = defender.current_stats[StatEnum.SPECIAL_ATTACK.name]
+            attack = attacker.current_stats[StatEnum.SPECIAL_ATTACK]
+            defense = defender.current_stats[StatEnum.SPECIAL_ATTACK]
 
-        effects["STATS"][StatEnum.HP.name] = -round(((2*attacker.level/5 + 2)*self._power*attack/defense/50+5) * random.uniform(0.85, 1))
+        if self.category in [MoveCategoryEnum.PHYSICAL, MoveCategoryEnum.SPECIAL]:
+            effectiveness = self.type.effectiveness(defender.species.type)
+            critical_multiplier = 1.5 if random.randint(1, 256) <= attacker.current_stats[
+                StatEnum.SPEED] / 2 else 1
+            modifier = critical_multiplier * effectiveness.value * random.uniform(0.85, 1)
+            stats[StatEnum.HP] = -round(
+                ((2 * attacker.level / 5 + 2) * self._power * attack / defense / 50 + 5) * modifier)
 
-        return effects
+        return MoveEffects(failed, stats, effectiveness, critical_multiplier == 1.5)

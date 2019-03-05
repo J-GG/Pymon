@@ -38,14 +38,14 @@ class BattleController(metaclass=Singleton):
 
         players_move_effects = players_move.move.effects(players_pokemon, opponent_pokemon)
 
-        for stat, value in players_move_effects["STATS"].items():
+        for stat, value in players_move_effects.stats.items():
             opponent_pokemon.current_stats[stat] = opponent_pokemon.current_stats[stat] + value
 
         players_move.current_pp = players_move.current_pp - 1 if players_move.current_pp > 0 else 0
 
         player_attacker = {"pokemon": players_pokemon, "move": players_move, "effects": players_move_effects}
-        opponent_attacker = {"pokemon": opponent_pokemon, "move": random.choice(opponent_pokemon.moves),"effects": []}
-        if players_pokemon.current_stats[StatEnum.SPEED.name] > opponent_pokemon.current_stats[StatEnum.SPEED.name]:
+        opponent_attacker = {"pokemon": opponent_pokemon, "move": random.choice(opponent_pokemon.moves), "effects": []}
+        if players_pokemon.current_stats[StatEnum.SPEED] > opponent_pokemon.current_stats[StatEnum.SPEED]:
             first_attacker, second_attacker = player_attacker, opponent_attacker
         else:
             first_attacker, second_attacker = opponent_attacker, player_attacker

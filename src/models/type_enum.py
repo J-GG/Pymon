@@ -1,5 +1,7 @@
 from enum import Enum
 
+from .move_effectiveness_enum import MoveEffectivenessEnum
+
 
 class TypeEnum(Enum):
     """The list of types.
@@ -97,7 +99,7 @@ class TypeEnum(Enum):
             elif type in self._super_effective:
                 multiplier *= 2
 
-        return multiplier
+        return MoveEffectivenessEnum(multiplier)
 
 
 TypeEnum.NORMAL.no_effect = [TypeEnum.GHOST]

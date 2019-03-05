@@ -41,7 +41,7 @@ class Pokemon:
         else:
             self._iv = dict()
             for stat in StatEnum:
-                self._iv[stat.name] = randint(0, 31)
+                self._iv[stat] = randint(0, 31)
 
         self._stats = dict()
         self._current_stats = dict()
@@ -203,10 +203,10 @@ class Pokemon:
         """
 
         for stat in StatEnum:
-            stat_value = stat.get_stat(self.level, self.species.base_stats[stat.name], self._iv[stat.name])
-            if stat.name in self.current_stats and stat.name in self.stats:
-                self.current_stats[stat.name] += stat_value - self.stats[stat.name]
+            stat_value = stat.get_stat(self.level, self.species.base_stats[stat], self._iv[stat])
+            if stat in self.current_stats and stat in self.stats:
+                self.current_stats[stat] += stat_value - self.stats[stat]
             else:
-                self.current_stats[stat.name] = stat_value
+                self.current_stats[stat] = stat_value
 
-            self.stats[stat.name] = stat.get_stat(self.level, self.species.base_stats[stat.name], self._iv[stat.name])
+            self.stats[stat] = stat.get_stat(self.level, self.species.base_stats[stat], self._iv[stat])

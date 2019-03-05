@@ -1,9 +1,9 @@
 import cocos
+from cocos.actions import *
 
 from models.stat_enum import StatEnum
 from views.common.layer import Layer
 from views.common.text import Text
-from cocos.actions import *
 from .hp_bar_color_enum import HPBarColorEnum
 
 
@@ -13,7 +13,6 @@ class OpponentHUD(Layer):
     Attributes:
         - HP_BAR_SIZE: The size in pixels of the HP bar.
     """
-
     HP_BAR_SIZE = 48
 
     def __init__(self, pokemon):
@@ -37,11 +36,12 @@ class OpponentHUD(Layer):
         self.add(self._hp_bar)
 
         for color in HPBarColorEnum:
-            if 100 * pokemon.current_stats[StatEnum.HP.name] // pokemon.stats[StatEnum.HP.name] <= color.upper_limit:
+            if 100 * pokemon.current_stats[StatEnum.HP] // pokemon.stats[StatEnum.HP] <= color.upper_limit:
                 self._bar_color = color
                 break
 
-        self._hp_bar_size = OpponentHUD.HP_BAR_SIZE * pokemon.current_stats[StatEnum.HP.name] // pokemon.stats[StatEnum.HP.name]
+        self._hp_bar_size = OpponentHUD.HP_BAR_SIZE * pokemon.current_stats[StatEnum.HP] // pokemon.stats[
+            StatEnum.HP]
 
         self._hp_bar_content = {color: [] for color in HPBarColorEnum}
         for i in range(OpponentHUD.HP_BAR_SIZE):
@@ -54,14 +54,15 @@ class OpponentHUD(Layer):
                 self.add(self._hp_bar_content[color][i], z=1)
 
     def update_hp(self):
-        """Update the size and the color of the HP bar.
-        """
+        """Update the size and the color of the HP bar."""
 
-        new_hp_bar_size = OpponentHUD.HP_BAR_SIZE * self._pokemon.current_stats[StatEnum.HP.name] // self._pokemon.stats[StatEnum.HP.name]
+        new_hp_bar_size = OpponentHUD.HP_BAR_SIZE * self._pokemon.current_stats[StatEnum.HP] // \
+                          self._pokemon.stats[StatEnum.HP]
 
-        for pixel_index in range(self._hp_bar_size-1, -1, -1):
+        for pixel_index in range(self._hp_bar_size - 1, -1, -1):
             if pixel_index > new_hp_bar_size:
-                self.do(Delay(self._hp_bar_size*0.05-0.05*pixel_index) + CallFunc(self.hide_hp_pixel, pixel_index))
+                self.do(
+                    Delay(self._hp_bar_size * 0.05 - 0.05 * pixel_index) + CallFunc(self.hide_hp_pixel, pixel_index))
 
         self._hp_bar_size = new_hp_bar_size
 
