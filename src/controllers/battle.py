@@ -25,10 +25,24 @@ class BattleController(metaclass=Singleton):
                                                 moves["VINE_WHIP"].default_pp),
                                     LearnedMove(moves["GROWL"], moves["GROWL"].default_pp, moves["GROWL"].default_pp)])
 
-        self._battle = BattleScene(players_pokemon, opponent_pokemon)
+        self._battle = BattleScene(self, players_pokemon, opponent_pokemon)
+
+    def attempt_run(self, players_pokemon: Pokemon, opponent_pokemon: Pokemon) -> None:
+        """The player attempts to escape the battle.
+
+        :param players_pokemon: The player's pokemon.
+        :param opponent_pokemon: The opponent pokemon.
+        """
+
+        F = ((players_pokemon.stats[StatEnum.SPEED] * 128) / opponent_pokemon.stats[StatEnum.SPEED] + 30) % 256
+
+        if F > random.randint(0, 255):
+            self._battle.successful_run()
+        else:
+            self._battle.failed_run()
 
     def run(self) -> None:
-        """The player attempts to escape the battle."""
+        """the player escapes the battle."""
 
         from controllers.main_menu import MainMenuController
         MainMenuController().show_menu()

@@ -58,8 +58,8 @@ class Actions(Layer):
         :return Whether the event has been handled.
         """
 
-        from controllers.battle import BattleController
         event_handled = False
+
         if self._is_visible:
             if key == KeyEnum.UP.value and self._selected.value < 3:
                 self._selected = ActionEnum(self._selected.value + 1)
@@ -69,15 +69,17 @@ class Actions(Layer):
                 event_handled = True
             elif key == KeyEnum.ENTER.value:
                 if self._selected == ActionEnum.FIGHT:
-                    self.do(CallFunc(self.toggle_apparition) + CallFunc(self.parent.fight_action))
+                    self.toggle_apparition()
+                    self.parent.fight_action()
                     event_handled = True
                 elif self._selected == ActionEnum.RUN:
-                    BattleController().run()
+                    self.toggle_apparition()
+                    self.parent.attempt_run()
                     event_handled = True
-
+                    
             self._update_selection()
 
-            return event_handled
+        return event_handled
 
     def toggle_apparition(self) -> None:
         """Show or hide the list of actions."""

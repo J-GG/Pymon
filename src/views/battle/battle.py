@@ -39,9 +39,16 @@ class BattleScene(cocos.scene.Scene):
     TRAVELING_DURATION = 2
     ZOOM_OUT_DURATION = 1
 
-    def __init__(self, players_pokemon: PokemonModel, opponent_pokemon: PokemonModel) -> None:
-        super().__init__()
+    def __init__(self, battle_controller, players_pokemon: PokemonModel, opponent_pokemon: PokemonModel) -> None:
+        """Create a battle scene.
 
+        :param battle_controller: The controller to be called to manage.
+        :param players_pokemon: The player's pokemon.
+        :param opponent_pokemon: The opponent pokemon.
+        """
+
+        super().__init__()
+        self._battle_controller = battle_controller
         self._players_pokemon = players_pokemon
         self._opponent_pokemon = opponent_pokemon
 
@@ -147,13 +154,28 @@ class BattleScene(cocos.scene.Scene):
     def move_selected(self, move: LearnedMove) -> None:
         """The player selected a move. It is transmitted to the controller.
 
-        :param move: The selected move
+        :param move: The selected move.
         """
 
-        from controllers.battle import BattleController
-        BattleController().uses_move(self._players_pokemon, self._opponent_pokemon, move)
+        self._battle_controller.uses_move(self._players_pokemon, self._opponent_pokemon, move)
 
-    def round(self, first_attacker: typing.Dict[str], second_attacker: typing.Dict[str]) -> None:
+    def attempt_run(self) -> None:
+        """Notify to the controller that the player wants to escape."""
+
+        self._battle_controller.attempt_run(self._players_pokemon, self._opponent_pokemon)
+
+    def successful_run(self) -> None:
+        """The attempt to run is successful. The battle is over."""
+
+        self._dialog.set_text(I18n().get("BATTLE.SUCCESSFUL_RUN"), lambda: self._battle_controller.run())
+
+    def failed_run(self) -> None:
+        """The attempt to run failed. The battle continues."""
+
+        self._dialog.set_text(I18n().get("BATTLE.FAILED_RUN"))
+
+    def round(self, first_attacker: typing.Dict[str, typing.Any],
+              second_attacker: typing.Dict[str, typing.Any]) -> None:
         self._moves.toggle_apparition()
         self._moves.update_moves()
 
