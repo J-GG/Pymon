@@ -27,19 +27,19 @@ class OpponentHUDLayer(Layer):
         self._pokemon = pokemon
 
         self._name = Text(pokemon.nickname)
-        self._name.position = 400 - self._name.width, 370
+        self._name.position = -self._name.width, 0
         self.add(self._name, z=1)
 
         self._level_txt = cocos.sprite.Sprite('img/battle/hud/level.png')
-        self._level_txt.position = 405, 368
+        self._level_txt.position = 5, -2
         self.add(self._level_txt, z=1)
 
         self._level = Text(str(pokemon.level))
-        self._level.position = 417, 370
+        self._level.position = 17, 0
         self.add(self._level, z=1)
 
         self._hp_bar = cocos.sprite.Sprite('img/battle/hud/hp_bar.png')
-        self._hp_bar.position = 395, 358
+        self._hp_bar.position = -5, -12
         self.add(self._hp_bar)
 
         for color in HPBarColorEnum:
@@ -53,7 +53,7 @@ class OpponentHUDLayer(Layer):
         for i in range(OpponentHUDLayer.HP_BAR_SIZE):
             for color in HPBarColorEnum:
                 hp_pixel = cocos.sprite.Sprite('img/battle/hud/hp_bar_{0}.png'.format(color.name))
-                hp_pixel.position = 378 + i, 358
+                hp_pixel.position = -22 + i, -12
                 hp_pixel.visible = True if color == self._bar_color and i <= self._hp_bar_size else False
                 self._hp_bar_content[color].append(hp_pixel)
 

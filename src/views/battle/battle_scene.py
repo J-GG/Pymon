@@ -88,11 +88,11 @@ class BattleScene(cocos.scene.Scene):
 
         self._opponent_pokemonLayer = OpponentPokemonLayer(self._opponent_pokemon)
         self._opponent_pokemonLayer.scale = 2
-        self._opponent_pokemonLayer.position = (720, 400)
+        self._opponent_pokemonLayer.position = (720, 380)
         self._opponent_pokemonLayer.do(Delay(BattleScene.TRANSITION_DURATION * 2 / 3)
                                        + MoveBy((250, 0), BattleScene.TRAVELING_DURATION)
-                                       + MoveTo((720, 400), 0)
-                                       + (ScaleTo(1, BattleScene.ZOOM_OUT_DURATION) | MoveBy((-180, -75),
+                                       + MoveTo((720, 380), 0)
+                                       + (ScaleTo(1, BattleScene.ZOOM_OUT_DURATION) | MoveBy((-180, -70),
                                                                                              BattleScene.ZOOM_OUT_DURATION))
                                        )
         self.add(self._opponent_pokemonLayer)
@@ -122,10 +122,12 @@ class BattleScene(cocos.scene.Scene):
         """Show the pokemon information."""
 
         self._opponent_hud = OpponentHUDLayer(self._opponent_pokemon)
+        self._opponent_hud.position = (350, 370)
         self._opponent_hud.do(FadeOut(0) + FadeIn(0.5))
         self.add(self._opponent_hud, z=50)
 
         self._hud = HUDLayer(self._players_pokemon)
+        self._hud.position = (420, 180)
         self._hud.do(FadeOut(0) + FadeIn(0.5))
         self.add(self._hud, z=50)
 

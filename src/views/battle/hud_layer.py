@@ -27,19 +27,19 @@ class HUDLayer(Layer):
         self._pokemon = pokemon
 
         self._name = Text(pokemon.nickname)
-        self._name.position = 450 - self._name.width, 230
+        self._name.position = -self._name.width, 0
         self.add(self._name, z=1)
 
         self._level_txt = cocos.sprite.Sprite('img/battle/hud/level.png')
-        self._level_txt.position = 455, 228
+        self._level_txt.position = 5, -2
         self.add(self._level_txt, z=1)
 
         self._level = Text(str(pokemon.level))
-        self._level.position = 467, 230
+        self._level.position = 17, 0
         self.add(self._level, z=1)
 
         self._hp_bar = cocos.sprite.Sprite('img/battle/hud/hp_bar.png')
-        self._hp_bar.position = 444, 218
+        self._hp_bar.position = -6, -12
         self.add(self._hp_bar)
 
         for color in HPBarColorEnum:
@@ -53,18 +53,18 @@ class HUDLayer(Layer):
         for i in range(HUDLayer.HP_BAR_SIZE):
             for color in HPBarColorEnum:
                 hp_pixel = cocos.sprite.Sprite('img/battle/hud/hp_bar_{0}.png'.format(color.name))
-                hp_pixel.position = 427 + i, 218
+                hp_pixel.position = -23 + i, -12
                 hp_pixel.visible = True if color == self._bar_color and i <= self._hp_bar_size else False
                 self._hp_bar_content[color].append(hp_pixel)
 
                 self.add(self._hp_bar_content[color][i], z=1)
 
         self._hp = Text("{0}/{1}".format(pokemon.hp, pokemon.stats[StatEnum.HP]))
-        self._hp.position = 427, 206
+        self._hp.position = -20, -24
         self.add(self._hp, z=1)
 
         self._xp_bar = cocos.sprite.Sprite('img/battle/hud/xp_bar.png')
-        self._xp_bar.position = 435, 195
+        self._xp_bar.position = -10, -37
         self.add(self._xp_bar)
 
         self._current_xp_bar = []
