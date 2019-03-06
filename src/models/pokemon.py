@@ -1,6 +1,9 @@
+import typing
 from math import floor
 from random import randint
 
+from models.learned_move import LearnedMove
+from models.pokemon_species import PokemonSpecies
 from models.staged_stat_enum import StagedStatEnum
 from models.stat_enum import StatEnum
 
@@ -15,11 +18,11 @@ class Pokemon:
     vary depending on the situation.
     """
 
-    def __init__(self, species, nickname, level, moves, hp=None, experience=None, iv=None):
-        """Creates a new pokemon.
+    def __init__(self, species: PokemonSpecies, nickname: str, level: int, moves: [LearnedMove], hp: int = None,
+                 experience: int = None, iv: typing.Dict[StatEnum, int] = None) -> None:
+        """Create a new pokemon.
 
-        :param species: The species of the pokemon. An instance of
-        ``PokemonSpecies``
+        :param species: The species of the pokemon.
         :param nickname: The nickname of the pokemon.
         :param level: The level of the pokemon.
         :param moves: The moves the pokemon has learned. A list of 4
@@ -54,7 +57,7 @@ class Pokemon:
             self._staged_stats[staged_stat] = 0
 
     @property
-    def species(self):
+    def species(self) -> PokemonSpecies:
         """Get the species of the pokemon.
 
         :return: An instance of ``PokemonSpecies``.
@@ -63,7 +66,7 @@ class Pokemon:
         return self._species
 
     @property
-    def nickname(self):
+    def nickname(self) -> str:
         """Get te nickname of the pokemon.
 
         :return: The nickname of the pokemon.
@@ -72,7 +75,7 @@ class Pokemon:
         return self._nickname
 
     @nickname.setter
-    def nickname(self, nickname):
+    def nickname(self, nickname: str) -> None:
         """Set the nickname of the pokemon.
 
         :param nickname: The nickname of the pokemon.
@@ -81,7 +84,7 @@ class Pokemon:
         self._nickname = nickname
 
     @property
-    def level(self):
+    def level(self) -> int:
         """Get the level of the pokemon.
 
         :return: The level of the pokemon.
@@ -90,7 +93,7 @@ class Pokemon:
         return self._level
 
     @level.setter
-    def level(self, level):
+    def level(self, level: int) -> None:
         """Set the level of the pokemon.
 
         :param level: The level of the pokemon.
@@ -99,7 +102,7 @@ class Pokemon:
         self._level = level
 
     @property
-    def staged_stats(self):
+    def staged_stats(self) -> typing.Dict[StagedStatEnum, int]:
         """Get the staged stats of the pokemon.
 
         :return: A dictionary of all staged stats with their value.
@@ -108,16 +111,17 @@ class Pokemon:
         return self._staged_stats
 
     @staged_stats.setter
-    def staged_stats(self, staged_stats):
+    def staged_stats(self, staged_stats: typing.Dict[StagedStatEnum, int]) -> None:
         """Set the stages stats of the pokemon.
 
-        :param staged_stats: The staged stats of the pokemon.
+        :param staged_stats: A dictionary of all the staged stats with their
+        value.
         """
 
         self._staged_stats = staged_stats
 
     @property
-    def moves(self):
+    def moves(self) -> [LearnedMove]:
         """Get the moves the pokemon has learned.
 
         :return: A list of ``LearnedMove``.
@@ -126,7 +130,7 @@ class Pokemon:
         return self._moves
 
     @moves.setter
-    def moves(self, moves):
+    def moves(self, moves: [LearnedMove]) -> None:
         """Set the moves the pokemon has learned.
 
         :param moves: A list of ``LearnedMove``.
@@ -135,7 +139,7 @@ class Pokemon:
         self._moves = moves
 
     @property
-    def hp(self):
+    def hp(self) -> int:
         """Get the current HP of the pokemon.
 
         :return: The current HP of the pokemon.
@@ -144,7 +148,7 @@ class Pokemon:
         return self._hp
 
     @hp.setter
-    def hp(self, hp):
+    def hp(self, hp: int) -> None:
         """Set the current HP of the pokemon.
 
         :param hp: The current HP of the pokemon.
@@ -153,7 +157,7 @@ class Pokemon:
         self._hp = hp
 
     @property
-    def stats(self):
+    def stats(self) -> typing.Dict[StatEnum, int]:
         """Get the stats of the pokemon.
 
         :return: A dictionary of all stats with their maximum value.
@@ -162,7 +166,7 @@ class Pokemon:
         return self._stats
 
     @stats.setter
-    def stats(self, stats):
+    def stats(self, stats: typing.Dict[StatEnum, int]) -> None:
         """Set the stats of the pokemon.
 
         :param stats: A dictionary of all stats with their maximum value.
@@ -171,7 +175,7 @@ class Pokemon:
         self._stats = stats
 
     @property
-    def experience(self):
+    def experience(self) -> int:
         """Get the number of experience points of the pokemon.
 
         :return: The number of experience points of the pokemon.
@@ -180,7 +184,7 @@ class Pokemon:
         return self._experience
 
     @experience.setter
-    def experience(self, experience):
+    def experience(self, experience: int) -> None:
         """Set the number of experience points of the pokemon.
 
         :param experience: The number of experience points of the pokemon.
@@ -189,7 +193,7 @@ class Pokemon:
         self._experience = experience
 
     @property
-    def experience_for_next_level(self):
+    def experience_for_next_level(self) -> int:
         """Get the number of experience points needed to reach the next level.
 
         :return: The number of experience points needed to reach the
@@ -197,13 +201,13 @@ class Pokemon:
         """
         return self._experience_for_next_level
 
-    def _update_experience_for_next_level(self):
+    def _update_experience_for_next_level(self) -> None:
         """Determine the experience needed to reach the next level.
         """
 
         self._experience_for_next_level = floor(self.species.experience_function.get_xp_for_level(self.level + 1))
 
-    def gain_experience(self, experience_gained):
+    def gain_experience(self, experience_gained: int) -> None:
         """Increase the number of experience points of the pokemon.
 
         If the number of XP is higher than the amount necessary to reach the
@@ -218,7 +222,7 @@ class Pokemon:
             self._update_stats()
             self._update_experience_for_next_level()
 
-    def _update_stats(self):
+    def _update_stats(self) -> None:
         """Update the stats based on the level, the base stats and the IV of
         the pokemon.
 

@@ -1,3 +1,4 @@
+import typing
 from enum import Enum
 
 
@@ -27,10 +28,10 @@ class StagedStatEnum(Enum):
                             2: 5 / 3,
                             3: 6 / 3, 4: 7 / 3, 5: 8 / 3, 6: 9 / 3}
 
-    def __init__(self, value, multipliers):
-        """Creates a new staged stat.
+    def __init__(self, value: str, multipliers: typing.Dict[int, float]) -> None:
+        """Create a new staged stat.
 
-        :param value The textual value of the enumeration
+        :param value The textual value of the enumeration.
         :param multipliers A dictionary with stages as keys and multipliers as
         values.
         """
@@ -39,7 +40,7 @@ class StagedStatEnum(Enum):
         self._value = value
         self._multipliers = multipliers
 
-    def get_multiplier(self, stage):
+    def get_multiplier(self, stage: int) -> float:
         """Get the multiplier for the given stage.
 
         :param stage: The stage of the stat.

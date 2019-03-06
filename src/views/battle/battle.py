@@ -1,10 +1,13 @@
 import importlib
 import random
+import typing
 
 import cocos
 from cocos.actions import *
 
+from models.learned_move import LearnedMove
 from models.move_effectiveness_enum import MoveEffectivenessEnum
+from models.pokemon import Pokemon as PokemonModel
 from toolbox.i18n import I18n
 from views.common.dialog import Dialog
 from .actions import Actions
@@ -26,7 +29,7 @@ class BattleScene(cocos.scene.Scene):
             scene and the battle scene.
         - TRANSITION_DURATION: How long the transition is visible in seconds.
         - TRAVELING_DURATION: How long the traveling on the opponent is.
-        - TRANSITION_DURATION: How long the traveling from the opponent to the
+        - ZOOM_OUT_DURATION: How long the traveling from the opponent to the
             player's pokemon is.
     """
 
@@ -36,7 +39,7 @@ class BattleScene(cocos.scene.Scene):
     TRAVELING_DURATION = 2
     ZOOM_OUT_DURATION = 1
 
-    def __init__(self, players_pokemon, opponent_pokemon):
+    def __init__(self, players_pokemon: PokemonModel, opponent_pokemon: PokemonModel) -> None:
         super().__init__()
 
         self._players_pokemon = players_pokemon
@@ -48,7 +51,7 @@ class BattleScene(cocos.scene.Scene):
 
         self._intro()
 
-    def _intro(self):
+    def _intro(self) -> None:
         """The "cinematic" showing the battle field and the pokemon."""
 
         self._transition = Transition()
@@ -108,7 +111,7 @@ class BattleScene(cocos.scene.Scene):
             + CallFunc(self._start)
         )
 
-    def _start(self):
+    def _start(self) -> None:
         """Show the pokemon information."""
 
         self._opponent_hud = OpponentHUD(self._opponent_pokemon)
@@ -131,17 +134,17 @@ class BattleScene(cocos.scene.Scene):
 
         self.show_actions()
 
-    def show_actions(self):
+    def show_actions(self) -> None:
         """Ask the player to choose an action."""
 
         self._actions.toggle_apparition()
 
-    def fight_action(self):
+    def fight_action(self) -> None:
         """Ask the player to choose a move for the pokemon."""
 
         self._moves.toggle_apparition()
 
-    def move_selected(self, move):
+    def move_selected(self, move: LearnedMove) -> None:
         """The player selected a move. It is transmitted to the controller.
 
         :param move: The selected move
@@ -150,7 +153,7 @@ class BattleScene(cocos.scene.Scene):
         from controllers.battle import BattleController
         BattleController().uses_move(self._players_pokemon, self._opponent_pokemon, move)
 
-    def round(self, first_attacker, second_attacker):
+    def round(self, first_attacker: typing.Dict[str], second_attacker: typing.Dict[str]) -> None:
         self._moves.toggle_apparition()
         self._moves.update_moves()
 

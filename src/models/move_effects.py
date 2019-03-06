@@ -1,12 +1,25 @@
+import typing
+
+from models.staged_stat_enum import StagedStatEnum
+from models.status_enum import StatusEnum
+
+
 class MoveEffects:
     """The effects of a move."""
 
-    def __init__(self, staged_stats, status):
+    def __init__(self, staged_stats: typing.Dict[StagedStatEnum, int], status: typing.Dict[StatusEnum, int]) -> None:
+        """Create a new move effects.
+
+        :param staged_stats: A dictionary of all the staged stats altered with
+        their value.
+        :param status:A dictionary of all the status altered with their value.
+        """
+
         self._staged_stats = staged_stats
         self._status = status
 
     @property
-    def staged_stats(self):
+    def staged_stats(self) -> typing.Dict[StagedStatEnum, int]:
         """Get the staged stats effects of the move.
 
         :return: The staged stats effects of the move.
@@ -15,7 +28,7 @@ class MoveEffects:
         return self._staged_stats
 
     @property
-    def status(self):
+    def status(self) -> typing.Dict[StatusEnum, int]:
         """Get the status effects of the move.
 
         :return: The status effects of the move.

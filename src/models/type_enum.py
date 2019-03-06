@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import typing
 from enum import Enum
 
 from .move_effectiveness_enum import MoveEffectivenessEnum
@@ -51,7 +54,12 @@ class TypeEnum(Enum):
     STEEL = "Steel"
     FAIRY = "Fairy"
 
-    def __init__(self, value):
+    def __init__(self, value: str) -> None:
+        """Create a new type.
+
+        :param value: The textual value of the enumeration.
+        """
+
         self._value = value
 
         self._no_effect = []
@@ -59,36 +67,70 @@ class TypeEnum(Enum):
         self._super_effective = []
 
     @property
-    def no_effect(self):
+    def no_effect(self) -> typing.List[TypeEnum]:
+        """Get the list of no effect types.
+
+        :return: A list of no effect types.
+        """
+
         return self._no_effect
 
     @no_effect.setter
-    def no_effect(self, no_effect):
+    def no_effect(self, no_effect: typing.List[TypeEnum]) -> None:
+        """Set the list of no effect types.
+
+        :param no_effect: The list of types against which this type has
+        no effect.
+        """
+
         self._no_effect = no_effect
 
     @property
-    def not_effective(self):
+    def not_effective(self) -> typing.List[TypeEnum]:
+        """Get the list of not effective types.
+
+        :return: A list of not effective types.
+        """
+
         return self._not_effective
 
     @not_effective.setter
-    def not_effective(self, not_effective):
+    def not_effective(self, not_effective: typing.List[TypeEnum]) -> None:
+        """Set the list of not effective types.
+
+        :param not_effective: The list of types against which this type is
+        not effective.
+        """
+
         self._not_effective = not_effective
 
     @property
-    def super_effective(self):
+    def super_effective(self) -> typing.List[TypeEnum]:
+        """Get the list of super effective types.
+
+        :return: A list of super effective types.
+        """
+
         return self._super_effective
 
     @super_effective.setter
-    def super_effective(self, super_effective):
+    def super_effective(self, super_effective: typing.List[TypeEnum]) -> None:
+        """Set the list of super effective types.
+
+        :param super_effective: The list of types against which this type is
+        super effective.
+        """
+
         self._super_effective = super_effective
 
-    def effectiveness(self, defense_types):
+    def effectiveness(self, defense_types: typing.List[TypeEnum]) -> MoveEffectivenessEnum:
         """Determines the effectiveness of a move of this type against
             one or several of the defending type.
 
         :param defense_types: A list of types of the opponent.
         :return: The multiplier of the move.
         """
+
         multiplier = 1
         for type in defense_types:
             if type in self._no_effect:

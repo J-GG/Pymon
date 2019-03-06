@@ -1,7 +1,25 @@
+import typing
+
+from models.move_effectiveness_enum import MoveEffectivenessEnum
+from models.staged_stat_enum import StagedStatEnum
+
+
 class UsedMoveEffects:
     """The effects of the move when used in a battle."""
 
-    def __init__(self, failed, hp, staged_stats, effectiveness, critical_hit):
+    def __init__(self, failed: bool, hp: int, staged_stats: typing.Dict[StagedStatEnum, int],
+                 effectiveness: MoveEffectivenessEnum, critical_hit: bool) -> None:
+        """Create a new used move effects.
+
+        :param failed: Whether the move failed or not.
+        :param hp: The relative modification of HP. Can be greater or lower
+        than 0.
+        :param staged_stats: A dictionary with the modification on the staged
+        stats.
+        :param effectiveness: The effectiveness of the move.
+        :param critical_hit: Whether the move is a critical hit or not.
+        """
+
         self._failed = failed
         self._hp = hp
         self._staged_stats = staged_stats
@@ -9,7 +27,7 @@ class UsedMoveEffects:
         self._critical_hit = critical_hit
 
     @property
-    def failed(self):
+    def failed(self) -> bool:
         """Get whether the move failed.
 
         :return: True if the move failed.
@@ -18,7 +36,7 @@ class UsedMoveEffects:
         return self._failed
 
     @property
-    def hp(self):
+    def hp(self) -> int:
         """Get the HP effects of the move.
 
         :return: The HP effects of the move.
@@ -27,7 +45,7 @@ class UsedMoveEffects:
         return self._hp
 
     @property
-    def staged_stats(self):
+    def staged_stats(self) -> typing.Dict[StagedStatEnum, int]:
         """Get the staged stats effects of the move.
 
         :return: The staged stats effects of the move.
@@ -36,7 +54,7 @@ class UsedMoveEffects:
         return self._staged_stats
 
     @property
-    def effectiveness(self):
+    def effectiveness(self) -> MoveEffectivenessEnum:
         """Get the effectiveness of the move.
 
         :return: The effectiveness of the move.
@@ -45,7 +63,7 @@ class UsedMoveEffects:
         return self._effectiveness
 
     @property
-    def critical_hit(self):
+    def critical_hit(self) -> bool:
         """Whether the move is a critical hit.
 
         :return: True if it's a critical hit.

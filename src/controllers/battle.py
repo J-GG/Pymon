@@ -13,7 +13,7 @@ from views.battle.battle import BattleScene
 class BattleController(metaclass=Singleton):
     """Manages the battle."""
 
-    def battle(self):
+    def battle(self) -> None:
         """Starts a battle."""
         players_pokemon = Pokemon(pokemons["PIKACHU"], pokemons["PIKACHU"].name, 5, [
             LearnedMove(moves["TAIL_WHIP"], moves["TAIL_WHIP"].default_pp, moves["TAIL_WHIP"].default_pp),
@@ -27,13 +27,25 @@ class BattleController(metaclass=Singleton):
 
         self._battle = BattleScene(players_pokemon, opponent_pokemon)
 
-    def run(self):
+    def run(self) -> None:
         """The player attempts to escape the battle."""
 
         from controllers.main_menu import MainMenuController
         MainMenuController().show_menu()
 
-    def uses_move(self, players_pokemon, opponent_pokemon, players_move):
+    def uses_move(self, players_pokemon: Pokemon, opponent_pokemon: Pokemon, players_move: LearnedMove) -> None:
+        """The player's pokemon uses the specified learned move on the opponent
+         pokemon.
+
+        Determines the effects of the move before transmitting them to the
+        view.
+
+        :param players_pokemon: The player's pokemon using the move.
+        :param opponent_pokemon: The opponent pokemon on which the move is
+        used.
+        :param players_move: The move used by the player's pokemon.
+        """
+
         if players_move.current_pp == 0:
             print("Can't choose this move")
 

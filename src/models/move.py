@@ -1,17 +1,21 @@
 import random
 
+from models.move_category_enum import MoveCategoryEnum
+from models.move_effects import MoveEffects
 from models.staged_stat_enum import StagedStatEnum
 from models.stat_enum import StatEnum
+from models.type_enum import TypeEnum
 from toolbox.i18n import I18n
-from .move_category_enum import MoveCategoryEnum
 from .used_move_effects import UsedMoveEffects
 
 
 class Move:
     """A move in the game."""
 
-    def __init__(self, id, move_type, category, power, accuracy, default_pp, effects=None):
-        """Creates a move.
+    def __init__(self, id: str, move_type: TypeEnum, category: MoveCategoryEnum, power: int, accuracy: int,
+                 default_pp: int,
+                 effects: MoveEffects = None):
+        """Create a move.
 
         :param id: The id of the move.
         :param move_type: The ``EnumType`` indicating the type of the move.
@@ -32,7 +36,7 @@ class Move:
         self._effects = effects
 
     @property
-    def id(self):
+    def id(self) -> str:
         """Get the id of the move.
 
         :return: The id of the move.
@@ -41,7 +45,7 @@ class Move:
         return self._id
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Get the translated name of the move.
 
         :return: The name of the move.
@@ -50,7 +54,7 @@ class Move:
         return I18n().get("MOVE.{0}".format(self._id))
 
     @property
-    def type(self):
+    def type(self) -> TypeEnum:
         """Get the type of the move.
 
         The returned value is of ``TypeEnum`` type.
@@ -60,7 +64,7 @@ class Move:
         return self._type
 
     @property
-    def category(self):
+    def category(self) -> MoveCategoryEnum:
         """Get the category of the move.
 
         The returned value is of ``MoveCategoryEnum`` type.
@@ -70,7 +74,7 @@ class Move:
         return self._category
 
     @property
-    def power(self):
+    def power(self) -> int:
         """Get the power of the move.
 
         The greater, the more damage it causes to the target.
@@ -80,7 +84,7 @@ class Move:
         return self._power
 
     @property
-    def accuracy(self):
+    def accuracy(self) -> int:
         """Get the accuracy of this move out of 100.
 
         The greater, the more likely is the move to hit the target.
@@ -91,7 +95,7 @@ class Move:
         return self._accuracy
 
     @property
-    def default_pp(self):
+    def default_pp(self) -> int:
         """Get the default number of power points.
 
         It is the number of times a pokemon can use this move when they
@@ -101,7 +105,7 @@ class Move:
 
         return self._default_pp
 
-    def effects(self, attacker, defender):
+    def effects(self, attacker, defender) -> UsedMoveEffects:
         """Apply the effects of the move based on the attacked who used the
         move and the defender.
 

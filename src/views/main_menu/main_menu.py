@@ -9,7 +9,9 @@ class MainMenuScene(cocos.scene.Scene):
     """The scene displaying the main menu lets the user to choose between
     starting a new game and continuing an existing one."""
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """Create the main menu scene."""
+
         super().__init__()
 
         self._background = Background()

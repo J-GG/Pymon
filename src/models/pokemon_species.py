@@ -1,16 +1,22 @@
+import typing
+
+from models.move import Move
+from models.type_enum import TypeEnum
 from toolbox.i18n import I18n
 
 
 class PokemonSpecies:
     """A species of pokemon."""
 
-    def __init__(self, id, type, moves_by_lvl_up, base_stats, base_experience, experience_function):
-        """Creates a new pokemon species.
+    def __init__(self, id: str, type: TypeEnum, moves_by_lvl_up: typing.Dict[int, typing.List[Move]], base_stats,
+                 base_experience,
+                 experience_function):
+        """Create a new pokemon species.
 
         :param id: The id of the species.
         :param type: A list of ``EnumType``
         :param moves_by_lvl_up: A dictionary of moves learned by leveling up.
-         The key is the level and the value is a list of moves id.
+         The key is the level and the value is a list of ``Move``.
         :param base_stats: A dictionary of base stats.
         The key is a value of ``StatEnum`` and the value an int.
         :param base_experience: The base experience of the species.

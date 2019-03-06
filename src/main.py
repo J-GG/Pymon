@@ -7,4 +7,4 @@ if __name__ == '__main__':
     init_pyglet()
 
     cocos.director.director.init(caption="Pymon")
-    IntroController.show_itro()
+    IntroController.show_intro()

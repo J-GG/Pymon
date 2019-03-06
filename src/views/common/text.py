@@ -16,7 +16,12 @@ class Text(cocos.cocosnode.CocosNode):
     characters["p"] = ("p", True)
     characters["q"] = ("q", True)
 
-    def __init__(self, text):
+    def __init__(self, text: str) -> None:
+        """Create a new text to be displayed.
+
+        :param text: The text to be displayed.
+        """
+
         super().__init__()
 
         self._width = 0
@@ -36,14 +41,29 @@ class Text(cocos.cocosnode.CocosNode):
             self.add(self._sprites[index])
 
     @property
-    def width(self):
+    def width(self) -> int:
+        """Get the with of the text.
+
+        :return: The width of the text.
+        """
+
         return self._width
 
     @property
-    def opacity(self):
+    def opacity(self) -> int:
+        """Get the opacity of the text.
+
+        :return: The opacity of the text.
+        """
+
         return self._opacity
 
     @opacity.setter
-    def opacity(self, opacity):
+    def opacity(self, opacity: int) -> None:
+        """Set the opacity of the text.
+
+        :param opacity: The opacity of the text.
+        """
+
         for sprite in self._sprites:
             sprite.opacity = opacity

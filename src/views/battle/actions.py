@@ -13,7 +13,12 @@ class Actions(Layer):
 
     is_event_handler = True
 
-    def __init__(self, selected=ActionEnum.FIGHT):
+    def __init__(self, selected: ActionEnum = ActionEnum.FIGHT) -> None:
+        """Create a layer with the list of actions and manage their interaction.
+
+        :param selected: The selected action.
+        """
+
         super().__init__()
         self._selected = selected
 
@@ -34,13 +39,25 @@ class Actions(Layer):
 
             self.add(self._actions[action.name])
 
-    def _update_selection(self):
+    def _update_selection(self) -> None:
+        """Show the selected sprite of the selected action."""
+
         for action in ActionEnum:
             self._actions[action.name].get(Actions.SELECTED_SPRITE).visible = False
 
         self._actions[self._selected.name].get(Actions.SELECTED_SPRITE).visible = True
 
-    def on_key_press(self, key, modifiers):
+    def on_key_press(self, key, modifiers) -> bool:
+        """Manage the key press event.
+
+        Update the selected action when pressing UP or BOTTOM.
+        Activate the selected action when pressing ENTER.
+
+        :param key: The pressed key.
+        :param modifiers: The pressed modifiers.
+        :return Whether the event has been handled.
+        """
+
         from controllers.battle import BattleController
         event_handled = False
         if self._is_visible:
@@ -62,11 +79,12 @@ class Actions(Layer):
 
             return event_handled
 
-    def toggle_apparition(self):
+    def toggle_apparition(self) -> None:
+        """Show or hide the list of actions."""
+
         for index, action in enumerate(ActionEnum):
             offset = self._actions[action.name].width if self._is_visible else -self._actions[action.name].width
             self._actions[action.name].do(Delay(0.1 * action.value) + MoveBy((offset, 0), 0.2))
 
         self._is_visible = not self._is_visible
         self._update_selection()
-

@@ -1,6 +1,7 @@
 import cocos
 from cocos.actions import *
 
+from models.pokemon import Pokemon
 from models.stat_enum import StatEnum
 from views.common.layer import Layer
 from views.common.text import Text
@@ -13,9 +14,15 @@ class OpponentHUD(Layer):
     Attributes:
         - HP_BAR_SIZE: The size in pixels of the HP bar.
     """
+
     HP_BAR_SIZE = 48
 
-    def __init__(self, pokemon):
+    def __init__(self, pokemon: Pokemon) -> None:
+        """Create a new HUD showing the opponent pokemon's information.
+
+        :param pokemon: The opponent pokemon.
+        """
+
         super().__init__()
         self._pokemon = pokemon
 
@@ -52,7 +59,7 @@ class OpponentHUD(Layer):
 
                 self.add(self._hp_bar_content[color][i], z=1)
 
-    def update_hp(self):
+    def update_hp(self) -> None:
         """Update the size and the color of the HP bar."""
 
         new_hp_bar_size = OpponentHUD.HP_BAR_SIZE * self._pokemon.hp // self._pokemon.stats[StatEnum.HP]
@@ -64,7 +71,7 @@ class OpponentHUD(Layer):
 
         self._hp_bar_size = new_hp_bar_size
 
-    def hide_hp_pixel(self, pixel_index):
+    def hide_hp_pixel(self, pixel_index: int) -> None:
         """Hide the pixel whose the index is specified and changes the color
         of the HP bar if necessary.
 

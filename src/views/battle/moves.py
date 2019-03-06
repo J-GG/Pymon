@@ -1,6 +1,7 @@
 import cocos
 from cocos.actions import *
 
+from models.pokemon import Pokemon
 from views.common.key_enum import KeyEnum
 from views.common.layer import Layer
 
@@ -13,10 +14,15 @@ class Moves(Layer):
 
     is_event_handler = True
 
-    def __init__(self, pokemon, selected=0):
+    def __init__(self, pokemon: Pokemon) -> None:
+        """Show the pokemon's list of moves and ask the player to choose one.
+
+        :param pokemon: The player's pokemon.
+        """
+
         super().__init__()
         self._pokemon = pokemon
-        self._selected = selected
+        self._selected = 0
 
         self._is_visible = False
         self._actions = dict()
@@ -30,13 +36,26 @@ class Moves(Layer):
         selected_sprite.visible = False
         self._actions[len(self._actions) - 1].add(selected_sprite, name=Moves.SELECTED_SPRITE)
 
-    def _update_selected_action(self):
+    def _update_selected_action(self) -> None:
+        """Show the selected sprite of the selected action."""
+
         for action in range(len(self._actions)):
             self._actions[action].get(Moves.SELECTED_SPRITE).visible = False
 
         self._actions[self._selected].get(Moves.SELECTED_SPRITE).visible = True
 
-    def on_key_press(self, key, modifiers):
+    def on_key_press(self, key, modifiers) -> bool:
+        """Manage the key press event.
+
+        Update the selected move when pressing UP or BOTTOM.
+        Choose the selected move when pressing ENTER or go back to the
+        previous menu.
+
+        :param key: The pressed key.
+        :param modifiers: The pressed modifiers.
+        :return Whether the event has been handled.
+        """
+
         event_handled = False
         if self._is_visible:
             if key == KeyEnum.B.value or (key == KeyEnum.ENTER.value and self._selected == len(self._actions) - 1):
@@ -56,7 +75,9 @@ class Moves(Layer):
 
             return event_handled
 
-    def toggle_apparition(self):
+    def toggle_apparition(self) -> None:
+        """Show or hide the list of moves."""
+
         for action in range(len(self._actions)):
             offset = self._actions[action].width if self._is_visible else -self._actions[action].width
             self._actions[action].do(Delay(0.1 * len(self._actions) - (0.1 * action)) + MoveBy((offset, 0), 0.2))
@@ -67,7 +88,9 @@ class Moves(Layer):
             self._selected = 0
             self._update_selected_action()
 
-    def update_moves(self):
+    def update_moves(self) -> None:
+        """Update the list of moves."""
+
         for index, move in enumerate(self._pokemon.moves):
             if index in self._actions:
                 self.remove(self._actions[index])
