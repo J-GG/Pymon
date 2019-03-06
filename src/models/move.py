@@ -110,10 +110,11 @@ class Move:
         :return: A ``UsedMoveEffects``containing the result of the move.
         """
 
-        failed = random.randint(1, 100) > self._accuracy
+        failed = random.randint(1, 100) > self._accuracy * StagedStatEnum.ACCURACY.get_multiplier(
+            attacker.staged_stats[StagedStatEnum.ACCURACY]) if self._accuracy else False
         effectiveness = None
         critical_multiplier = None
-        staged_stats = None
+        staged_stats = dict()
         hp = 0
 
         if not failed:
@@ -136,6 +137,6 @@ class Move:
                 modifier = critical_multiplier * effectiveness.value * random.uniform(0.85, 1)
                 hp = -round(((2 * attacker.level / 5 + 2) * self._power * attack / defense / 50 + 5) * modifier)
 
-            staged_stats = self._effects.staged_stats if self._effects else None
+            staged_stats = self._effects.staged_stats if self._effects else dict()
 
         return UsedMoveEffects(failed, hp, staged_stats, effectiveness, critical_multiplier == 1.5)
