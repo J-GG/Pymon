@@ -1,9 +1,9 @@
 import json
 
-from models.experience_function_enum import ExperienceFunctionEnum
-from models.pokemon_species import PokemonSpecies
-from models.stat_enum import StatEnum
-from models.type_enum import TypeEnum
+from models.enumerations.experience_function_enum import ExperienceFunctionEnum
+from models.enumerations.stat_enum import StatEnum
+from models.enumerations.type_enum import TypeEnum
+from models.pokemon_species_model import PokemonSpeciesModel
 from toolbox.init import PATH
 from .moves import moves
 
@@ -35,4 +35,4 @@ with open(PATH + "/assets/data/pokemon.json") as file:
         for (lvl, movesList) in pokemon[POKEMON_MOVES_BY_LVL_UP].items():
             moves_by_lvl_up[lvl] = [moves[move] for move in movesList]
 
-        pokemons[id] = PokemonSpecies(id, type, moves_by_lvl_up, base_stats, base_experience, experience_function)
+        pokemons[id] = PokemonSpeciesModel(id, type, moves_by_lvl_up, base_stats, base_experience, experience_function)

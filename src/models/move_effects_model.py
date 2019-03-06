@@ -1,10 +1,10 @@
 import typing
 
-from models.staged_stat_enum import StagedStatEnum
-from models.status_enum import StatusEnum
+from models.enumerations.staged_stat_enum import StagedStatEnum
+from models.enumerations.status_enum import StatusEnum
 
 
-class MoveEffects:
+class MoveEffectsModel:
     """The effects of a move."""
 
     def __init__(self, staged_stats: typing.Dict[StagedStatEnum, int], status: typing.Dict[StatusEnum, int]) -> None:

@@ -1,12 +1,12 @@
 import cocos
 from cocos.actions import *
 
-from models.pokemon import Pokemon
+from models.pokemon_model import PokemonModel
 from views.common.key_enum import KeyEnum
 from views.common.layer import Layer
 
 
-class Moves(Layer):
+class MovesLayer(Layer):
     """Shows the pokemon's list of moves."""
 
     SELECTED_SPRITE = "SELECTED_SPRITE"
@@ -14,7 +14,7 @@ class Moves(Layer):
 
     is_event_handler = True
 
-    def __init__(self, pokemon: Pokemon) -> None:
+    def __init__(self, pokemon: PokemonModel) -> None:
         """Show the pokemon's list of moves and ask the player to choose one.
 
         :param pokemon: The player's pokemon.
@@ -34,15 +34,15 @@ class Moves(Layer):
 
         selected_sprite = cocos.sprite.Sprite('img/battle/moves/selected_return.png')
         selected_sprite.visible = False
-        self._actions[len(self._actions) - 1].add(selected_sprite, name=Moves.SELECTED_SPRITE)
+        self._actions[len(self._actions) - 1].add(selected_sprite, name=MovesLayer.SELECTED_SPRITE)
 
     def _update_selected_action(self) -> None:
         """Show the selected sprite of the selected action."""
 
         for action in range(len(self._actions)):
-            self._actions[action].get(Moves.SELECTED_SPRITE).visible = False
+            self._actions[action].get(MovesLayer.SELECTED_SPRITE).visible = False
 
-        self._actions[self._selected].get(Moves.SELECTED_SPRITE).visible = True
+        self._actions[self._selected].get(MovesLayer.SELECTED_SPRITE).visible = True
 
     def on_key_press(self, key, modifiers) -> bool:
         """Manage the key press event.
@@ -102,7 +102,7 @@ class Moves(Layer):
             selected_sprite = cocos.sprite.Sprite(
                 'img/battle/moves/selected_{0}.png'.format(move.move.type.name.lower()))
             selected_sprite.visible = False
-            self._actions[index].add(selected_sprite, name=Moves.SELECTED_SPRITE)
+            self._actions[index].add(selected_sprite, name=MovesLayer.SELECTED_SPRITE)
 
             name = cocos.text.Label(move.move.name, font_size=9, anchor_x="left", anchor_y="center",
                                     color=(0, 0, 0, 255), bold=True)
@@ -112,7 +112,7 @@ class Moves(Layer):
             pp = cocos.text.Label("PP {0}/{1}".format(move.current_pp, move.pp),
                                   font_size=9, anchor_x="left", anchor_y="center", bold=True)
             pp.position = (-15, -8)
-            self._actions[index].add(pp, name=Moves.PP)
+            self._actions[index].add(pp, name=MovesLayer.PP)
             type = cocos.sprite.Sprite('img/common/types/{0}.png'.format(move.move.type.name.lower()))
             type.position = (-35, -8)
             type.scale = 0.9

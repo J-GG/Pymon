@@ -1,10 +1,10 @@
 import json
 
-from models.move import Move
-from models.move_category_enum import MoveCategoryEnum
-from models.move_effects import MoveEffects
-from models.staged_stat_enum import StagedStatEnum
-from models.type_enum import TypeEnum
+from models.enumerations.move_category_enum import MoveCategoryEnum
+from models.enumerations.staged_stat_enum import StagedStatEnum
+from models.enumerations.type_enum import TypeEnum
+from models.move_effects_model import MoveEffectsModel
+from models.move_model import MoveModel
 from toolbox.init import PATH
 
 """This module is meant to load the data regarding the moves available in the 
@@ -41,6 +41,6 @@ with open(PATH + "/assets/data/moves.json") as file:
             effects_stats = {StagedStatEnum[name]: value for name, value in effects_node[MOVE_STATS].items()}
             effects_status = effects_node[MOVE_STATUS] if MOVE_STATUS in effects_node else None
 
-            effects = MoveEffects(effects_stats, effects_status)
+            effects = MoveEffectsModel(effects_stats, effects_status)
 
-        moves[id] = Move(id, type, category, power, accuracy, default_pp, effects)
+        moves[id] = MoveModel(id, type, category, power, accuracy, default_pp, effects)

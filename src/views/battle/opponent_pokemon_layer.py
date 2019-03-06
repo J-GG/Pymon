@@ -1,14 +1,14 @@
 import cocos
 import pyglet
 
-from models.pokemon import Pokemon
+from models.pokemon_model import PokemonModel
 from toolbox.init import PATH
 
 
-class OpponentPokemon(cocos.layer.Layer):
+class OpponentPokemonLayer(cocos.layer.Layer):
     """The opponent pokemon"""
 
-    def __init__(self, opponent_pokemon: Pokemon) -> None:
+    def __init__(self, opponent_pokemon: PokemonModel) -> None:
         """Create a new layer showing the opponent pokemon.
 
         :param opponent_pokemon: The opponent pokemon.

@@ -1,7 +1,7 @@
 import cocos
 
 
-class Background(cocos.layer.ColorLayer):
+class BackgroundLayer(cocos.layer.ColorLayer):
     """The background of the introduction."""
 
     def __init__(self) -> None:

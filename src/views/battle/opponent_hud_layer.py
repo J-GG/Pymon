@@ -1,14 +1,14 @@
 import cocos
 from cocos.actions import *
 
-from models.pokemon import Pokemon
-from models.stat_enum import StatEnum
+from models.enumerations.stat_enum import StatEnum
+from models.pokemon_model import PokemonModel
 from views.common.layer import Layer
 from views.common.text import Text
 from .hp_bar_color_enum import HPBarColorEnum
 
 
-class OpponentHUD(Layer):
+class OpponentHUDLayer(Layer):
     """The information about the opponent pokemon: name, level, HP
 
     Attributes:
@@ -17,7 +17,7 @@ class OpponentHUD(Layer):
 
     HP_BAR_SIZE = 48
 
-    def __init__(self, pokemon: Pokemon) -> None:
+    def __init__(self, pokemon: PokemonModel) -> None:
         """Create a new HUD showing the opponent pokemon's information.
 
         :param pokemon: The opponent pokemon.
@@ -47,10 +47,10 @@ class OpponentHUD(Layer):
                 self._bar_color = color
                 break
 
-        self._hp_bar_size = OpponentHUD.HP_BAR_SIZE * pokemon.hp // pokemon.stats[StatEnum.HP]
+        self._hp_bar_size = OpponentHUDLayer.HP_BAR_SIZE * pokemon.hp // pokemon.stats[StatEnum.HP]
 
         self._hp_bar_content = {color: [] for color in HPBarColorEnum}
-        for i in range(OpponentHUD.HP_BAR_SIZE):
+        for i in range(OpponentHUDLayer.HP_BAR_SIZE):
             for color in HPBarColorEnum:
                 hp_pixel = cocos.sprite.Sprite('img/battle/hud/hp_bar_{0}.png'.format(color.name))
                 hp_pixel.position = 378 + i, 358
@@ -62,7 +62,7 @@ class OpponentHUD(Layer):
     def update_hp(self) -> None:
         """Update the size and the color of the HP bar."""
 
-        new_hp_bar_size = OpponentHUD.HP_BAR_SIZE * self._pokemon.hp // self._pokemon.stats[StatEnum.HP]
+        new_hp_bar_size = OpponentHUDLayer.HP_BAR_SIZE * self._pokemon.hp // self._pokemon.stats[StatEnum.HP]
 
         for pixel_index in range(self._hp_bar_size - 1, -1, -1):
             if pixel_index > new_hp_bar_size:
@@ -80,7 +80,7 @@ class OpponentHUD(Layer):
 
         self._hp_bar_content[self._bar_color][pixel_index].visible = False
         for color in HPBarColorEnum:
-            if pixel_index * 100 // OpponentHUD.HP_BAR_SIZE <= color.upper_limit:
+            if pixel_index * 100 // OpponentHUDLayer.HP_BAR_SIZE <= color.upper_limit:
                 if color != self._bar_color:
                     self._bar_color = color
                     for i in range(pixel_index):

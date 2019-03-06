@@ -5,12 +5,12 @@ from toolbox.init import PATH
 from views.common.layer import Layer
 
 
-class Transition(Layer):
+class TransitionLayer(Layer):
     """The transition played just before the beginning of the battle."""
 
     def __init__(self) -> None:
         """Create a new transition layer."""
-        
+
         super().__init__()
 
         self._background = cocos.sprite.Sprite(

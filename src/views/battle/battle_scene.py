@@ -5,20 +5,20 @@ import typing
 import cocos
 from cocos.actions import *
 
-from models.learned_move import LearnedMove
-from models.move_effectiveness_enum import MoveEffectivenessEnum
-from models.pokemon import Pokemon as PokemonModel
+from models.enumerations.move_effectiveness_enum import MoveEffectivenessEnum
+from models.learned_move_model import LearnedMoveModel
+from models.pokemon_model import PokemonModel
 from toolbox.i18n import I18n
 from views.common.dialog import Dialog
-from .actions import Actions
-from .background import Background
-from .fade import Fade
-from .hud import HUD
-from .moves import Moves
-from .opponent_hud import OpponentHUD
-from .opponent_pokemon import OpponentPokemon
-from .pokemon import Pokemon
-from .transition import Transition
+from .actions_layer import ActionsLayer
+from .background_layer import BackgroundLayer
+from .fade_layer import FadeLayer
+from .hud_layer import HUDLayer
+from .moves_layer import MovesLayer
+from .opponent_hud_layer import OpponentHUDLayer
+from .opponent_pokemon_layer import OpponentPokemonLayer
+from .pokemon_layer import PokemonLayer
+from .transition_layer import TransitionLayer
 
 
 class BattleScene(cocos.scene.Scene):
@@ -61,13 +61,13 @@ class BattleScene(cocos.scene.Scene):
     def _intro(self) -> None:
         """The "cinematic" showing the battle field and the pokemon."""
 
-        self._transition = Transition()
+        self._transition = TransitionLayer()
         self._transition.do(
             Delay(BattleScene.TRANSITION_DURATION * 2 / 3) +
             (ScaleTo(3.5, BattleScene.TRANSITION_DURATION * 1 / 3) | FadeOut(BattleScene.TRANSITION_DURATION * 1 / 3)))
         self.add(self._transition, z=100)
 
-        self._background = Background()
+        self._background = BackgroundLayer()
         self._background.scale = 2
         self._background.position = (160, 240)
         self._background.do(Delay(BattleScene.TRANSITION_DURATION * 2 / 3)
@@ -86,7 +86,7 @@ class BattleScene(cocos.scene.Scene):
         self._dialog.set_text(I18n().get("BATTLE.WILD").format(self._opponent_pokemon.nickname))
         self.add(self._dialog, z=50)
 
-        self._opponent_pokemonLayer = OpponentPokemon(self._opponent_pokemon)
+        self._opponent_pokemonLayer = OpponentPokemonLayer(self._opponent_pokemon)
         self._opponent_pokemonLayer.scale = 2
         self._opponent_pokemonLayer.position = (720, 400)
         self._opponent_pokemonLayer.do(Delay(BattleScene.TRANSITION_DURATION * 2 / 3)
@@ -97,14 +97,14 @@ class BattleScene(cocos.scene.Scene):
                                        )
         self.add(self._opponent_pokemonLayer)
 
-        self._fade = Fade()
+        self._fade = FadeLayer()
         self._fade.do(Delay(BattleScene.TRANSITION_DURATION + BattleScene.TRAVELING_DURATION / 2)
                       + FadeIn(0.2)
                       + FadeOut(1)
                       )
         self.add(self._fade, z=100)
 
-        self._pokemon = Pokemon(self._players_pokemon)
+        self._pokemon = PokemonLayer(self._players_pokemon)
         self._pokemon.scale = 2.5
         self._pokemon.position = (150, 150)
         self._pokemon.do(
@@ -121,22 +121,22 @@ class BattleScene(cocos.scene.Scene):
     def _start(self) -> None:
         """Show the pokemon information."""
 
-        self._opponent_hud = OpponentHUD(self._opponent_pokemon)
+        self._opponent_hud = OpponentHUDLayer(self._opponent_pokemon)
         self._opponent_hud.do(FadeOut(0) + FadeIn(0.5))
         self.add(self._opponent_hud, z=50)
 
-        self._hud = HUD(self._players_pokemon)
+        self._hud = HUDLayer(self._players_pokemon)
         self._hud.do(FadeOut(0) + FadeIn(0.5))
         self.add(self._hud, z=50)
 
         self._dialog.set_text(I18n().get("BATTLE.WHAT_WILL_DO").format(self._players_pokemon.nickname))
         self._dialog.do(FadeIn(0.5))
 
-        self._actions = Actions()
+        self._actions = ActionsLayer()
         self._actions.do(FadeOut(0) + FadeIn(0.5))
         self.add(self._actions)
 
-        self._moves = Moves(self._players_pokemon)
+        self._moves = MovesLayer(self._players_pokemon)
         self.add(self._moves)
 
         self.show_actions()
@@ -151,7 +151,7 @@ class BattleScene(cocos.scene.Scene):
 
         self._moves.toggle_apparition()
 
-    def move_selected(self, move: LearnedMove) -> None:
+    def move_selected(self, move: LearnedMoveModel) -> None:
         """The player selected a move. It is transmitted to the controller.
 
         :param move: The selected move.

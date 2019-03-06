@@ -1,10 +1,10 @@
-from models.move import Move
+from models.move_model import MoveModel
 
 
-class LearnedMove:
+class LearnedMoveModel:
     """A move learned by a pokemon."""
 
-    def __init__(self, move: Move, pp: int, current_pp: int = None) -> None:
+    def __init__(self, move: MoveModel, pp: int, current_pp: int = None) -> None:
         """Create a new learned move.
 
         :param move: The ``Move`` it refers to.
@@ -17,7 +17,7 @@ class LearnedMove:
         self._current_pp = current_pp if current_pp else pp
 
     @property
-    def move(self) -> Move:
+    def move(self) -> MoveModel:
         """Get the move the pokemon learned.
 
         :return: An instance of ``Move``.

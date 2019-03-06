@@ -1,14 +1,14 @@
 import typing
 
-from models.move import Move
-from models.type_enum import TypeEnum
+from models.enumerations.type_enum import TypeEnum
+from models.move_model import MoveModel
 from toolbox.i18n import I18n
 
 
-class PokemonSpecies:
+class PokemonSpeciesModel:
     """A species of pokemon."""
 
-    def __init__(self, id: str, type: TypeEnum, moves_by_lvl_up: typing.Dict[int, typing.List[Move]], base_stats,
+    def __init__(self, id: str, type: TypeEnum, moves_by_lvl_up: typing.Dict[int, typing.List[MoveModel]], base_stats,
                  base_experience,
                  experience_function):
         """Create a new pokemon species.

@@ -1,4 +1,4 @@
-from views.main_menu.main_menu import MainMenuScene
+from views.main_menu.main_menu_scene import MainMenuScene
 
 
 class MainMenuController:
@@ -7,5 +7,5 @@ class MainMenuController:
     @staticmethod
     def show_menu() -> None:
         """Show the main menu of the game."""
-        
+
         MainMenuScene()

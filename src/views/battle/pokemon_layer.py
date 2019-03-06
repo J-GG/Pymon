@@ -1,11 +1,11 @@
 import cocos
 import pyglet
 
-from models.pokemon import Pokemon as PokemonModel
+from models.pokemon_model import PokemonModel
 from toolbox.init import PATH
 
 
-class Pokemon(cocos.layer.Layer):
+class PokemonLayer(cocos.layer.Layer):
     """The player's pokemon"""
 
     def __init__(self, players_pokemon: PokemonModel) -> None:

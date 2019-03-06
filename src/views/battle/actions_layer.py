@@ -1,12 +1,12 @@
 import cocos
 from cocos.actions import *
 
-from views.battle.actions_enum import ActionEnum
+from views.battle.action_enum import ActionEnum
 from views.common.key_enum import KeyEnum
 from views.common.layer import Layer
 
 
-class Actions(Layer):
+class ActionsLayer(Layer):
     """Shows the list of actions available to the player."""
 
     SELECTED_SPRITE = "SELECTED_SPRITE"
@@ -32,7 +32,7 @@ class Actions(Layer):
             selected_sprite = cocos.sprite.Sprite('img/battle/actions/selected_action.png')
             selected_sprite.scale = self._actions[action.name].scale
             selected_sprite.visible = False
-            self._actions[action.name].add(selected_sprite, name=Actions.SELECTED_SPRITE)
+            self._actions[action.name].add(selected_sprite, name=ActionsLayer.SELECTED_SPRITE)
 
             label = cocos.text.Label(action.name, font_size=8, anchor_x="center", anchor_y="center")
             self._actions[action.name].add(label)
@@ -43,9 +43,9 @@ class Actions(Layer):
         """Show the selected sprite of the selected action."""
 
         for action in ActionEnum:
-            self._actions[action.name].get(Actions.SELECTED_SPRITE).visible = False
+            self._actions[action.name].get(ActionsLayer.SELECTED_SPRITE).visible = False
 
-        self._actions[self._selected.name].get(Actions.SELECTED_SPRITE).visible = True
+        self._actions[self._selected.name].get(ActionsLayer.SELECTED_SPRITE).visible = True
 
     def on_key_press(self, key, modifiers) -> bool:
         """Manage the key press event.
@@ -76,7 +76,7 @@ class Actions(Layer):
                     self.toggle_apparition()
                     self.parent.attempt_run()
                     event_handled = True
-                    
+
             self._update_selection()
 
         return event_handled

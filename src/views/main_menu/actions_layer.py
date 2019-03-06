@@ -1,10 +1,10 @@
 import cocos
 
-from controllers.battle import BattleController
+from controllers.battle_controller import BattleController
 from views.common.key_enum import KeyEnum
 
 
-class Actions(cocos.layer.Layer):
+class ActionsLayer(cocos.layer.Layer):
     """The item which can be selected by the user:
     - Continue
     - New Game

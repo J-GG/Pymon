@@ -1,4 +1,4 @@
-from views.intro.intro import IntroScene
+from views.intro.intro_scene import IntroScene
 
 
 class IntroController:

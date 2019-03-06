@@ -3,7 +3,7 @@ import random
 import cocos
 
 
-class Background(cocos.layer.Layer):
+class BackgroundLayer(cocos.layer.Layer):
     """The background of a battle.
 
     Attributes:
@@ -18,5 +18,5 @@ class Background(cocos.layer.Layer):
         super().__init__()
 
         self._background = cocos.sprite.Sprite(
-            'img/battle/backgrounds/{0}'.format((random.choice(Background.BATTLE_BACKGROUND))))
+            'img/battle/backgrounds/{0}'.format((random.choice(BackgroundLayer.BATTLE_BACKGROUND))))
         self.add(self._background)

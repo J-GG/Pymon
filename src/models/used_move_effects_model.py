@@ -1,10 +1,10 @@
 import typing
 
-from models.move_effectiveness_enum import MoveEffectivenessEnum
-from models.staged_stat_enum import StagedStatEnum
+from models.enumerations.move_effectiveness_enum import MoveEffectivenessEnum
+from models.enumerations.staged_stat_enum import StagedStatEnum
 
 
-class UsedMoveEffects:
+class UsedMoveEffectsModel:
     """The effects of the move when used in a battle."""
 
     def __init__(self, failed: bool, hp: int, staged_stats: typing.Dict[StagedStatEnum, int],

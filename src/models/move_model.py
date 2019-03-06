@@ -1,20 +1,20 @@
 import random
 
-from models.move_category_enum import MoveCategoryEnum
-from models.move_effects import MoveEffects
-from models.staged_stat_enum import StagedStatEnum
-from models.stat_enum import StatEnum
-from models.type_enum import TypeEnum
+from models.enumerations.move_category_enum import MoveCategoryEnum
+from models.enumerations.staged_stat_enum import StagedStatEnum
+from models.enumerations.stat_enum import StatEnum
+from models.enumerations.type_enum import TypeEnum
+from models.move_effects_model import MoveEffectsModel
 from toolbox.i18n import I18n
-from .used_move_effects import UsedMoveEffects
+from .used_move_effects_model import UsedMoveEffectsModel
 
 
-class Move:
+class MoveModel:
     """A move in the game."""
 
     def __init__(self, id: str, move_type: TypeEnum, category: MoveCategoryEnum, power: int, accuracy: int,
                  default_pp: int,
-                 effects: MoveEffects = None):
+                 effects: MoveEffectsModel = None):
         """Create a move.
 
         :param id: The id of the move.
@@ -105,7 +105,7 @@ class Move:
 
         return self._default_pp
 
-    def effects(self, attacker, defender) -> UsedMoveEffects:
+    def effects(self, attacker, defender) -> UsedMoveEffectsModel:
         """Apply the effects of the move based on the attacked who used the
         move and the defender.
 
@@ -143,4 +143,4 @@ class Move:
 
             staged_stats = self._effects.staged_stats if self._effects else dict()
 
-        return UsedMoveEffects(failed, hp, staged_stats, effectiveness, critical_multiplier == 1.5)
+        return UsedMoveEffectsModel(failed, hp, staged_stats, effectiveness, critical_multiplier == 1.5)

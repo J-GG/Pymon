@@ -2,13 +2,13 @@ import typing
 from math import floor
 from random import randint
 
-from models.learned_move import LearnedMove
-from models.pokemon_species import PokemonSpecies
-from models.staged_stat_enum import StagedStatEnum
-from models.stat_enum import StatEnum
+from models.enumerations.staged_stat_enum import StagedStatEnum
+from models.enumerations.stat_enum import StatEnum
+from models.learned_move_model import LearnedMoveModel
+from models.pokemon_species_model import PokemonSpeciesModel
 
 
-class Pokemon:
+class PokemonModel:
     """A pokemon with their own characteristics.
 
     The ``stats`` designates the maximum value the stats of the pokemon
@@ -18,7 +18,8 @@ class Pokemon:
     vary depending on the situation.
     """
 
-    def __init__(self, species: PokemonSpecies, nickname: str, level: int, moves: [LearnedMove], hp: int = None,
+    def __init__(self, species: PokemonSpeciesModel, nickname: str, level: int, moves: [LearnedMoveModel],
+                 hp: int = None,
                  experience: int = None, iv: typing.Dict[StatEnum, int] = None) -> None:
         """Create a new pokemon.
 
@@ -57,7 +58,7 @@ class Pokemon:
             self._staged_stats[staged_stat] = 0
 
     @property
-    def species(self) -> PokemonSpecies:
+    def species(self) -> PokemonSpeciesModel:
         """Get the species of the pokemon.
 
         :return: An instance of ``PokemonSpecies``.
@@ -121,7 +122,7 @@ class Pokemon:
         self._staged_stats = staged_stats
 
     @property
-    def moves(self) -> [LearnedMove]:
+    def moves(self) -> [LearnedMoveModel]:
         """Get the moves the pokemon has learned.
 
         :return: A list of ``LearnedMove``.
@@ -130,7 +131,7 @@ class Pokemon:
         return self._moves
 
     @moves.setter
-    def moves(self, moves: [LearnedMove]) -> None:
+    def moves(self, moves: [LearnedMoveModel]) -> None:
         """Set the moves the pokemon has learned.
 
         :param moves: A list of ``LearnedMove``.

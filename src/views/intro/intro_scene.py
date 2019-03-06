@@ -1,8 +1,8 @@
 import cocos
 from cocos.actions import *
 
-from controllers.main_menu import MainMenuController
-from .background import Background
+from controllers.main_menu_controller import MainMenuController
+from .background_layer import BackgroundLayer
 
 
 class IntroScene(cocos.scene.Scene):
@@ -13,7 +13,7 @@ class IntroScene(cocos.scene.Scene):
 
         super().__init__()
 
-        self._background = Background()
+        self._background = BackgroundLayer()
         self.add(self._background)
 
         self.do(Delay(0.1) + CallFunc(MainMenuController().show_menu))

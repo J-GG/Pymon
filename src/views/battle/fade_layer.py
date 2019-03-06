@@ -3,7 +3,7 @@ import cocos
 from views.common.layer import Layer
 
 
-class Fade(Layer):
+class FadeLayer(Layer):
     """A simple fade."""
 
     def __init__(self) -> None:

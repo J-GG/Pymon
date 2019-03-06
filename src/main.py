@@ -1,6 +1,6 @@
 import cocos
 
-from controllers.intro import IntroController
+from controllers.intro_controller import IntroController
 from toolbox.init import init_pyglet
 
 if __name__ == '__main__':
