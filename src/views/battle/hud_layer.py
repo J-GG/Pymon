@@ -13,11 +13,13 @@ from .hp_bar_color_enum import HPBarColorEnum
 class HUDLayer(Layer):
     """The information about the player's pokemon: name, level, HP, XP
 
-        Attributes:
+    Attributes:
         - HP_BAR_SIZE: The size in pixels of the HP bar.
+        - HP_UPDATE_DURATION: The time it takes for the HP bar to update.
     """
 
     HP_BAR_SIZE = 47
+    HP_UPDATE_DURATION = 1
 
     def __init__(self, pokemon: PokemonModel) -> None:
         """Create a new HUD showing the player's pokemon's information.
@@ -86,10 +88,11 @@ class HUDLayer(Layer):
 
         new_hp_bar_size = HUDLayer.HP_BAR_SIZE * self._pokemon.hp // self._pokemon.stats[StatEnum.HP]
         hp_per_pixel = self._pokemon.stats[StatEnum.HP] / HUDLayer.HP_BAR_SIZE
+        time_between_update = HUDLayer.HP_UPDATE_DURATION / (self._hp_bar_size - new_hp_bar_size)
 
         for pixel_index in range(self._hp_bar_size, new_hp_bar_size - 1, -1):
             self.do(
-                Delay(self._hp_bar_size * 0.1 - 0.1 * pixel_index)
+                Delay(self._hp_bar_size * time_between_update - time_between_update * pixel_index)
                 + (CallFunc(self._hide_hp_pixel, pixel_index) | CallFunc(self._update_hp_number,
                                                                          floor(hp_per_pixel * pixel_index)))
             )

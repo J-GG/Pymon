@@ -7,6 +7,7 @@ from cocos.actions import *
 
 from models.battle.fight_action_model import FightActionModel
 from models.battle.run_action_model import RunActionModel
+from models.enumerations.move_category_enum import MoveCategoryEnum
 from models.enumerations.move_effectiveness_enum import MoveEffectivenessEnum
 from models.learned_move_model import LearnedMoveModel
 from models.pokemon_model import PokemonModel
@@ -204,34 +205,49 @@ class BattleScene(cocos.scene.Scene):
             else:
                 self._dialog.set_text(I18n().get("BATTLE.FAILED_RUN"), callback)
         elif isinstance(action, FightActionModel):
-            text = [I18n().get("BATTLE.MOVE_USED").format(action.attacker.nickname, action.move.move.name)]
-            effects = action.get_effects()
-
-            if effects.failed:
-                text.append(I18n().get("BATTLE.FAILED"))
+            self._dialog.set_text(
+                I18n().get("BATTLE.MOVE_USED").format(action.attacker.nickname, action.move.move.name))
+            if action.attacker == self._players_pokemon:
+                self._pokemon.do(Delay(0.5) + MoveBy((15, 15), 0.10) + MoveBy((-15, -15), 0.10)
+                                 + (CallFunc(self._opponent_hud.update_hp) | CallFunc(self._moves.update_moves)))
             else:
-                if effects.critical_hit:
-                    text.append(I18n().get("BATTLE.CRITICAL_HIT"))
+                self._opponent_pokemonLayer.do(Delay(0.5) + MoveBy((-15, -15), 0.10) + MoveBy((15, 15), 0.10)
+                                               + CallFunc(self._hud.update_hp))
 
-                if effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.NO_EFFECT:
-                    text.append(I18n().get("BATTLE.NO_EFFECT"))
-                elif effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.NOT_EFFECTIVE or effects.effectiveness == MoveEffectivenessEnum.VERY_INEFFECTIVE:
-                    text.append(I18n().get("BATTLE.NOT_EFFECTIVE"))
-                elif effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.SUPER_EFFECTIVE or effects.effectiveness == MoveEffectivenessEnum.EXTREMELY_EFFECTIVE:
-                    text.append(I18n().get("BATTLE.SUPER_EFFECTIVE"))
+            delay = 1 if action.move.move.category == MoveCategoryEnum.STATUS else 2
+            self._dialog.do(Delay(delay) + CallFunc(self._explain_fight_action_effects, action, callback))
 
-                if action.attacker == self._players_pokemon:
-                    self._opponent_hud.update_hp()
-                    self._moves.update_moves()
-                else:
-                    self._hud.update_hp()
+    def _explain_fight_action_effects(self, action: FightActionModel, callback: typing.Callable) -> None:
+        """Write the effects of the move to the user.
 
-                for staged_stat, stage in effects.staged_stats.items():
-                    if stage > 0:
-                        text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
-                            action.attacker.nickname, staged_stat.value[0]))
-                    elif stage < 0:
-                        text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
-                            action.defender.nickname, staged_stat.value[0]))
+        :param action: The fight action being played.
+        :param callback: The function to call after.
+        """
 
+        text = []
+        effects = action.get_effects()
+
+        if effects.failed:
+            text.append(I18n().get("BATTLE.MOVE_FAILED").format(action.attacker.nickname))
+        else:
+            if effects.critical_hit:
+                text.append(I18n().get("BATTLE.CRITICAL_HIT"))
+
+            if effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.NO_EFFECT:
+                text.append(I18n().get("BATTLE.NO_EFFECT"))
+            elif effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.NOT_EFFECTIVE or effects.effectiveness == MoveEffectivenessEnum.VERY_INEFFECTIVE:
+                text.append(I18n().get("BATTLE.NOT_EFFECTIVE"))
+            elif effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.SUPER_EFFECTIVE or effects.effectiveness == MoveEffectivenessEnum.EXTREMELY_EFFECTIVE:
+                text.append(I18n().get("BATTLE.SUPER_EFFECTIVE"))
+
+            for staged_stat, stage in effects.staged_stats.items():
+                if stage > 0:
+                    text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
+                        action.attacker.nickname, staged_stat.value[0]))
+                elif stage < 0:
+                    text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
+                        action.defender.nickname, staged_stat.value[0]))
+        if text:
             self._dialog.set_text(text, callback)
+        else:
+            callback()

@@ -13,9 +13,11 @@ class OpponentHUDLayer(Layer):
 
     Attributes:
         - HP_BAR_SIZE: The size in pixels of the HP bar.
+        - HP_UPDATE_DURATION: The time it takes for the HP bar to update.
     """
 
     HP_BAR_SIZE = 47
+    HP_UPDATE_DURATION = 1.3
 
     def __init__(self, pokemon: PokemonModel) -> None:
         """Create a new HUD showing the opponent pokemon's information.
@@ -63,11 +65,13 @@ class OpponentHUDLayer(Layer):
         """Update the size and the color of the HP bar."""
 
         new_hp_bar_size = OpponentHUDLayer.HP_BAR_SIZE * self._pokemon.hp // self._pokemon.stats[StatEnum.HP]
+        time_between_update = OpponentHUDLayer.HP_UPDATE_DURATION / (self._hp_bar_size - new_hp_bar_size)
 
         for pixel_index in range(self._hp_bar_size, new_hp_bar_size, -1):
             if pixel_index > new_hp_bar_size:
                 self.do(
-                    Delay(self._hp_bar_size * 0.1 - 0.1 * pixel_index) + CallFunc(self.hide_hp_pixel, pixel_index))
+                    Delay(self._hp_bar_size * time_between_update - time_between_update * pixel_index) + CallFunc(
+                        self.hide_hp_pixel, pixel_index))
 
         self._hp_bar_size = new_hp_bar_size
 
