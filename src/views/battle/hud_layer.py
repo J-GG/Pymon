@@ -1,4 +1,4 @@
-from math import floor
+from math import ceil
 
 import cocos
 from cocos.actions import *
@@ -94,9 +94,9 @@ class HUDLayer(Layer):
             self.do(
                 Delay(self._hp_bar_size * time_between_update - time_between_update * pixel_index)
                 + (CallFunc(self._hide_hp_pixel, pixel_index) | CallFunc(self._update_hp_number,
-                                                                         floor(hp_per_pixel * pixel_index)))
+                                                                         ceil(hp_per_pixel * pixel_index)))
             )
-        self._hp.do(Delay((self._hp_bar_size - new_hp_bar_size) * 0.1)
+        self._hp.do(Delay(HUDLayer.HP_UPDATE_DURATION + 0.1)
                     + CallFunc(self._update_hp_number, self._pokemon.hp))
 
         self._hp_bar_size = new_hp_bar_size

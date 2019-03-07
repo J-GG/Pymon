@@ -215,7 +215,10 @@ class BattleScene(cocos.scene.Scene):
                                                + CallFunc(self._hud.update_hp))
 
             delay = 1 if action.move.move.category == MoveCategoryEnum.STATUS else 2
-            self._dialog.do(Delay(delay) + CallFunc(self._explain_fight_action_effects, action, callback))
+            if action.defender.hp > 0:
+                self._dialog.do(Delay(delay) + CallFunc(self._explain_fight_action_effects, action, callback))
+            else:
+                self._dialog.do(Delay(delay) + CallFunc(self._pokemon_ko, action.defender))
 
     def _explain_fight_action_effects(self, action: FightActionModel, callback: typing.Callable) -> None:
         """Write the effects of the move to the user.
@@ -251,3 +254,6 @@ class BattleScene(cocos.scene.Scene):
             self._dialog.set_text(text, callback)
         else:
             callback()
+
+    def _pokemon_ko(self, pokemon):
+        self._dialog.set_text(I18n().get("BATTLE.KO").format(pokemon.nickname), lambda: self._battle_controller.run())

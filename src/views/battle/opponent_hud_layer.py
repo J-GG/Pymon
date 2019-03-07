@@ -67,11 +67,9 @@ class OpponentHUDLayer(Layer):
         new_hp_bar_size = OpponentHUDLayer.HP_BAR_SIZE * self._pokemon.hp // self._pokemon.stats[StatEnum.HP]
         time_between_update = OpponentHUDLayer.HP_UPDATE_DURATION / (self._hp_bar_size - new_hp_bar_size)
 
-        for pixel_index in range(self._hp_bar_size, new_hp_bar_size, -1):
-            if pixel_index > new_hp_bar_size:
-                self.do(
-                    Delay(self._hp_bar_size * time_between_update - time_between_update * pixel_index) + CallFunc(
-                        self.hide_hp_pixel, pixel_index))
+        for pixel_index in range(self._hp_bar_size, new_hp_bar_size - 1, -1):
+            self.do(Delay(self._hp_bar_size * time_between_update - time_between_update * pixel_index)
+                    + CallFunc(self.hide_hp_pixel, pixel_index))
 
         self._hp_bar_size = new_hp_bar_size
 

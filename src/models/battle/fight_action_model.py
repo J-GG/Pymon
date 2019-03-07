@@ -64,7 +64,7 @@ class FightActionModel:
             effectiveness = None
             critical_multiplier = None
             staged_stats = dict()
-            hp = 0
+            damage = 0
 
             if not failed:
                 if self._move.move.category in [MoveCategoryEnum.PHYSICAL, MoveCategoryEnum.SPECIAL]:
@@ -86,12 +86,14 @@ class FightActionModel:
                         StatEnum.SPEED] * StagedStatEnum.SPEED.get_multiplier(
                         self._attacker.staged_stats[StagedStatEnum.SPEED]) / 2 else 1
                     modifier = critical_multiplier * effectiveness.value * random.uniform(0.85, 1)
-                    hp = -round(
+                    damage = round(
                         ((
                                  2 * self._attacker.level / 5 + 2) * self._move.move.power * attack / defense / 50 + 5) * modifier)
+                    damage = -damage if self._defender.hp - damage >= 0 else -self._defender.hp
 
                 staged_stats = self._move.move.effects.staged_stats if self._move.move.effects else dict()
 
-            self._effects = UsedMoveEffectsModel(failed, hp, staged_stats, effectiveness, critical_multiplier == 1.5)
+            self._effects = UsedMoveEffectsModel(failed, damage, staged_stats, effectiveness,
+                                                 critical_multiplier == 1.5)
 
         return self._effects
