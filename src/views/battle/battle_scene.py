@@ -5,6 +5,8 @@ import typing
 import cocos
 from cocos.actions import *
 
+from models.battle.fight_action_model import FightActionModel
+from models.battle.run_action_model import RunActionModel
 from models.enumerations.move_effectiveness_enum import MoveEffectivenessEnum
 from models.learned_move_model import LearnedMoveModel
 from models.pokemon_model import PokemonModel
@@ -131,7 +133,6 @@ class BattleScene(cocos.scene.Scene):
         self._hud.do(FadeOut(0) + FadeIn(0.5))
         self.add(self._hud, z=50)
 
-        self._dialog.set_text(I18n().get("BATTLE.WHAT_WILL_DO").format(self._players_pokemon.nickname))
         self._dialog.do(FadeIn(0.5))
 
         self._actions = ActionsLayer()
@@ -146,68 +147,91 @@ class BattleScene(cocos.scene.Scene):
     def show_actions(self) -> None:
         """Ask the player to choose an action."""
 
+        self._dialog.set_text(I18n().get("BATTLE.WHAT_WILL_DO").format(self._players_pokemon.nickname))
+
         self._actions.toggle_apparition()
 
-    def fight_action(self) -> None:
+    def show_moves(self) -> None:
         """Ask the player to choose a move for the pokemon."""
 
         self._moves.toggle_apparition()
 
-    def move_selected(self, move: LearnedMoveModel) -> None:
+    def fight_action(self, move: LearnedMoveModel) -> None:
         """The player selected a move. It is transmitted to the controller.
 
         :param move: The selected move.
         """
 
-        self._battle_controller.uses_move(self._players_pokemon, self._opponent_pokemon, move)
+        self._moves.toggle_apparition()
 
-    def attempt_run(self) -> None:
-        """Notify to the controller that the player wants to escape."""
+        self._battle_controller.round(self._players_pokemon, self._opponent_pokemon,
+                                      FightActionModel(self._players_pokemon, self._opponent_pokemon, move))
 
-        self._battle_controller.attempt_run(self._players_pokemon, self._opponent_pokemon)
+    def run_action(self) -> None:
+        """The player selected to run. It is transmitted to the controller."""
 
-    def successful_run(self) -> None:
+        self._battle_controller.round(self._players_pokemon, self._opponent_pokemon,
+                                      RunActionModel(self._players_pokemon, self._opponent_pokemon))
+
+    def _successful_run(self) -> None:
         """The attempt to run is successful. The battle is over."""
 
         self._dialog.set_text(I18n().get("BATTLE.SUCCESSFUL_RUN"), lambda: self._battle_controller.run())
 
-    def failed_run(self) -> None:
-        """The attempt to run failed. The battle continues."""
+    def round(self, first_action: typing.Union[FightActionModel, RunActionModel],
+              second_action: typing.Union[FightActionModel, RunActionModel]) -> None:
+        """Play the actions.
 
-        self._dialog.set_text(I18n().get("BATTLE.FAILED_RUN"))
+        :param first_action: The first action.
+        :param second_action: The second action.
+        """
 
-    def round(self, first_attacker: typing.Dict[str, typing.Any],
-              second_attacker: typing.Dict[str, typing.Any]) -> None:
-        self._moves.toggle_apparition()
-        self._moves.update_moves()
+        self._do_action(first_action, second_action)
 
-        text = []
-        text.append(I18n().get("BATTLE.MOVE_USED").format(first_attacker["pokemon"].nickname,
-                                                          first_attacker["move"].move.name))
-        effects = first_attacker["effects"]
+    def _do_action(self, action: typing.Union[FightActionModel, RunActionModel],
+                   next_action: typing.Union[FightActionModel, RunActionModel] = None):
+        """Perform the specified action.
 
-        if effects.failed:
-            text.append(I18n().get("BATTLE.FAILED"))
-        else:
-            if effects.critical_hit:
-                text.append(I18n().get("BATTLE.CRITICAL_HIT"))
+        :param action: The action to play.
+        :param next_action: The next action to be played.
+        """
 
-            if effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.NO_EFFECT:
-                text.append(I18n().get("BATTLE.NO_EFFECT"))
-            elif effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.NOT_EFFECTIVE or effects.effectiveness == MoveEffectivenessEnum.VERY_INEFFECTIVE:
-                text.append(I18n().get("BATTLE.NOT_EFFECTIVE"))
-            elif effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.SUPER_EFFECTIVE or effects.effectiveness == MoveEffectivenessEnum.EXTREMELY_EFFECTIVE:
-                text.append(I18n().get("BATTLE.SUPER_EFFECTIVE"))
+        callback = lambda: self._do_action(next_action) if next_action else self.show_actions()
 
-            if first_attacker["pokemon"] == self._players_pokemon:
-                self._opponent_hud.update_hp()
+        if isinstance(action, RunActionModel):
+            if action.is_run_successful():
+                self._successful_run()
+            else:
+                self._dialog.set_text(I18n().get("BATTLE.FAILED_RUN"), callback)
+        elif isinstance(action, FightActionModel):
+            text = [I18n().get("BATTLE.MOVE_USED").format(action.attacker.nickname, action.move.move.name)]
+            effects = action.get_effects()
 
-            for staged_stat, stage in effects.staged_stats.items():
-                if stage > 0:
-                    text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
-                        first_attacker["pokemon"].nickname, staged_stat.value[0]))
-                elif stage < 0:
-                    text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
-                        second_attacker["pokemon"].nickname, staged_stat.value[0]))
+            if effects.failed:
+                text.append(I18n().get("BATTLE.FAILED"))
+            else:
+                if effects.critical_hit:
+                    text.append(I18n().get("BATTLE.CRITICAL_HIT"))
 
-        self._dialog.set_text(text)
+                if effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.NO_EFFECT:
+                    text.append(I18n().get("BATTLE.NO_EFFECT"))
+                elif effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.NOT_EFFECTIVE or effects.effectiveness == MoveEffectivenessEnum.VERY_INEFFECTIVE:
+                    text.append(I18n().get("BATTLE.NOT_EFFECTIVE"))
+                elif effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.SUPER_EFFECTIVE or effects.effectiveness == MoveEffectivenessEnum.EXTREMELY_EFFECTIVE:
+                    text.append(I18n().get("BATTLE.SUPER_EFFECTIVE"))
+
+                if action.attacker == self._players_pokemon:
+                    self._opponent_hud.update_hp()
+                    self._moves.update_moves()
+                else:
+                    self._hud.update_hp()
+
+                for staged_stat, stage in effects.staged_stats.items():
+                    if stage > 0:
+                        text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
+                            action.attacker.nickname, staged_stat.value[0]))
+                    elif stage < 0:
+                        text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
+                            action.defender.nickname, staged_stat.value[0]))
+
+            self._dialog.set_text(text, callback)

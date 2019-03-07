@@ -1,3 +1,5 @@
+from math import floor
+
 import cocos
 from cocos.actions import *
 
@@ -15,7 +17,7 @@ class HUDLayer(Layer):
         - HP_BAR_SIZE: The size in pixels of the HP bar.
     """
 
-    HP_BAR_SIZE = 48
+    HP_BAR_SIZE = 47
 
     def __init__(self, pokemon: PokemonModel) -> None:
         """Create a new HUD showing the player's pokemon's information.
@@ -50,7 +52,7 @@ class HUDLayer(Layer):
         self._hp_bar_size = HUDLayer.HP_BAR_SIZE * pokemon.hp // pokemon.stats[StatEnum.HP]
 
         self._hp_bar_content = {color: [] for color in HPBarColorEnum}
-        for i in range(HUDLayer.HP_BAR_SIZE):
+        for i in range(HUDLayer.HP_BAR_SIZE + 1):
             for color in HPBarColorEnum:
                 hp_pixel = cocos.sprite.Sprite('img/battle/hud/hp_bar_{0}.png'.format(color.name))
                 hp_pixel.position = -23 + i, -12
@@ -78,18 +80,38 @@ class HUDLayer(Layer):
             self.add(self._current_xp_bar[i], z=1)
 
     def update_hp(self) -> None:
-        """Update the size and the color of the HP bar."""
+        """Update the size and the color of the HP bar as well as the HP
+        number.
+        """
 
         new_hp_bar_size = HUDLayer.HP_BAR_SIZE * self._pokemon.hp // self._pokemon.stats[StatEnum.HP]
+        hp_per_pixel = self._pokemon.stats[StatEnum.HP] / HUDLayer.HP_BAR_SIZE
 
-        for pixel_index in range(self._hp_bar_size - 1, -1, -1):
-            if pixel_index > new_hp_bar_size:
-                self.do(
-                    Delay(self._hp_bar_size * 0.1 - 0.1 * pixel_index) + CallFunc(self.hide_hp_pixel, pixel_index))
+        for pixel_index in range(self._hp_bar_size, new_hp_bar_size - 1, -1):
+            self.do(
+                Delay(self._hp_bar_size * 0.1 - 0.1 * pixel_index)
+                + (CallFunc(self._hide_hp_pixel, pixel_index) | CallFunc(self._update_hp_number,
+                                                                         floor(hp_per_pixel * pixel_index)))
+            )
+        self._hp.do(Delay((self._hp_bar_size - new_hp_bar_size) * 0.1)
+                    + CallFunc(self._update_hp_number, self._pokemon.hp))
 
         self._hp_bar_size = new_hp_bar_size
 
-    def hide_hp_pixel(self, pixel_index: int) -> None:
+    def _update_hp_number(self, hp: int) -> None:
+        """Update the textual number of HP.
+
+        :param hp: The number of HP to display.
+        """
+
+        hp = 0 if hp < 0 else hp
+
+        self.remove(self._hp)
+        self._hp = Text("{0}/{1}".format(hp, self._pokemon.stats[StatEnum.HP]))
+        self._hp.position = -20, -24
+        self.add(self._hp, z=1)
+
+    def _hide_hp_pixel(self, pixel_index: int) -> None:
         """Hide the pixel whose the index is specified and changes the color
         of the HP bar if necessary.
 

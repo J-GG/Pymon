@@ -62,7 +62,7 @@ class MovesLayer(Layer):
                 self.do(CallFunc(self.toggle_apparition) + Delay(0.3) + CallFunc(self.parent.show_actions))
                 event_handled = True
             elif key == KeyEnum.ENTER.value:
-                self.parent.move_selected(self._pokemon.moves[self._selected])
+                self.parent.fight_action(self._pokemon.moves[self._selected])
                 event_handled = True
             elif key == KeyEnum.UP.value and self._selected > 0:
                 self._selected = self._selected - 1

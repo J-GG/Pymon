@@ -70,11 +70,11 @@ class ActionsLayer(Layer):
             elif key == KeyEnum.ENTER.value:
                 if self._selected == ActionEnum.FIGHT:
                     self.toggle_apparition()
-                    self.parent.fight_action()
+                    self.parent.show_moves()
                     event_handled = True
                 elif self._selected == ActionEnum.RUN:
                     self.toggle_apparition()
-                    self.parent.attempt_run()
+                    self.parent.run_action()
                     event_handled = True
 
             self._update_selection()

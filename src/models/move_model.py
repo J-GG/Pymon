@@ -1,12 +1,7 @@
-import random
-
 from models.enumerations.move_category_enum import MoveCategoryEnum
-from models.enumerations.staged_stat_enum import StagedStatEnum
-from models.enumerations.stat_enum import StatEnum
 from models.enumerations.type_enum import TypeEnum
 from models.move_effects_model import MoveEffectsModel
 from toolbox.i18n import I18n
-from .used_move_effects_model import UsedMoveEffectsModel
 
 
 class MoveModel:
@@ -14,7 +9,7 @@ class MoveModel:
 
     def __init__(self, id: str, move_type: TypeEnum, category: MoveCategoryEnum, power: int, accuracy: int,
                  default_pp: int,
-                 effects: MoveEffectsModel = None):
+                 effects: MoveEffectsModel = None) -> None:
         """Create a move.
 
         :param id: The id of the move.
@@ -105,42 +100,11 @@ class MoveModel:
 
         return self._default_pp
 
-    def effects(self, attacker, defender) -> UsedMoveEffectsModel:
-        """Apply the effects of the move based on the attacked who used the
-        move and the defender.
+    @property
+    def effects(self) -> MoveEffectsModel:
+        """Get the effects of the move.
 
-        :param attacker: The pokemon who used the move.
-        :param defender: The pokemon receiving the move.
-        :return: A ``UsedMoveEffects``containing the result of the move.
+        :return: A ``MoveEffectsModel``.
         """
 
-        failed = random.randint(1, 100) > self._accuracy * StagedStatEnum.ACCURACY.get_multiplier(
-            attacker.staged_stats[StagedStatEnum.ACCURACY]) if self._accuracy else False
-        effectiveness = None
-        critical_multiplier = None
-        staged_stats = dict()
-        hp = 0
-
-        if not failed:
-            if self.category in [MoveCategoryEnum.PHYSICAL, MoveCategoryEnum.SPECIAL]:
-                if self._category == MoveCategoryEnum.PHYSICAL:
-                    attack = attacker.stats[StatEnum.ATTACK] * StagedStatEnum.ATTACK.get_multiplier(
-                        attacker.staged_stats[StagedStatEnum.ATTACK])
-                    defense = defender.stats[StatEnum.DEFENSE] * StagedStatEnum.DEFENSE.get_multiplier(
-                        defender.staged_stats[StagedStatEnum.DEFENSE])
-                else:
-                    attack = attacker.stats[StatEnum.SPECIAL_ATTACK] * StagedStatEnum.SPECIAL_ATTACK.get_multiplier(
-                        attacker.staged_stats[StagedStatEnum.SPECIAL_ATTACK])
-                    defense = defender.stats[StatEnum.SPECIAL_ATTACK] * StagedStatEnum.SPECIAL_DEFENSE.get_multiplier(
-                        defender.staged_stats[StagedStatEnum.SPECIAL_DEFENSE])
-
-                effectiveness = self.type.effectiveness(defender.species.type)
-                critical_multiplier = 1.5 if random.randint(1, 256) <= attacker.stats[
-                    StatEnum.SPEED] * StagedStatEnum.SPEED.get_multiplier(
-                    attacker.staged_stats[StagedStatEnum.SPEED]) / 2 else 1
-                modifier = critical_multiplier * effectiveness.value * random.uniform(0.85, 1)
-                hp = -round(((2 * attacker.level / 5 + 2) * self._power * attack / defense / 50 + 5) * modifier)
-
-            staged_stats = self._effects.staged_stats if self._effects else dict()
-
-        return UsedMoveEffectsModel(failed, hp, staged_stats, effectiveness, critical_multiplier == 1.5)
+        return self._effects

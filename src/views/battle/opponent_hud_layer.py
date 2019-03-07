@@ -15,7 +15,7 @@ class OpponentHUDLayer(Layer):
         - HP_BAR_SIZE: The size in pixels of the HP bar.
     """
 
-    HP_BAR_SIZE = 48
+    HP_BAR_SIZE = 47
 
     def __init__(self, pokemon: PokemonModel) -> None:
         """Create a new HUD showing the opponent pokemon's information.
@@ -50,7 +50,7 @@ class OpponentHUDLayer(Layer):
         self._hp_bar_size = OpponentHUDLayer.HP_BAR_SIZE * pokemon.hp // pokemon.stats[StatEnum.HP]
 
         self._hp_bar_content = {color: [] for color in HPBarColorEnum}
-        for i in range(OpponentHUDLayer.HP_BAR_SIZE):
+        for i in range(OpponentHUDLayer.HP_BAR_SIZE + 1):
             for color in HPBarColorEnum:
                 hp_pixel = cocos.sprite.Sprite('img/battle/hud/hp_bar_{0}.png'.format(color.name))
                 hp_pixel.position = -22 + i, -12
@@ -64,7 +64,7 @@ class OpponentHUDLayer(Layer):
 
         new_hp_bar_size = OpponentHUDLayer.HP_BAR_SIZE * self._pokemon.hp // self._pokemon.stats[StatEnum.HP]
 
-        for pixel_index in range(self._hp_bar_size - 1, -1, -1):
+        for pixel_index in range(self._hp_bar_size, new_hp_bar_size, -1):
             if pixel_index > new_hp_bar_size:
                 self.do(
                     Delay(self._hp_bar_size * 0.1 - 0.1 * pixel_index) + CallFunc(self.hide_hp_pixel, pixel_index))

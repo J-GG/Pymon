@@ -1,5 +1,7 @@
 import typing
 
+from models.enumerations.experience_function_enum import ExperienceFunctionEnum
+from models.enumerations.stat_enum import StatEnum
 from models.enumerations.type_enum import TypeEnum
 from models.move_model import MoveModel
 from toolbox.i18n import I18n
@@ -8,9 +10,9 @@ from toolbox.i18n import I18n
 class PokemonSpeciesModel:
     """A species of pokemon."""
 
-    def __init__(self, id: str, type: TypeEnum, moves_by_lvl_up: typing.Dict[int, typing.List[MoveModel]], base_stats,
-                 base_experience,
-                 experience_function):
+    def __init__(self, id: str, type: TypeEnum, moves_by_lvl_up: typing.Dict[int, typing.List[MoveModel]],
+                 base_stats: typing.Dict[StatEnum, int], base_experience: int,
+                 experience_function: ExperienceFunctionEnum) -> None:
         """Create a new pokemon species.
 
         :param id: The id of the species.
@@ -33,7 +35,7 @@ class PokemonSpeciesModel:
         self._experience_function = experience_function
 
     @property
-    def id(self):
+    def id(self) -> str:
         """Get the id of the pokemon species.
 
         The id can be used to get the translated name of the species.
@@ -42,7 +44,7 @@ class PokemonSpeciesModel:
         return self._id
 
     @property
-    def name(self):
+    def name(self) -> str:
         """Get the translated name of the species.
 
         :return: The name of the species.
@@ -51,7 +53,7 @@ class PokemonSpeciesModel:
         return I18n().get("POKEMON.{0}".format(self._id))
 
     @property
-    def type(self):
+    def type(self) -> TypeEnum:
         """Get the types (1 or 2) of the pokemon.
 
         The list contains values of ``TypeEnum`` type.
@@ -60,7 +62,7 @@ class PokemonSpeciesModel:
         return self._type
 
     @property
-    def moves_by_lvl_up(self):
+    def moves_by_lvl_up(self) -> typing.Dict[int, typing.List[MoveModel]]:
         """Get the dictionary of moves which can be learned by leveling up.
 
         The key is the level and the value is a list of moves id.
@@ -69,7 +71,7 @@ class PokemonSpeciesModel:
         return self._moves_by_lvl_up
 
     @property
-    def base_stats(self):
+    def base_stats(self) -> typing.Dict[StatEnum, int]:
         """Get the dictionary of base stats.
 
         The key is a value of ``StatEnum`` and the value an int.
@@ -78,7 +80,7 @@ class PokemonSpeciesModel:
         return self._base_stats
 
     @property
-    def base_experience(self):
+    def base_experience(self) -> int:
         """Get the base experience.
 
         :return: The base experience.
@@ -86,7 +88,7 @@ class PokemonSpeciesModel:
         return self._base_experience
 
     @property
-    def experience_function(self):
+    def experience_function(self) -> ExperienceFunctionEnum:
         """The experience function to determine the experience necessary to
         reach a certain level.
 
