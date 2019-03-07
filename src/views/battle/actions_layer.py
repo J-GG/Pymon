@@ -26,7 +26,7 @@ class ActionsLayer(Layer):
         self._actions = dict()
         for action in ActionEnum:
             self._actions[action.name] = cocos.sprite.Sprite('img/battle/actions/action.png')
-            self._actions[action.name].position = 617 + self._actions[action.name].width, 100 + 40 * action.value
+            self._actions[action.name].position = 700 + self._actions[action.name].width, 100 + 40 * action.value
             self._actions[action.name].scale = 1.2
 
             selected_sprite = cocos.sprite.Sprite('img/battle/actions/selected_action.png')
@@ -86,7 +86,8 @@ class ActionsLayer(Layer):
 
         for index, action in enumerate(ActionEnum):
             offset = self._actions[action.name].width if self._is_visible else -self._actions[action.name].width
-            self._actions[action.name].do(Delay(0.1 * action.value) + MoveBy((offset, 0), 0.2))
+            self._actions[action.name].do(
+                Delay(0.1 * action.value) + MoveTo((700 + offset, 100 + 40 * action.value), 0.2))
 
         self._is_visible = not self._is_visible
         self._update_selection()

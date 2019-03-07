@@ -78,9 +78,14 @@ class MovesLayer(Layer):
     def toggle_apparition(self) -> None:
         """Show or hide the list of moves."""
 
-        for action in range(len(self._actions)):
-            offset = self._actions[action].width if self._is_visible else -self._actions[action].width
-            self._actions[action].do(Delay(0.1 * len(self._actions) - (0.1 * action)) + MoveBy((offset, 0), 0.2))
+        nb_moves = len(self._pokemon.moves)
+        for index in range(nb_moves):
+            offset = self._actions[index].width if self._is_visible else -self._actions[index].width
+            self._actions[index].do(Delay(0.1 * len(self._actions) - (0.1 * index))
+                                    + MoveTo((715 + offset, 250 - 40 * index), 0.2))
+
+        return_offset = self._actions[nb_moves].width if self._is_visible else -self._actions[nb_moves].width
+        self._actions[nb_moves].do(MoveTo((670 + return_offset, 90), 0.2))
 
         self._is_visible = not self._is_visible
 
@@ -97,7 +102,7 @@ class MovesLayer(Layer):
 
             self._actions[index] = cocos.sprite.Sprite('img/battle/moves/{0}.png'.format(move.move.type.name.lower()))
             offset = 0 if self._is_visible else self._actions[index].width
-            self._actions[index].position = 575 + offset, 250 - 40 * index
+            self._actions[index].position = 715 + offset, 250 - 40 * index
 
             selected_sprite = cocos.sprite.Sprite(
                 'img/battle/moves/selected_{0}.png'.format(move.move.type.name.lower()))
