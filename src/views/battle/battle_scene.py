@@ -216,10 +216,7 @@ class BattleScene(cocos.scene.Scene):
                                                + CallFunc(self._hud.update_hp))
 
             delay = 1 if action.move.move.category == MoveCategoryEnum.STATUS else 2
-            if action.defender.hp > 0:
-                self._dialog.do(Delay(delay) + CallFunc(self._explain_fight_action_effects, action, callback))
-            else:
-                self._dialog.do(Delay(delay) + CallFunc(self._pokemon_ko, action.defender))
+            self._dialog.do(Delay(delay) + CallFunc(self._explain_fight_action_effects, action, callback))
 
     def _explain_fight_action_effects(self, action: FightActionModel, callback: typing.Callable) -> None:
         """Write the effects of the move to the user.
@@ -244,17 +241,25 @@ class BattleScene(cocos.scene.Scene):
             elif effects.effectiveness and effects.effectiveness == MoveEffectivenessEnum.SUPER_EFFECTIVE or effects.effectiveness == MoveEffectivenessEnum.EXTREMELY_EFFECTIVE:
                 text.append(I18n().get("BATTLE.SUPER_EFFECTIVE"))
 
-            for staged_stat, stage in effects.staged_stats.items():
-                if stage > 0:
-                    text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
-                        action.attacker.nickname, staged_stat.value[0]))
-                elif stage < 0:
-                    text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
-                        action.defender.nickname, staged_stat.value[0]))
-        if text:
-            self._dialog.set_text(text, callback)
+            if action.defender.hp > 0:
+                for staged_stat, stage in effects.staged_stats.items():
+                    if stage > 0:
+                        text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
+                            action.attacker.nickname, staged_stat.value[0]))
+                    elif stage < 0:
+                        text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
+                            action.defender.nickname, staged_stat.value[0]))
+
+        if action.defender.hp > 0:
+            if text:
+                self._dialog.set_text(text, callback)
+            else:
+                callback()
         else:
-            callback()
+            if text:
+                self._dialog.set_text(text, lambda: self._pokemon_ko(action.defender))
+            else:
+                self._pokemon_ko(action.defender)
 
     def _pokemon_ko(self, pokemon: PokemonModel) -> None:
         """A pokemon is KO. Notify the user and the controller.
