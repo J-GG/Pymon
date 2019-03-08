@@ -16,7 +16,7 @@ class OpponentHUDLayer(Layer):
         - HP_UPDATE_DURATION: The time it takes for the HP bar to update.
     """
 
-    HP_BAR_SIZE = 47
+    HP_BAR_SIZE = 48
     HP_UPDATE_DURATION = 1.3
 
     def __init__(self, pokemon: PokemonModel) -> None:
@@ -52,7 +52,7 @@ class OpponentHUDLayer(Layer):
         self._hp_bar_size = OpponentHUDLayer.HP_BAR_SIZE * pokemon.hp // pokemon.stats[StatEnum.HP]
 
         self._hp_bar_content = {color: [] for color in HPBarColorEnum}
-        for i in range(OpponentHUDLayer.HP_BAR_SIZE + 1):
+        for i in range(OpponentHUDLayer.HP_BAR_SIZE):
             for color in HPBarColorEnum:
                 hp_pixel = cocos.sprite.Sprite('img/battle/hud/hp_bar_{0}.png'.format(color.name))
                 hp_pixel.position = -22 + i, -12
@@ -66,26 +66,29 @@ class OpponentHUDLayer(Layer):
 
         new_hp_bar_size = OpponentHUDLayer.HP_BAR_SIZE * self._pokemon.hp // self._pokemon.stats[StatEnum.HP]
         time_between_update = OpponentHUDLayer.HP_UPDATE_DURATION / (self._hp_bar_size - new_hp_bar_size)
+        step, visible, offset = (1, True, 0) if new_hp_bar_size > self._hp_bar_size else (-1, False, -1)
 
-        for pixel_index in range(self._hp_bar_size, new_hp_bar_size - 1, -1):
+        for pixel_index in range(self._hp_bar_size + offset, new_hp_bar_size + offset, step):
             self.do(Delay(self._hp_bar_size * time_between_update - time_between_update * pixel_index)
-                    + CallFunc(self.hide_hp_pixel, pixel_index))
+                    + CallFunc(self._toggle_hp_pixel, pixel_index, visible))
 
         self._hp_bar_size = new_hp_bar_size
 
-    def hide_hp_pixel(self, pixel_index: int) -> None:
-        """Hide the pixel whose the index is specified and changes the color
+    def _toggle_hp_pixel(self, pixel_index: int, visible: bool) -> None:
+        """Hide or show the pixel whose the index is specified and changes the color
         of the HP bar if necessary.
 
-        :param pixel_index: the index of the current pixel.
+        :param pixel_index: The index of the pixel to hide.
+        :param visible: Whether the pixel is visible or not
         """
 
-        self._hp_bar_content[self._bar_color][pixel_index].visible = False
+        self._hp_bar_content[self._bar_color][pixel_index].visible = visible
         for color in HPBarColorEnum:
             if pixel_index * 100 // OpponentHUDLayer.HP_BAR_SIZE <= color.upper_limit:
                 if color != self._bar_color:
                     self._bar_color = color
-                    for i in range(pixel_index):
+                    offset = -1 if visible else 0
+                    for i in range(pixel_index + offset):
                         for c in HPBarColorEnum:
                             self._hp_bar_content[c][i].visible = True if c == self._bar_color else False
                 break

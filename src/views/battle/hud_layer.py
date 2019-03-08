@@ -21,8 +21,8 @@ class HUDLayer(Layer):
         - XP_UPDATE_DURATION: The time it takes for the XP bar to update.
     """
 
-    HP_BAR_SIZE = 47
-    HP_UPDATE_DURATION = 1
+    HP_BAR_SIZE = 48
+    HP_UPDATE_DURATION = 1.3
     XP_BAR_SIZE = 93
     XP_UPDATE_DURATION = 1
 
@@ -59,7 +59,7 @@ class HUDLayer(Layer):
         self._hp_bar_size = HUDLayer.HP_BAR_SIZE * pokemon.hp // pokemon.stats[StatEnum.HP]
 
         self._hp_bar_content = {color: [] for color in HPBarColorEnum}
-        for i in range(HUDLayer.HP_BAR_SIZE + 1):
+        for i in range(HUDLayer.HP_BAR_SIZE):
             for color in HPBarColorEnum:
                 hp_pixel = cocos.sprite.Sprite('img/battle/hud/hp_bar_{0}.png'.format(color.name))
                 hp_pixel.position = -23 + i, -12
@@ -94,16 +94,17 @@ class HUDLayer(Layer):
         new_hp_bar_size = HUDLayer.HP_BAR_SIZE * self._pokemon.hp // self._pokemon.stats[StatEnum.HP]
         hp_per_pixel = self._pokemon.stats[StatEnum.HP] / HUDLayer.HP_BAR_SIZE
         time_between_update = HUDLayer.HP_UPDATE_DURATION / (self._hp_bar_size - new_hp_bar_size)
+        step, visible, offset = (1, True, 0) if new_hp_bar_size > self._hp_bar_size else (-1, False, -1)
 
-        for pixel_index in range(self._hp_bar_size, new_hp_bar_size - 1, -1):
+        for pixel_index in range(self._hp_bar_size + offset, new_hp_bar_size + offset, step):
             self.do(
                 Delay(self._hp_bar_size * time_between_update - time_between_update * pixel_index)
-                + (CallFunc(self._hide_hp_pixel, pixel_index) | CallFunc(self._update_hp_number,
-                                                                         ceil(hp_per_pixel * pixel_index),
-                                                                         self._pokemon.stats[StatEnum.HP]))
+                + (CallFunc(self._toggle_hp_pixel, pixel_index, visible) | CallFunc(self._update_hp_number,
+                                                                                    ceil(hp_per_pixel * pixel_index),
+                                                                                    self._pokemon.stats[StatEnum.HP]))
             )
-        self._hp.do(Delay(HUDLayer.HP_UPDATE_DURATION + 0.1)
-                    + CallFunc(self._update_hp_number, self._pokemon.hp, self._pokemon.stats[StatEnum.HP]))
+        self._hp.do(Delay(HUDLayer.HP_UPDATE_DURATION + 0.1) + CallFunc(self._update_hp_number, self._pokemon.hp,
+                                                                        self._pokemon.stats[StatEnum.HP]))
 
         self._hp_bar_size = new_hp_bar_size
 
@@ -121,19 +122,21 @@ class HUDLayer(Layer):
         self._hp.position = -20, -24
         self.add(self._hp, z=1)
 
-    def _hide_hp_pixel(self, pixel_index: int) -> None:
-        """Hide the pixel whose the index is specified and changes the color
+    def _toggle_hp_pixel(self, pixel_index: int, visible: bool) -> None:
+        """Hide or show the pixel whose the index is specified and changes the color
         of the HP bar if necessary.
 
         :param pixel_index: The index of the pixel to hide.
+        :param visible: Whether the pixel is visible or not
         """
 
-        self._hp_bar_content[self._bar_color][pixel_index].visible = False
+        self._hp_bar_content[self._bar_color][pixel_index].visible = visible
         for color in HPBarColorEnum:
             if pixel_index * 100 // HUDLayer.HP_BAR_SIZE <= color.upper_limit:
                 if color != self._bar_color:
                     self._bar_color = color
-                    for i in range(pixel_index):
+                    offset = -1 if visible else 0
+                    for i in range(pixel_index + offset):
                         for c in HPBarColorEnum:
                             self._hp_bar_content[c][i].visible = True if c == self._bar_color else False
                 break
@@ -153,21 +156,26 @@ class HUDLayer(Layer):
         else:
             new_xp_bar_size = HUDLayer.XP_BAR_SIZE * (self._pokemon.experience - xp_current_lvl) // (
                     self._pokemon.experience_for_next_level - xp_current_lvl)
-        time_between_update = HUDLayer.XP_UPDATE_DURATION / (new_xp_bar_size - self._xp_bar_size)
 
-        for pixel_index in range(self._xp_bar_size, new_xp_bar_size, 1):
-            self._xp_bar_content[pixel_index].do(
-                Delay(time_between_update * pixel_index)
-                + CallFunc(self._toggle_xp_pixel, pixel_index, True))
+        if new_xp_bar_size != self._xp_bar_size:
+            time_between_update = HUDLayer.XP_UPDATE_DURATION / (new_xp_bar_size - self._xp_bar_size)
 
-        if level_up_stats:
-            self._level.do(Delay(HUDLayer.XP_UPDATE_DURATION) + CallFunc(self._update_level))
-            self._hp.do(Delay(HUDLayer.XP_UPDATE_DURATION)
-                        + CallFunc(self._update_hp_number,
-                                   int(self._hp.text.split("/")[0]) + level_up_stats[StatEnum.HP],
-                                   int(self._hp.text.split("/")[1]) + level_up_stats[StatEnum.HP]))
+            for pixel_index in range(self._xp_bar_size, new_xp_bar_size, 1):
+                self._xp_bar_content[pixel_index].do(
+                    Delay(time_between_update * pixel_index)
+                    + CallFunc(self._toggle_xp_pixel, pixel_index, True))
 
-        self._xp_bar_size = new_xp_bar_size
+            if level_up_stats:
+                self._level.do(Delay(HUDLayer.XP_UPDATE_DURATION) + CallFunc(self._update_level))
+                hp = int(self._hp.text.split("/")[0]) + level_up_stats[StatEnum.HP]
+                max_hp = int(self._hp.text.split("/")[1]) + level_up_stats[StatEnum.HP]
+                self._hp.do(Delay(HUDLayer.XP_UPDATE_DURATION)
+                            + CallFunc(self._update_hp_number, hp, max_hp))
+                new_hp_bar_size = HUDLayer.HP_BAR_SIZE * hp // max_hp
+                for pixel_index in range(new_hp_bar_size):
+                    self._hp.do(Delay(HUDLayer.XP_UPDATE_DURATION) + CallFunc(self._toggle_hp_pixel, pixel_index, True))
+
+            self._xp_bar_size = new_xp_bar_size
 
     def _update_level(self) -> None:
         """Update the level."""

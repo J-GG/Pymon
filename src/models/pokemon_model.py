@@ -245,5 +245,5 @@ class PokemonModel:
         for stat in StatEnum:
             self._stats[stat] = stat.get_stat(self._level, self._species.base_stats[stat], self._iv[stat])
 
-        self._hp = self._hp + old_hp_stat - self._stats[StatEnum.HP] if old_hp_stat and self._hp else self._stats[
+        self._hp = self._hp + (self._stats[StatEnum.HP] - old_hp_stat) if old_hp_stat and self._hp else self._stats[
             StatEnum.HP]

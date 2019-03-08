@@ -50,7 +50,7 @@
     "id": "THUNDER_SHOCK",
     "type": "ELECTRIC",
     "category": "SPECIAL",
-    "power": 1000,
+    "power": 40,
     "accuracy": 100,
     "defaultPp": 30
   }

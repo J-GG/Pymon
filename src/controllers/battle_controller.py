@@ -19,13 +19,13 @@ class BattleController(metaclass=Singleton):
     def battle(self) -> None:
         """Starts a battle."""
 
-        players_pokemon = PokemonModel(pokemons["PIKACHU"], pokemons["PIKACHU"].name, 5, [
+        players_pokemon = PokemonModel(pokemons["PIKACHU"], pokemons["PIKACHU"].name, 8, [
             LearnedMoveModel(moves["TAIL_WHIP"], moves["TAIL_WHIP"].default_pp, moves["TAIL_WHIP"].default_pp),
             LearnedMoveModel(moves["THUNDER_SHOCK"], moves["THUNDER_SHOCK"].default_pp,
                              moves["THUNDER_SHOCK"].default_pp),
             LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp, moves["GROWL"].default_pp),
         ])
-        players_pokemon.hp = 1
+        # players_pokemon.hp = 1
         opponent_pokemon = PokemonModel(pokemons["BULBASAUR"], pokemons["BULBASAUR"].name, 5,
                                         [LearnedMoveModel(moves["VINE_WHIP"], moves["VINE_WHIP"].default_pp,
                                                           moves["VINE_WHIP"].default_pp),
@@ -60,7 +60,7 @@ class BattleController(metaclass=Singleton):
         if isinstance(first_action, FightActionModel):
             self._fight_action(first_action)
 
-        if isinstance(second_action, FightActionModel):
+        if isinstance(second_action, FightActionModel) and second_action.attacker.hp > 0:
             self._fight_action(second_action)
 
         self._battle.round(first_action, second_action)
@@ -100,8 +100,8 @@ class BattleController(metaclass=Singleton):
         if pokemon_ko == players_pokemon:
             MainMenuController.show_menu()
         else:
-            gained_levels = players_pokemon.gain_experience(20000)
-            self._battle.player_won_fight(20000, gained_levels)
+            gained_levels = players_pokemon.gain_experience(400)
+            self._battle.player_won_fight(400, gained_levels)
 
     def run(self) -> None:
         """the player escapes the battle."""
