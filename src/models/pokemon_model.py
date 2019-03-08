@@ -208,20 +208,30 @@ class PokemonModel:
 
         self._experience_for_next_level = floor(self.species.experience_function.get_xp_for_level(self.level + 1))
 
-    def gain_experience(self, experience_gained: int) -> None:
-        """Increase the number of experience points of the pokemon.
+    def gain_experience(self, experience_gained: int) -> typing.Dict[int, typing.Dict[StatEnum, int]]:
+        """Increase the number of experience points of the pokemon and return
+        for each level how many points the pokemon has gained in each stat.
 
         If the number of XP is higher than the amount necessary to reach the
         next level, the pokemon levels up.
 
         :param experience_gained: The number of experience points gained.
+        :return A dictionary of levels with the stats increase.
         """
 
         self.experience += experience_gained
+        gained_levels = dict()
         while self.experience >= self._experience_for_next_level:
+            gained_levels[self.level] = dict()
+            old_stats = self._stats.copy()
             self.level += 1
             self._update_stats()
             self._update_experience_for_next_level()
+
+            for stat in StatEnum:
+                gained_levels[self.level - 1][stat] = self.stats[stat] - old_stats[stat]
+
+        return gained_levels
 
     def _update_stats(self) -> None:
         """Update the stats based on the level, the base stats and the IV of

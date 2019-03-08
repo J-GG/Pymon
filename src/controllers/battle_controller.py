@@ -19,12 +19,13 @@ class BattleController(metaclass=Singleton):
     def battle(self) -> None:
         """Starts a battle."""
 
-        players_pokemon = PokemonModel(pokemons["PIKACHU"], pokemons["PIKACHU"].name, 15, [
+        players_pokemon = PokemonModel(pokemons["PIKACHU"], pokemons["PIKACHU"].name, 5, [
             LearnedMoveModel(moves["TAIL_WHIP"], moves["TAIL_WHIP"].default_pp, moves["TAIL_WHIP"].default_pp),
             LearnedMoveModel(moves["THUNDER_SHOCK"], moves["THUNDER_SHOCK"].default_pp,
                              moves["THUNDER_SHOCK"].default_pp),
             LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp, moves["GROWL"].default_pp),
         ])
+        players_pokemon.hp = 1
         opponent_pokemon = PokemonModel(pokemons["BULBASAUR"], pokemons["BULBASAUR"].name, 5,
                                         [LearnedMoveModel(moves["VINE_WHIP"], moves["VINE_WHIP"].default_pp,
                                                           moves["VINE_WHIP"].default_pp),
@@ -84,6 +85,23 @@ class BattleController(metaclass=Singleton):
                     staged_stat] + value)
 
         fight_action.move.current_pp = fight_action.move.current_pp - 1 if fight_action.move.current_pp > 0 else 0
+
+    def pokemon_ko(self, pokemon_ko: PokemonModel, players_pokemon: PokemonModel,
+                   opponent_pokemon: PokemonModel) -> None:
+        """A pokemon got defeated.
+
+        The player's pokemon gains some XP if he is the one who won.
+
+        :param pokemon_ko: The pokemon who is KO.
+        :param players_pokemon: The player's pokemon.
+        :param opponent_pokemon: The opponent pokemon.
+        """
+
+        if pokemon_ko == players_pokemon:
+            MainMenuController.show_menu()
+        else:
+            gained_levels = players_pokemon.gain_experience(20000)
+            self._battle.player_won_fight(20000, gained_levels)
 
     def run(self) -> None:
         """the player escapes the battle."""

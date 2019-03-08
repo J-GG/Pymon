@@ -27,6 +27,7 @@ class Text(cocos.cocosnode.CocosNode):
         self._width = 0
         self._opacity = 255
         self._sprites = []
+        self._text = text
         for index, c in enumerate(text):
             y_offset = 0
             if c in Text.characters:
@@ -39,6 +40,15 @@ class Text(cocos.cocosnode.CocosNode):
             self._sprites[index].position = self._width, (self._sprites[index].height - 11) / 2 - y_offset
             self._width += self._sprites[index].width
             self.add(self._sprites[index])
+
+    @property
+    def text(self) -> str:
+        """Get the text.
+
+        :return: The text.
+        """
+
+        return self._text
 
     @property
     def width(self) -> int:

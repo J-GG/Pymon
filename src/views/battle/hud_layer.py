@@ -1,3 +1,4 @@
+import typing
 from math import ceil
 
 import cocos
@@ -16,10 +17,14 @@ class HUDLayer(Layer):
     Attributes:
         - HP_BAR_SIZE: The size in pixels of the HP bar.
         - HP_UPDATE_DURATION: The time it takes for the HP bar to update.
+        - XP_BAR_SIZE: The size in pixels of the XP bar.
+        - XP_UPDATE_DURATION: The time it takes for the XP bar to update.
     """
 
     HP_BAR_SIZE = 47
     HP_UPDATE_DURATION = 1
+    XP_BAR_SIZE = 93
+    XP_UPDATE_DURATION = 1
 
     def __init__(self, pokemon: PokemonModel) -> None:
         """Create a new HUD showing the player's pokemon's information.
@@ -71,15 +76,15 @@ class HUDLayer(Layer):
         self._xp_bar.position = -10, -37
         self.add(self._xp_bar)
 
-        self._current_xp_bar = []
-        current_xp_bar_size = 93 * (pokemon.experience - pokemon.species.experience_function.get_xp_for_level(
-            pokemon.level)) // (
-                                      pokemon.experience_for_next_level - pokemon.species.experience_function.get_xp_for_level(
-                                  pokemon.level))
-        for i in range(current_xp_bar_size):
-            self._current_xp_bar.append(cocos.sprite.Sprite('img/battle/hud/xp_bar_blue.png'))
-            self._current_xp_bar[i].position = 390 + i, 195
-            self.add(self._current_xp_bar[i], z=1)
+        xp_current_lvl = self._pokemon.species.experience_function.get_xp_for_level(self._pokemon.level)
+        self._xp_bar_content = []
+        self._xp_bar_size = HUDLayer.XP_BAR_SIZE * (pokemon.experience - xp_current_lvl) // (
+                pokemon.experience_for_next_level - xp_current_lvl)
+        for i in range(HUDLayer.XP_BAR_SIZE):
+            self._xp_bar_content.append(cocos.sprite.Sprite('img/battle/hud/xp_bar_blue.png'))
+            self._xp_bar_content[i].position = -56 + i, -37
+            self._xp_bar_content[i].visible = False if i > self._xp_bar_size else True
+            self.add(self._xp_bar_content[i], z=1)
 
     def update_hp(self) -> None:
         """Update the size and the color of the HP bar as well as the HP
@@ -94,23 +99,25 @@ class HUDLayer(Layer):
             self.do(
                 Delay(self._hp_bar_size * time_between_update - time_between_update * pixel_index)
                 + (CallFunc(self._hide_hp_pixel, pixel_index) | CallFunc(self._update_hp_number,
-                                                                         ceil(hp_per_pixel * pixel_index)))
+                                                                         ceil(hp_per_pixel * pixel_index),
+                                                                         self._pokemon.stats[StatEnum.HP]))
             )
         self._hp.do(Delay(HUDLayer.HP_UPDATE_DURATION + 0.1)
-                    + CallFunc(self._update_hp_number, self._pokemon.hp))
+                    + CallFunc(self._update_hp_number, self._pokemon.hp, self._pokemon.stats[StatEnum.HP]))
 
         self._hp_bar_size = new_hp_bar_size
 
-    def _update_hp_number(self, hp: int) -> None:
+    def _update_hp_number(self, hp: int, max_hp: int) -> None:
         """Update the textual number of HP.
 
         :param hp: The number of HP to display.
+        :param max_hp: The number of maximal HP to display.
         """
 
         hp = 0 if hp < 0 else hp
 
         self.remove(self._hp)
-        self._hp = Text("{0}/{1}".format(hp, self._pokemon.stats[StatEnum.HP]))
+        self._hp = Text("{0}/{1}".format(hp, max_hp))
         self._hp.position = -20, -24
         self.add(self._hp, z=1)
 
@@ -118,7 +125,7 @@ class HUDLayer(Layer):
         """Hide the pixel whose the index is specified and changes the color
         of the HP bar if necessary.
 
-        :param pixel_index: the index of the current pixel.
+        :param pixel_index: The index of the pixel to hide.
         """
 
         self._hp_bar_content[self._bar_color][pixel_index].visible = False
@@ -130,3 +137,59 @@ class HUDLayer(Layer):
                         for c in HPBarColorEnum:
                             self._hp_bar_content[c][i].visible = True if c == self._bar_color else False
                 break
+
+    def update_xp(self, level_up_stats: typing.Dict[StatEnum, int] = None) -> None:
+        """Update the size of the XP bar and update the number of HP after
+        leveling up.
+
+        :param level_up_stats: The stats increase associated with the optional
+        level up.
+        """
+
+        xp_current_lvl = self._pokemon.species.experience_function.get_xp_for_level(self._pokemon.level)
+
+        if level_up_stats:
+            new_xp_bar_size = HUDLayer.XP_BAR_SIZE
+        else:
+            new_xp_bar_size = HUDLayer.XP_BAR_SIZE * (self._pokemon.experience - xp_current_lvl) // (
+                    self._pokemon.experience_for_next_level - xp_current_lvl)
+        time_between_update = HUDLayer.XP_UPDATE_DURATION / (new_xp_bar_size - self._xp_bar_size)
+
+        for pixel_index in range(self._xp_bar_size, new_xp_bar_size, 1):
+            self._xp_bar_content[pixel_index].do(
+                Delay(time_between_update * pixel_index)
+                + CallFunc(self._toggle_xp_pixel, pixel_index, True))
+
+        if level_up_stats:
+            self._level.do(Delay(HUDLayer.XP_UPDATE_DURATION) + CallFunc(self._update_level))
+            self._hp.do(Delay(HUDLayer.XP_UPDATE_DURATION)
+                        + CallFunc(self._update_hp_number,
+                                   int(self._hp.text.split("/")[0]) + level_up_stats[StatEnum.HP],
+                                   int(self._hp.text.split("/")[1]) + level_up_stats[StatEnum.HP]))
+
+        self._xp_bar_size = new_xp_bar_size
+
+    def _update_level(self) -> None:
+        """Update the level."""
+
+        self.remove(self._level)
+        self._level = Text(str(int(self._level.text) + 1))
+        self._level.position = 17, 0
+        self.add(self._level, z=1)
+
+    def reset_xp_bar(self) -> None:
+        """Hide all of the pixels of the XP bar."""
+
+        for pixel_index in range(HUDLayer.XP_BAR_SIZE):
+            self._toggle_xp_pixel(pixel_index, False)
+
+        self._xp_bar_size = 0
+
+    def _toggle_xp_pixel(self, pixel_index: int, visible: bool) -> None:
+        """Hide or show the pixel of the xp bar whose the index is specified.
+
+        :param pixel_index: The index of the pixel to hide.
+        :param visible: Whether the pixel is visible or not
+        """
+
+        self._xp_bar_content[pixel_index].visible = visible

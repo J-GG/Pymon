@@ -9,6 +9,7 @@ from models.battle.fight_action_model import FightActionModel
 from models.battle.run_action_model import RunActionModel
 from models.enumerations.move_category_enum import MoveCategoryEnum
 from models.enumerations.move_effectiveness_enum import MoveEffectivenessEnum
+from models.enumerations.stat_enum import StatEnum
 from models.learned_move_model import LearnedMoveModel
 from models.pokemon_model import PokemonModel
 from toolbox.i18n import I18n
@@ -255,5 +256,61 @@ class BattleScene(cocos.scene.Scene):
         else:
             callback()
 
-    def _pokemon_ko(self, pokemon):
-        self._dialog.set_text(I18n().get("BATTLE.KO").format(pokemon.nickname), lambda: self._battle_controller.run())
+    def _pokemon_ko(self, pokemon: PokemonModel) -> None:
+        """A pokemon is KO. Notify the user and the controller.
+
+        :param pokemon: The pokemon who fainted.
+        """
+
+        self._dialog.set_text(I18n().get("BATTLE.KO").format(pokemon.nickname),
+                              lambda: self._battle_controller.pokemon_ko(pokemon, self._players_pokemon,
+                                                                         self._opponent_pokemon))
+
+    def player_won_fight(self, xp_points: int, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
+        """The player's pokemon defeated the opponent. They gain some XP.
+
+        :param xp_points: The total number of gained xp points.
+        :param gained_levels: A dictionary with the gained levels as well as
+        the stats increase for each level.
+        """
+
+        self._dialog.set_text(I18n().get("BATTLE.GAINED_XP").format(self._players_pokemon.nickname, xp_points),
+                              lambda: self.experience_gained(gained_levels))
+
+    def experience_gained(self, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
+        """Update the XP bar.
+
+        :param gained_levels: A dictionary with the gained levels as well as
+        the stats increase for each level.
+        """
+
+        if len(gained_levels) > 0:
+            self._hud.do(CallFunc(self._hud.update_xp, gained_levels[self._players_pokemon.level - len(gained_levels)])
+                         + Delay(HUDLayer.XP_UPDATE_DURATION) + CallFunc(self._level_up, gained_levels))
+        else:
+            self._hud.do(CallFunc(self._hud.update_xp) +
+                         Delay(HUDLayer.XP_UPDATE_DURATION + 0.5) + CallFunc(self._battle_controller.run))
+
+    def _continue_experience_gained(self, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
+        """After leveling up, reset the XP bar and keep updating it.
+
+        :param gained_levels: A dictionary with the gained levels as well as
+        the stats increase for each level.
+        """
+
+        self._hud.reset_xp_bar()
+        del gained_levels[self._players_pokemon.level - len(gained_levels)]
+        self.experience_gained(gained_levels)
+
+    def _level_up(self, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
+        """The pokemon has leveled up. Show a message to the player , the stat
+        increase and a possible new move to learn.
+
+        :param gained_levels: A dictionary with the gained levels as well as
+        the stats increase for each level.
+        """
+
+        self._dialog.set_text(I18n().get("BATTLE.LEVEL_UP").format(self._players_pokemon.nickname,
+                                                                   self._players_pokemon.level - (
+                                                                           len(gained_levels) - 1)),
+                              lambda: self._continue_experience_gained(gained_levels))

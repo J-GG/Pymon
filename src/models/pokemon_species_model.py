@@ -10,7 +10,7 @@ from toolbox.i18n import I18n
 class PokemonSpeciesModel:
     """A species of pokemon."""
 
-    def __init__(self, id: str, type: TypeEnum, moves_by_lvl_up: typing.Dict[int, typing.List[MoveModel]],
+    def __init__(self, id: str, type: typing.List[TypeEnum], moves_by_lvl_up: typing.Dict[int, typing.List[MoveModel]],
                  base_stats: typing.Dict[StatEnum, int], base_experience: int,
                  experience_function: ExperienceFunctionEnum) -> None:
         """Create a new pokemon species.
@@ -53,7 +53,7 @@ class PokemonSpeciesModel:
         return I18n().get("POKEMON.{0}".format(self._id))
 
     @property
-    def type(self) -> TypeEnum:
+    def type(self) -> typing.List[TypeEnum]:
         """Get the types (1 or 2) of the pokemon.
 
         The list contains values of ``TypeEnum`` type.
