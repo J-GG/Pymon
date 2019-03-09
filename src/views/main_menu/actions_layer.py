@@ -16,6 +16,8 @@ class ActionsLayer(cocos.layer.Layer):
 
         super().__init__()
 
+        self._key_pressed_handled = False
+
         self._new_game_off = cocos.sprite.Sprite('img/main_menu/new_game_off.gif')
         self._new_game_off.position = (320, 120)
         self.add(self._new_game_off)
@@ -63,8 +65,10 @@ class ActionsLayer(cocos.layer.Layer):
             self._choice = 1
             event_handled = True
         elif key == KeyEnum.ENTER.value:
-            BattleController().battle()
-            event_handled = True
+            if not self._key_pressed_handled:
+                BattleController().battle()
+                self._key_pressed_handled = True
+                event_handled = True
 
         self._update_screen()
 
