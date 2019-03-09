@@ -22,6 +22,7 @@ from .moves_layer import MovesLayer
 from .opponent_hud_layer import OpponentHUDLayer
 from .opponent_pokemon_layer import OpponentPokemonLayer
 from .pokemon_layer import PokemonLayer
+from .stat_layer import StatLayer
 from .transition_layer import TransitionLayer
 
 
@@ -267,6 +268,11 @@ class BattleScene(cocos.scene.Scene):
         :param pokemon: The pokemon who fainted.
         """
 
+        if pokemon == self._players_pokemon:
+            self._pokemon.do(MoveBy((-200, -200), 0.5))
+        else:
+            self._opponent_pokemonLayer.do(MoveBy((200, 0), 0.5))
+
         self._dialog.set_text(I18n().get("BATTLE.KO").format(pokemon.nickname),
                               lambda: self._battle_controller.pokemon_ko(pokemon, self._players_pokemon,
                                                                          self._opponent_pokemon))
@@ -304,6 +310,7 @@ class BattleScene(cocos.scene.Scene):
         """
 
         self._hud.reset_xp_bar()
+        self._stats.kill()
         del gained_levels[self._players_pokemon.level - len(gained_levels)]
         self.experience_gained(gained_levels)
 
@@ -314,6 +321,10 @@ class BattleScene(cocos.scene.Scene):
         :param gained_levels: A dictionary with the gained levels as well as
         the stats increase for each level.
         """
+
+        self._stats = StatLayer(self._players_pokemon, gained_levels)
+        self._stats.position = (490, 70)
+        self.add(self._stats, z=100)
 
         self._dialog.set_text(I18n().get("BATTLE.LEVEL_UP").format(self._players_pokemon.nickname,
                                                                    self._players_pokemon.level - (

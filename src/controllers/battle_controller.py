@@ -32,6 +32,7 @@ class BattleController(metaclass=Singleton):
                                          LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp,
                                                           moves["GROWL"].default_pp)])
         opponent_pokemon.hp = 2
+
         self._battle = BattleScene(self, players_pokemon, opponent_pokemon)
 
     def round(self, players_pokemon: PokemonModel, opponent_pokemon: PokemonModel,
@@ -106,8 +107,8 @@ class BattleController(metaclass=Singleton):
         else:
             wild_pokemon = 1
             experience_gained = (wild_pokemon * pokemon_ko.species.base_experience * pokemon_ko.level) // 7
-            gained_levels = players_pokemon.gain_experience(45000)
-            self._battle.player_won_fight(45000, gained_levels)
+            gained_levels = players_pokemon.gain_experience(experience_gained)
+            self._battle.player_won_fight(experience_gained, gained_levels)
 
     def run(self) -> None:
         """the player escapes the battle."""
