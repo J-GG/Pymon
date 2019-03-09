@@ -89,7 +89,7 @@ class FightActionModel:
                     damage = round(
                         ((
                                  2 * self._attacker.level / 5 + 2) * self._move.move.power * attack / defense / 50 + 5) * modifier)
-                    damage = -damage if self._defender.hp - damage >= 0 else -self._defender.hp
+                    damage = max(1, damage) * -1
 
                 staged_stats = self._move.move.effects.staged_stats if self._move.move.effects else dict()
 

@@ -1,3 +1,5 @@
+from math import ceil
+
 import cocos
 from cocos.actions import *
 
@@ -45,18 +47,18 @@ class OpponentHUDLayer(Layer):
         self.add(self._hp_bar)
 
         for color in HPBarColorEnum:
-            if 100 * pokemon.hp // pokemon.stats[StatEnum.HP] <= color.upper_limit:
+            if ceil(100 * pokemon.hp / pokemon.stats[StatEnum.HP]) <= color.upper_limit:
                 self._bar_color = color
                 break
 
-        self._hp_bar_size = OpponentHUDLayer.HP_BAR_SIZE * pokemon.hp // pokemon.stats[StatEnum.HP]
+        self._hp_bar_size = ceil(OpponentHUDLayer.HP_BAR_SIZE * pokemon.hp / pokemon.stats[StatEnum.HP])
 
         self._hp_bar_content = {color: [] for color in HPBarColorEnum}
         for i in range(OpponentHUDLayer.HP_BAR_SIZE):
             for color in HPBarColorEnum:
                 hp_pixel = cocos.sprite.Sprite('img/battle/hud/hp_bar_{0}.png'.format(color.name))
                 hp_pixel.position = -22 + i, -12
-                hp_pixel.visible = True if color == self._bar_color and i <= self._hp_bar_size else False
+                hp_pixel.visible = True if color == self._bar_color and i < self._hp_bar_size else False
                 self._hp_bar_content[color].append(hp_pixel)
 
                 self.add(self._hp_bar_content[color][i], z=1)
@@ -64,15 +66,20 @@ class OpponentHUDLayer(Layer):
     def update_hp(self) -> None:
         """Update the size and the color of the HP bar."""
 
-        new_hp_bar_size = OpponentHUDLayer.HP_BAR_SIZE * self._pokemon.hp // self._pokemon.stats[StatEnum.HP]
-        time_between_update = OpponentHUDLayer.HP_UPDATE_DURATION / (self._hp_bar_size - new_hp_bar_size)
-        step, visible, offset = (1, True, 0) if new_hp_bar_size > self._hp_bar_size else (-1, False, -1)
+        new_hp_bar_size = ceil(OpponentHUDLayer.HP_BAR_SIZE * self._pokemon.hp / self._pokemon.stats[StatEnum.HP])
+        if new_hp_bar_size != self._hp_bar_size:
+            time_between_update = OpponentHUDLayer.HP_UPDATE_DURATION / abs(self._hp_bar_size - new_hp_bar_size)
+            start = 0 if self._hp_bar_size <= 0 else self._hp_bar_size - 1
+            step, visible, stop = (1, True, new_hp_bar_size) if new_hp_bar_size > self._hp_bar_size else (
+                -1, False, new_hp_bar_size - 1)
+            i = 0
 
-        for pixel_index in range(self._hp_bar_size + offset, new_hp_bar_size + offset, step):
-            self.do(Delay(self._hp_bar_size * time_between_update - time_between_update * pixel_index)
-                    + CallFunc(self._toggle_hp_pixel, pixel_index, visible))
+            for pixel_index in range(start, stop, step):
+                self.do(Delay(i * time_between_update)
+                        + CallFunc(self._toggle_hp_pixel, pixel_index, visible))
+                i += 1
 
-        self._hp_bar_size = new_hp_bar_size
+            self._hp_bar_size = new_hp_bar_size
 
     def _toggle_hp_pixel(self, pixel_index: int, visible: bool) -> None:
         """Hide or show the pixel whose the index is specified and changes the color
@@ -84,11 +91,11 @@ class OpponentHUDLayer(Layer):
 
         self._hp_bar_content[self._bar_color][pixel_index].visible = visible
         for color in HPBarColorEnum:
-            if pixel_index * 100 // OpponentHUDLayer.HP_BAR_SIZE <= color.upper_limit:
+            if ceil(pixel_index * 100 / OpponentHUDLayer.HP_BAR_SIZE) <= color.upper_limit:
                 if color != self._bar_color:
                     self._bar_color = color
-                    offset = -1 if visible else 0
-                    for i in range(pixel_index + offset):
+                    stop = pixel_index + 1 if visible else pixel_index
+                    for i in range(stop):
                         for c in HPBarColorEnum:
                             self._hp_bar_content[c][i].visible = True if c == self._bar_color else False
                 break

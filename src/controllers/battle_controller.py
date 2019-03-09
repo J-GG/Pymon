@@ -19,18 +19,19 @@ class BattleController(metaclass=Singleton):
     def battle(self) -> None:
         """Starts a battle."""
 
-        players_pokemon = PokemonModel(pokemons["PIKACHU"], pokemons["PIKACHU"].name, 10, [
+        players_pokemon = PokemonModel(pokemons["PIKACHU"], pokemons["PIKACHU"].name, 5, [
             LearnedMoveModel(moves["TAIL_WHIP"], moves["TAIL_WHIP"].default_pp, moves["TAIL_WHIP"].default_pp),
             LearnedMoveModel(moves["THUNDER_SHOCK"], moves["THUNDER_SHOCK"].default_pp,
                              moves["THUNDER_SHOCK"].default_pp),
             LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp, moves["GROWL"].default_pp),
         ])
+        players_pokemon.hp = players_pokemon.stats[StatEnum.HP] // 2
         opponent_pokemon = PokemonModel(pokemons["BULBASAUR"], pokemons["BULBASAUR"].name, 5,
                                         [LearnedMoveModel(moves["VINE_WHIP"], moves["VINE_WHIP"].default_pp,
                                                           moves["VINE_WHIP"].default_pp),
                                          LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp,
                                                           moves["GROWL"].default_pp)])
-
+        opponent_pokemon.hp = 2
         self._battle = BattleScene(self, players_pokemon, opponent_pokemon)
 
     def round(self, players_pokemon: PokemonModel, opponent_pokemon: PokemonModel,
@@ -74,6 +75,10 @@ class BattleController(metaclass=Singleton):
         move_effects = fight_action.get_effects()
 
         fight_action.defender.hp = fight_action.defender.hp + move_effects.hp
+        if fight_action.defender.hp < 0:
+            fight_action.defender.hp = 0
+        elif fight_action.defender.hp > fight_action.defender.stats[StatEnum.HP]:
+            fight_action.defender.hp = fight_action.defender.stats[StatEnum.HP]
 
         for staged_stat, value in move_effects.staged_stats.items():
             if value > 0:
@@ -101,8 +106,8 @@ class BattleController(metaclass=Singleton):
         else:
             wild_pokemon = 1
             experience_gained = (wild_pokemon * pokemon_ko.species.base_experience * pokemon_ko.level) // 7
-            gained_levels = players_pokemon.gain_experience(experience_gained)
-            self._battle.player_won_fight(experience_gained, gained_levels)
+            gained_levels = players_pokemon.gain_experience(45000)
+            self._battle.player_won_fight(45000, gained_levels)
 
     def run(self) -> None:
         """the player escapes the battle."""
