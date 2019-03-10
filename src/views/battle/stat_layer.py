@@ -11,7 +11,13 @@ class StatLayer(Layer):
     """The panel listing the stats increase after leveling up."""
 
     def __init__(self, pokemon: PokemonModel, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
-        """Create a stat layer."""
+        """Create a stat layer.
+
+        :param pokemon: The pokemon whose stats are displayed.
+        :param gained_levels: The list of the levels along with, for each stat,
+        the amount of the increase.
+        """
+        
         super().__init__()
 
         self._background = cocos.sprite.Sprite('img/battle/stats.png', anchor=(0, 0))

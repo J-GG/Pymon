@@ -300,7 +300,8 @@ class BattleScene(cocos.scene.Scene):
                          + Delay(HUDLayer.XP_UPDATE_DURATION) + CallFunc(self._level_up, gained_levels))
         else:
             self._hud.do(CallFunc(self._hud.update_xp) +
-                         Delay(HUDLayer.XP_UPDATE_DURATION + 0.5) + CallFunc(self._battle_controller.run))
+                         Delay(HUDLayer.XP_UPDATE_DURATION + 0.5) + CallFunc(self._battle_controller.end_battle,
+                                                                             self._players_pokemon))
 
     def _continue_experience_gained(self, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
         """After leveling up, reset the XP bar and keep updating it.

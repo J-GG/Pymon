@@ -1,4 +1,3 @@
-import typing
 from enum import Enum
 from math import floor
 
@@ -10,25 +9,25 @@ class StatEnum(Enum):
     of a species), the IV (depends on each pokemon) and their level.
     """
 
-    HP = "HP", lambda level, base_stat, iv: floor((2 * base_stat + iv) * level / 100 + level + 10)
-    ATTACK = "Attack", lambda level, base_stat, iv: floor(((2 * base_stat + iv) * level / 100 + 5) * 0.9)
-    DEFENSE = "Defense", lambda level, base_stat, iv: floor(((2 * base_stat + iv) * level / 100 + 5) * 0.9)
-    SPECIAL_ATTACK = "Special attack", lambda level, base_stat, iv: floor(
-        ((2 * base_stat + iv) * level / 100 + 5) * 0.9)
-    SPECIAL_DEFENSE = "Special defense", lambda level, base_stat, iv: floor(
-        ((2 * base_stat + iv) * level / 100 + 5) * 0.9)
-    SPEED = "Speed", lambda level, base_stat, iv: floor(((2 * base_stat + iv) * level / 100 + 5) * 0.9)
+    HP = "HP"
+    ATTACK = "Attack"
+    DEFENSE = "Defense"
+    SPECIAL_ATTACK = "Special attack"
+    SPECIAL_DEFENSE = "Special defense"
+    SPEED = "Speed"
 
-    def __init__(self, value: str, function: typing.Callable) -> None:
+    def __init__(self, value: str) -> None:
         """Create a new stat.
 
         :param value: The textual value of the enumeration.
-        :param function: the function to determine the value of the stat.
         """
 
         super().__init__()
         self._value = value
-        self._function = function
+        if value == "HP":
+            self._function = lambda level, base_stat, iv: floor((2 * base_stat + iv) * level / 100 + level + 10)
+        else:
+            self._function = lambda level, base_stat, iv: floor(((2 * base_stat + iv) * level / 100 + 5) * 0.9)
 
     def get_stat(self, level: int, base_stat: int, iv: int) -> int:
         """Get the value of the stat for the indicated level based on the base stat

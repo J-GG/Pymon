@@ -9,6 +9,7 @@ from models.learned_move_model import LearnedMoveModel
 from models.pokemon_model import PokemonModel
 from toolbox.data.moves import moves
 from toolbox.data.pokemon import pokemons
+from toolbox.save_management import save, delete, load
 from toolbox.singleton import Singleton
 from views.battle.battle_scene import BattleScene
 
@@ -19,19 +20,19 @@ class BattleController(metaclass=Singleton):
     def battle(self) -> None:
         """Starts a battle."""
 
-        players_pokemon = PokemonModel(pokemons["PIKACHU"], pokemons["PIKACHU"].name, 5, [
-            LearnedMoveModel(moves["TAIL_WHIP"], moves["TAIL_WHIP"].default_pp, moves["TAIL_WHIP"].default_pp),
-            LearnedMoveModel(moves["THUNDER_SHOCK"], moves["THUNDER_SHOCK"].default_pp,
-                             moves["THUNDER_SHOCK"].default_pp),
-            LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp, moves["GROWL"].default_pp),
-        ])
-        players_pokemon.hp = players_pokemon.stats[StatEnum.HP] // 2
+        players_pokemon = load()
+        if not players_pokemon:
+            players_pokemon = PokemonModel(pokemons["PIKACHU"], pokemons["PIKACHU"].name, 50, [
+                LearnedMoveModel(moves["TAIL_WHIP"], moves["TAIL_WHIP"].default_pp, moves["TAIL_WHIP"].default_pp),
+                LearnedMoveModel(moves["THUNDER_SHOCK"], moves["THUNDER_SHOCK"].default_pp,
+                                 moves["THUNDER_SHOCK"].default_pp),
+                LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp, moves["GROWL"].default_pp),
+            ])
         opponent_pokemon = PokemonModel(pokemons["BULBASAUR"], pokemons["BULBASAUR"].name, 5,
                                         [LearnedMoveModel(moves["VINE_WHIP"], moves["VINE_WHIP"].default_pp,
                                                           moves["VINE_WHIP"].default_pp),
                                          LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp,
                                                           moves["GROWL"].default_pp)])
-        opponent_pokemon.hp = 2
 
         self._battle = BattleScene(self, players_pokemon, opponent_pokemon)
 
@@ -103,7 +104,7 @@ class BattleController(metaclass=Singleton):
         """
 
         if pokemon_ko == players_pokemon:
-            MainMenuController.show_menu()
+            self.end_battle(players_pokemon)
         else:
             wild_pokemon = 1
             experience_gained = (wild_pokemon * pokemon_ko.species.base_experience * pokemon_ko.level) // 7
@@ -111,6 +112,19 @@ class BattleController(metaclass=Singleton):
             self._battle.player_won_fight(experience_gained, gained_levels)
 
     def run(self) -> None:
-        """the player escapes the battle."""
+        """The player escapes the battle."""
+
+        MainMenuController.show_menu()
+
+    def end_battle(self, players_pokemon: PokemonModel) -> None:
+        """The battle is over.
+
+        :param players_pokemon: The player's pokemon.
+        """
+
+        if players_pokemon.hp > 0:
+            save(players_pokemon)
+        else:
+            delete()
 
         MainMenuController.show_menu()

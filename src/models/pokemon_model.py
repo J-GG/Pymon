@@ -247,3 +247,11 @@ class PokemonModel:
 
         self._hp = self._hp + (self._stats[StatEnum.HP] - old_hp_stat) if old_hp_stat and self._hp else self._stats[
             StatEnum.HP]
+
+    def heal(self) -> None:
+        """Fully heal the pokemon. Set the HP to the max and reset the staged 
+        stats.
+        """
+        
+        self._hp = self.stats[StatEnum.HP]
+        self._staged_stats = {stat: 0 for stat in StagedStatEnum}

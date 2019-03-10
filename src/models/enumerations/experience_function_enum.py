@@ -1,4 +1,3 @@
-import typing
 from enum import Enum
 from math import floor
 
@@ -10,22 +9,20 @@ class ExperienceFunctionEnum(Enum):
     its level and one of these functions.
     """
 
-    FAST = "FAST", lambda level: floor(4 * level ** 3 / 5)
-    MEDIUM_FAST = "MEDIUM_FAST", lambda level: floor(level ** 3)
-    MEDIUM_SLOW = "MEDIUM_SLOW", lambda level: floor(6 / 5 * level ** 3 - 15 * level ** 2 + 100 * level - 140)
-    SLOW = "SLOW", lambda level: floor(5 * level ** 3 / 4)
+    FAST = "FAST"
+    MEDIUM_FAST = "MEDIUM_FAST"
+    MEDIUM_SLOW = "MEDIUM_SLOW"
+    SLOW = "SLOW"
 
-    def __init__(self, value: str, function: typing.Callable) -> None:
+    def __init__(self, value: str) -> None:
         """Create a new experience function.
 
         :param value: The name of the experience function.
-        :param function: The function to determine the experience of the
-        pokemon.
         """
 
         super().__init__()
         self._value = value
-        self._function = function
+        self._function = None
 
     def get_xp_for_level(self, level: int) -> int:
         """Get the number of points of experience necessary to reach the
@@ -37,3 +34,10 @@ class ExperienceFunctionEnum(Enum):
         """
 
         return self._function(level)
+
+
+ExperienceFunctionEnum.FAST._function = lambda level: floor(4 * level ** 3 / 5)
+ExperienceFunctionEnum.MEDIUM_FAST._function = lambda level: floor(level ** 3)
+ExperienceFunctionEnum.MEDIUM_SLOW._function = lambda level: floor(
+    6 / 5 * level ** 3 - 15 * level ** 2 + 100 * level - 140)
+ExperienceFunctionEnum.SLOW._function = lambda level: floor(5 * level ** 3 / 4)
