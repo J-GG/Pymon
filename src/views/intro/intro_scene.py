@@ -16,6 +16,6 @@ class IntroScene(cocos.scene.Scene):
         self._background = BackgroundLayer()
         self.add(self._background)
 
-        self.do(Delay(0.1) + CallFunc(MainMenuController.show_menu))
+        self.do(Delay(0.1) + CallFunc(MainMenuController().show_menu))
 
         cocos.director.director.run(self)

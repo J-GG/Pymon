@@ -9,7 +9,7 @@ from models.learned_move_model import LearnedMoveModel
 from models.pokemon_model import PokemonModel
 from toolbox.data.moves import moves
 from toolbox.data.pokemon import pokemons
-from toolbox.save_management import save, delete, load
+from toolbox.game import Game
 from toolbox.singleton import Singleton
 from views.battle.battle_scene import BattleScene
 
@@ -20,14 +20,7 @@ class BattleController(metaclass=Singleton):
     def battle(self) -> None:
         """Starts a battle."""
 
-        players_pokemon = load()
-        if not players_pokemon:
-            players_pokemon = PokemonModel(pokemons["PIKACHU"], pokemons["PIKACHU"].name, 50, [
-                LearnedMoveModel(moves["TAIL_WHIP"], moves["TAIL_WHIP"].default_pp, moves["TAIL_WHIP"].default_pp),
-                LearnedMoveModel(moves["THUNDER_SHOCK"], moves["THUNDER_SHOCK"].default_pp,
-                                 moves["THUNDER_SHOCK"].default_pp),
-                LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp, moves["GROWL"].default_pp),
-            ])
+        players_pokemon = Game.game_state.player.pokemons[0]
         opponent_pokemon = PokemonModel(pokemons["BULBASAUR"], pokemons["BULBASAUR"].name, 5,
                                         [LearnedMoveModel(moves["VINE_WHIP"], moves["VINE_WHIP"].default_pp,
                                                           moves["VINE_WHIP"].default_pp),
@@ -114,7 +107,7 @@ class BattleController(metaclass=Singleton):
     def run(self) -> None:
         """The player escapes the battle."""
 
-        MainMenuController.show_menu()
+        MainMenuController().show_menu()
 
     def end_battle(self, players_pokemon: PokemonModel) -> None:
         """The battle is over.
@@ -123,8 +116,8 @@ class BattleController(metaclass=Singleton):
         """
 
         if players_pokemon.hp > 0:
-            save(players_pokemon)
+            Game.save()
         else:
-            delete()
+            Game.delete()
 
-        MainMenuController.show_menu()
+        MainMenuController().show_menu()
