@@ -1,3 +1,4 @@
+import codecs
 from configparser import ConfigParser
 
 from toolbox.init import PATH
@@ -11,7 +12,7 @@ class I18n(metaclass=Singleton):
         """Create a new object to manage internationalization."""
 
         self._config_parser = ConfigParser()
-        self._config_parser.read(PATH + "/conf/i18n_en.conf")
+        self._config_parser.read_file(codecs.open(PATH + "/conf/i18n_en.conf", "r", "utf-8"))
 
     def get(self, key: str) -> str:
         """Get the translation for the given key.

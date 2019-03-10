@@ -12,6 +12,7 @@ from models.enumerations.move_effectiveness_enum import MoveEffectivenessEnum
 from models.enumerations.stat_enum import StatEnum
 from models.learned_move_model import LearnedMoveModel
 from models.pokemon_model import PokemonModel
+from toolbox.game import Game
 from toolbox.i18n import I18n
 from views.common.dialog import Dialog
 from .actions_layer import ActionsLayer
@@ -300,8 +301,7 @@ class BattleScene(cocos.scene.Scene):
                          + Delay(HUDLayer.XP_UPDATE_DURATION) + CallFunc(self._level_up, gained_levels))
         else:
             self._hud.do(CallFunc(self._hud.update_xp) +
-                         Delay(HUDLayer.XP_UPDATE_DURATION + 0.5) + CallFunc(self._battle_controller.end_battle,
-                                                                             self._players_pokemon))
+                         Delay(HUDLayer.XP_UPDATE_DURATION + 0.5) + CallFunc(self._battle_controller.won_battle))
 
     def _continue_experience_gained(self, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
         """After leveling up, reset the XP bar and keep updating it.
@@ -331,3 +331,10 @@ class BattleScene(cocos.scene.Scene):
                                                                    self._players_pokemon.level - (
                                                                            len(gained_levels) - 1)),
                               lambda: self._continue_experience_gained(gained_levels))
+
+    def player_lost_battle(self):
+        """The player lost the battle. Display a message."""
+
+        self._dialog.set_text([I18n().get("BATTLE.OUT_OF_POKEMON").format(Game.game_state.player.name),
+                               I18n().get("BATTLE.WHITED_OUT").format(Game.game_state.player.name)],
+                              self._battle_controller.lost_battle)

@@ -97,7 +97,8 @@ class BattleController(metaclass=Singleton):
         """
 
         if pokemon_ko == players_pokemon:
-            self.end_battle(players_pokemon)
+            if Game.game_state.player.has_conscious_pokemon:
+                self._battle.player_lost_battle()
         else:
             wild_pokemon = 1
             experience_gained = (wild_pokemon * pokemon_ko.species.base_experience * pokemon_ko.level) // 7
@@ -109,15 +110,14 @@ class BattleController(metaclass=Singleton):
 
         MainMenuController().show_menu()
 
-    def end_battle(self, players_pokemon: PokemonModel) -> None:
-        """The battle is over.
+    def lost_battle(self):
+        """The player lost the battle. His game state is erased."""
 
-        :param players_pokemon: The player's pokemon.
-        """
+        Game.delete()
+        MainMenuController().show_menu()
 
-        if players_pokemon.hp > 0:
-            Game.save()
-        else:
-            Game.delete()
+    def won_battle(self):
+        """The player won the battle. His game state is saved."""
 
+        Game.save()
         MainMenuController().show_menu()

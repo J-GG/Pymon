@@ -54,3 +54,16 @@ class PlayerModel:
 
         :param pokemons: The list of ``PokemonModel`` owned by the player.
         """
+
+    def has_conscious_pokemon(self) -> bool:
+        """Get whether the player has still at least one pokemon with more than
+        0 HP.
+
+        :return: True if the player has still conscious pokemon.
+        """
+
+        for pokemon in pokemons:
+            if pokemon.hp > 0:
+                return True
+
+        return False
