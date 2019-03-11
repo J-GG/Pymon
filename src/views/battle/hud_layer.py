@@ -97,7 +97,7 @@ class HUDLayer(Layer):
             time_between_update = HUDLayer.HP_UPDATE_DURATION / abs(self._hp_bar_size - new_hp_bar_size)
             start = 0 if self._hp_bar_size <= 0 else self._hp_bar_size - 1
             step, visible, stop = (1, True, new_hp_bar_size) if new_hp_bar_size > self._hp_bar_size else (
-            -1, False, new_hp_bar_size - 1)
+                -1, False, new_hp_bar_size - 1)
             i = 0
 
             for pixel_index in range(start, stop, step):
@@ -166,7 +166,7 @@ class HUDLayer(Layer):
 
             for pixel_index in range(self._xp_bar_size, new_xp_bar_size, 1):
                 self._xp_bar_content[pixel_index].do(
-                    Delay(time_between_update * pixel_index)
+                    Delay(time_between_update * (pixel_index - self._xp_bar_size))
                     + CallFunc(self._toggle_xp_pixel, pixel_index, True))
 
             if level_up_stats:
