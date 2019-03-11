@@ -11,7 +11,9 @@ class Game:
     """Manages the persistence of the data."""
 
     GAME_STATE_PATH = PATH + "/data/game_state"
-
+    if not os.path.exists(PATH + "/data"):
+        os.makedirs(PATH + "/data")
+        
     game_state = None
 
     @staticmethod
