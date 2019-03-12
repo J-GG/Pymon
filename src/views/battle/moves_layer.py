@@ -10,7 +10,6 @@ class MovesLayer(Layer):
     """Shows the pokemon's list of moves."""
 
     SELECTED_SPRITE = "SELECTED_SPRITE"
-    PP = "PP"
 
     is_event_handler = True
 
@@ -117,7 +116,7 @@ class MovesLayer(Layer):
             pp = cocos.text.Label("PP {0}/{1}".format(move.current_pp, move.pp),
                                   font_size=9, anchor_x="left", anchor_y="center", bold=True)
             pp.position = (-15, -8)
-            self._actions[index].add(pp, name=MovesLayer.PP)
+            self._actions[index].add(pp)
             type = cocos.sprite.Sprite('img/common/types/{0}.png'.format(move.move.type.name.lower()))
             type.position = (-35, -8)
             type.scale = 0.9

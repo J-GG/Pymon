@@ -17,6 +17,7 @@ class ActionsLayer(cocos.layer.Layer):
     CONTINUE = 0
     NEW_GAME = 1
     SETTINGS = 2
+    ACTIONS = [CONTINUE, NEW_GAME, SETTINGS]
 
     SELECTED_SPRITE = "SELECTED_SPRITE"
 
@@ -60,7 +61,7 @@ class ActionsLayer(cocos.layer.Layer):
             time_value.position = (70, 0)
             continue_sprite.add(time_value)
             for index, pokemon in enumerate(game_state.player.pokemons):
-                pokemon_sprite = cocos.sprite.Sprite('img/pokemon/mini/{0}.png'.format(pokemon.species.name.lower()))
+                pokemon_sprite = cocos.sprite.Sprite('img/pokemon/mini/{0}.png'.format(pokemon.species.id.lower()))
                 pokemon_sprite.scale = 0.7
                 pokemon_sprite.position = (-140 + index * 60, -50)
                 continue_sprite.add(pokemon_sprite)
@@ -93,7 +94,7 @@ class ActionsLayer(cocos.layer.Layer):
     def _update_screen(self) -> None:
         """update the selected action."""
 
-        for i in range(3):
+        for i in range(len(ActionsLayer.ACTIONS)):
             if self._choice == i:
                 self._actions[i].get(ActionsLayer.SELECTED_SPRITE).visible = True
             else:
@@ -115,17 +116,17 @@ class ActionsLayer(cocos.layer.Layer):
         if key == KeyEnum.UP.value and self._choice > 0 and (self._game_state or self._choice > 1):
             self._choice -= 1
             event_handled = True
-        elif key == KeyEnum.DOWN.value and self._choice < 2:
+        elif key == KeyEnum.DOWN.value and self._choice < len(ActionsLayer.ACTIONS) - 1:
             self._choice += 1
             event_handled = True
         elif key == KeyEnum.ENTER.value:
             if not self._key_pressed_handled:
                 if self._choice == ActionsLayer.CONTINUE:
-                    self.parent.continue_game(self._game_state)
+                    self.parent.continue_game()
                 elif self._choice == ActionsLayer.NEW_GAME:
                     self.parent.new_game()
                 else:
-                    pass
+                    self.parent.settings()
                 self._key_pressed_handled = True
                 event_handled = True
 

@@ -17,5 +17,6 @@ class PokemonLayer(cocos.layer.Layer):
         super().__init__()
 
         self._pokemon = cocos.sprite.Sprite(
-            pyglet.image.load_animation(PATH + '/assets/img/pokemon/back/{0}.gif'.format(players_pokemon.species.name)))
+            pyglet.image.load_animation(
+                PATH + '/assets/img/pokemon/back/{0}.gif'.format(players_pokemon.species.id.lower())))
         self.add(self._pokemon)

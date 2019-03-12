@@ -245,12 +245,13 @@ class BattleScene(cocos.scene.Scene):
 
             if action.defender.hp > 0:
                 for staged_stat, stage in effects.staged_stats.items():
-                    if stage > 0:
-                        text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
-                            action.attacker.nickname, staged_stat.value[0]))
-                    elif stage < 0:
-                        text.append(I18n().get("BATTLE.STAGED_STAT_{stage}".format(stage=stage)).format(
-                            action.defender.nickname, staged_stat.value[0]))
+                    if stage > 0 or stage < 0:
+                        if stage > 0:
+                            pokemon_name = action.attacker.nickname
+                        else:
+                            pokemon_name = action.defender.nickname
+                        text.append(I18n().get("BATTLE.STAGED_STAT_{0}".format(stage)).format(pokemon_name, I18n().get(
+                            "STAT.{0}".format(staged_stat.name))))
 
         if action.defender.hp > 0:
             if text:
@@ -332,9 +333,9 @@ class BattleScene(cocos.scene.Scene):
                                                                            len(gained_levels) - 1)),
                               lambda: self._continue_experience_gained(gained_levels))
 
-    def player_lost_battle(self):
+    def player_lost_battle(self) -> None:
         """The player lost the battle. Display a message."""
 
-        self._dialog.set_text([I18n().get("BATTLE.OUT_OF_POKEMON").format(Game.game_state.player.name),
-                               I18n().get("BATTLE.WHITED_OUT").format(Game.game_state.player.name)],
+        self._dialog.set_text([I18n().get("BATTLE.OUT_OF_POKEMON").format(Game().game_state.player.name),
+                               I18n().get("BATTLE.WHITED_OUT").format(Game().game_state.player.name)],
                               self._battle_controller.lost_battle)

@@ -1,6 +1,7 @@
 import cocos
 from cocos.actions import *
 
+from toolbox.i18n import I18n
 from views.battle.action_enum import ActionEnum
 from views.common.key_enum import KeyEnum
 from views.common.layer import Layer
@@ -34,7 +35,8 @@ class ActionsLayer(Layer):
             selected_sprite.visible = False
             self._actions[action.name].add(selected_sprite, name=ActionsLayer.SELECTED_SPRITE)
 
-            label = cocos.text.Label(action.name, font_size=8, anchor_x="center", anchor_y="center")
+            label = cocos.text.Label(I18n().get("BATTLE.ACTION.{0}".format(action.name)), font_size=8,
+                                     anchor_x="center", anchor_y="center")
             self._actions[action.name].add(label)
 
             self.add(self._actions[action.name])

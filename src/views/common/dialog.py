@@ -21,7 +21,7 @@ class Dialog(Layer):
         self._background.position = (0, 0)
         self.add(self._background)
 
-        self._cursor = cocos.sprite.Sprite('img/common/dialog_cursor.png')
+        self._cursor = cocos.sprite.Sprite('img/common/cursor.png')
         self._cursor.position = (625, 15)
         self._cursor.do(Repeat(MoveBy((0, 5), 0.5) + MoveBy((0, -5), 0.5)))
         self._cursor.visible = False

@@ -10,3 +10,7 @@ def init_pyglet() -> None:
 
     pyglet.resource.path = [PATH + '/assets']
     pyglet.resource.reindex()
+
+
+def init_game() -> None:
+    """Initialize the game"""

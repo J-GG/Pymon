@@ -32,15 +32,17 @@ class MainMenuScene(cocos.scene.Scene):
 
         cocos.director.director.replace(FadeTransition(self))
 
-    def continue_game(self, game_state: typing.Union[None, GameStateModel]) -> None:
-        """Load the game state and continue the saved game.
+    def continue_game(self) -> None:
+        """Load the game state and continue the saved game."""
 
-       :param game_state: The game state of the saved game.
-       """
-
-        self._main_menu_controller.continue_game(game_state)
+        self._main_menu_controller.continue_game()
 
     def new_game(self) -> None:
         """Start a new game."""
 
         self._main_menu_controller.new_game()
+
+    def settings(self) -> None:
+        """Set the settings."""
+
+        self._main_menu_controller.settings()

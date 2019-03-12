@@ -20,7 +20,7 @@ class BattleController(metaclass=Singleton):
     def battle(self) -> None:
         """Starts a battle."""
 
-        players_pokemon = Game.game_state.player.pokemons[0]
+        players_pokemon = Game().game_state.player.pokemons[0]
         opponent_pokemon = PokemonModel(pokemons["BULBASAUR"], pokemons["BULBASAUR"].name, 5,
                                         [LearnedMoveModel(moves["VINE_WHIP"], moves["VINE_WHIP"].default_pp,
                                                           moves["VINE_WHIP"].default_pp),
@@ -97,27 +97,27 @@ class BattleController(metaclass=Singleton):
         """
 
         if pokemon_ko == players_pokemon:
-            if Game.game_state.player.has_conscious_pokemon:
+            if Game().game_state.player.has_conscious_pokemon:
                 self._battle.player_lost_battle()
         else:
             wild_pokemon = 1
             experience_gained = (wild_pokemon * pokemon_ko.species.base_experience * pokemon_ko.level) // 7
-            gained_levels = players_pokemon.gain_experience(5400)
-            self._battle.player_won_fight(5400, gained_levels)
+            gained_levels = players_pokemon.gain_experience(experience_gained)
+            self._battle.player_won_fight(experience_gained, gained_levels)
 
     def run(self) -> None:
         """The player escapes the battle."""
 
         MainMenuController().show_menu()
 
-    def lost_battle(self):
+    def lost_battle(self) -> None:
         """The player lost the battle. His game state is erased."""
 
-        Game.delete()
+        Game().game_state.delete()
         MainMenuController().show_menu()
 
-    def won_battle(self):
+    def won_battle(self) -> None:
         """The player won the battle. His game state is saved."""
 
-        Game.save()
+        Game().game_state.save()
         MainMenuController().show_menu()

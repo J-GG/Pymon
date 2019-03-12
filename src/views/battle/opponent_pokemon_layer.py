@@ -18,5 +18,5 @@ class OpponentPokemonLayer(cocos.layer.Layer):
 
         self._pokemon = cocos.sprite.Sprite(
             pyglet.image.load_animation(
-                PATH + '/assets/img/pokemon/front/{0}.gif'.format(opponent_pokemon.species.name)))
+                PATH + '/assets/img/pokemon/front/{0}.gif'.format(opponent_pokemon.species.id.lower())))
         self.add(self._pokemon)
