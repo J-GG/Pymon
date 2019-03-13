@@ -1,9 +1,11 @@
 import typing
 
 import cocos
+import pyglet
 
 from models.game_state_model import GameStateModel
 from toolbox.i18n import I18n
+from toolbox.init import PATH
 from views.common.key_enum import KeyEnum
 
 
@@ -36,9 +38,11 @@ class ActionsLayer(cocos.layer.Layer):
         self._actions = []
 
         continue_file = "multi_line_action" if game_state else "multi_line_action_disabled"
-        continue_sprite = cocos.sprite.Sprite('img/main_menu/{0}.jpg'.format(continue_file))
+        continue_sprite = cocos.sprite.Sprite(
+            pyglet.image.load(PATH + '/assets/img/main_menu/{0}.jpg'.format(continue_file)))
         continue_sprite.position = (320, 355)
-        continue_selected = cocos.sprite.Sprite('img/main_menu/multi_line_action_selected.jpg')
+        continue_selected = cocos.sprite.Sprite(
+            pyglet.image.load(PATH + '/assets/img/main_menu/multi_line_action_selected.jpg'))
         continue_sprite.add(continue_selected, name=ActionsLayer.SELECTED_SPRITE)
         continue_text = cocos.text.Label(I18n().get("MAIN_MENU.CONTINUE"), bold=True, color=(0, 0, 0, 255))
         continue_text.position = (-180, 60)
@@ -61,16 +65,18 @@ class ActionsLayer(cocos.layer.Layer):
             time_value.position = (70, 0)
             continue_sprite.add(time_value)
             for index, pokemon in enumerate(game_state.player.pokemons):
-                pokemon_sprite = cocos.sprite.Sprite('img/pokemon/mini/{0}.png'.format(pokemon.species.id.lower()))
+                pokemon_sprite = cocos.sprite.Sprite(
+                    pyglet.image.load(PATH + '/assets/img/pokemon/mini/{0}.png'.format(pokemon.species.id.lower())))
                 pokemon_sprite.scale = 0.7
                 pokemon_sprite.position = (-140 + index * 60, -50)
                 continue_sprite.add(pokemon_sprite)
         self.add(continue_sprite)
         self._actions.append(continue_sprite)
 
-        new_game = cocos.sprite.Sprite('img/main_menu/single_line_action.jpg')
+        new_game = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/main_menu/single_line_action.jpg'))
         new_game.position = (320, 196)
-        new_game_selected = cocos.sprite.Sprite('img/main_menu/single_line_action_selected.jpg')
+        new_game_selected = cocos.sprite.Sprite(
+            pyglet.image.load(PATH + '/assets/img/main_menu/single_line_action_selected.jpg'))
         new_game.add(new_game_selected, name=ActionsLayer.SELECTED_SPRITE)
         new_game_text = cocos.text.Label(I18n().get("MAIN_MENU.NEW_GAME"), bold=True, color=(0, 0, 0, 255))
         new_game_text.position = (-180, -5)
@@ -78,9 +84,10 @@ class ActionsLayer(cocos.layer.Layer):
         self.add(new_game)
         self._actions.append(new_game)
 
-        settings = cocos.sprite.Sprite('img/main_menu/single_line_action.jpg')
+        settings = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/main_menu/single_line_action.jpg'))
         settings.position = (320, 91)
-        settings_selected = cocos.sprite.Sprite('img/main_menu/single_line_action_selected.jpg')
+        settings_selected = cocos.sprite.Sprite(
+            pyglet.image.load(PATH + '/assets/img/main_menu/single_line_action_selected.jpg'))
         settings.add(settings_selected, name=ActionsLayer.SELECTED_SPRITE)
         settings_text = cocos.text.Label(I18n().get("MAIN_MENU.SETTINGS"), bold=True, color=(0, 0, 0, 255))
         settings_text.position = (-180, -5)

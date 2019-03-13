@@ -1,7 +1,9 @@
 import cocos
+import pyglet
 from cocos.actions import *
 
 from toolbox.i18n import I18n
+from toolbox.init import PATH
 from views.battle.action_enum import ActionEnum
 from views.common.key_enum import KeyEnum
 from views.common.layer import Layer
@@ -26,11 +28,13 @@ class ActionsLayer(Layer):
         self._is_visible = False
         self._actions = dict()
         for action in ActionEnum:
-            self._actions[action.name] = cocos.sprite.Sprite('img/battle/actions/action.png')
+            self._actions[action.name] = cocos.sprite.Sprite(
+                pyglet.image.load(PATH + '/assets/img/battle/actions/action.png'))
             self._actions[action.name].position = 700 + self._actions[action.name].width, 100 + 40 * action.value
             self._actions[action.name].scale = 1.2
 
-            selected_sprite = cocos.sprite.Sprite('img/battle/actions/selected_action.png')
+            selected_sprite = cocos.sprite.Sprite(
+                pyglet.image.load(PATH + '/assets/img/battle/actions/selected_action.png'))
             selected_sprite.scale = self._actions[action.name].scale
             selected_sprite.visible = False
             self._actions[action.name].add(selected_sprite, name=ActionsLayer.SELECTED_SPRITE)

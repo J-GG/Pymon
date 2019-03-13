@@ -1,7 +1,9 @@
 import cocos
+import pyglet
 from cocos.actions import *
 
 from models.pokemon_model import PokemonModel
+from toolbox.init import PATH
 from views.common.key_enum import KeyEnum
 from views.common.layer import Layer
 
@@ -27,11 +29,12 @@ class MovesLayer(Layer):
         self._actions = dict()
         self.update_moves()
 
-        self._actions[len(self._actions)] = cocos.sprite.Sprite('img/battle/moves/return.png')
+        self._actions[len(self._actions)] = cocos.sprite.Sprite(
+            pyglet.image.load(PATH + '/assets/img/battle/moves/return.png'))
         self._actions[len(self._actions) - 1].position = 615 + self._actions[len(self._actions) - 1].width, 90
         self.add(self._actions[len(self._actions) - 1])
 
-        selected_sprite = cocos.sprite.Sprite('img/battle/moves/selected_return.png')
+        selected_sprite = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/battle/moves/selected_return.png'))
         selected_sprite.visible = False
         self._actions[len(self._actions) - 1].add(selected_sprite, name=MovesLayer.SELECTED_SPRITE)
 
@@ -99,12 +102,13 @@ class MovesLayer(Layer):
             if index in self._actions:
                 self.remove(self._actions[index])
 
-            self._actions[index] = cocos.sprite.Sprite('img/battle/moves/{0}.png'.format(move.move.type.name.lower()))
+            self._actions[index] = cocos.sprite.Sprite(
+                pyglet.image.load(PATH + '/assets/img/battle/moves/{0}.png'.format(move.move.type.name.lower())))
             offset = 0 if self._is_visible else self._actions[index].width
             self._actions[index].position = 715 + offset, 250 - 40 * index
 
-            selected_sprite = cocos.sprite.Sprite(
-                'img/battle/moves/selected_{0}.png'.format(move.move.type.name.lower()))
+            selected_sprite = cocos.sprite.Sprite(pyglet.image.load(
+                PATH + '/assets/img/battle/moves/selected_{0}.png'.format(move.move.type.name.lower())))
             selected_sprite.visible = False
             self._actions[index].add(selected_sprite, name=MovesLayer.SELECTED_SPRITE)
 
@@ -117,7 +121,8 @@ class MovesLayer(Layer):
                                   font_size=9, anchor_x="left", anchor_y="center", bold=True)
             pp.position = (-15, -8)
             self._actions[index].add(pp)
-            type = cocos.sprite.Sprite('img/common/types/{0}.png'.format(move.move.type.name.lower()))
+            type = cocos.sprite.Sprite(
+                pyglet.image.load(PATH + '/assets/img/common/types/{0}.png'.format(move.move.type.name.lower())))
             type.position = (-35, -8)
             type.scale = 0.9
             self._actions[index].add(type)

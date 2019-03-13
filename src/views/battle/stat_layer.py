@@ -1,10 +1,12 @@
 import typing
 
 import cocos
+import pyglet
 
 from models.enumerations.stat_enum import StatEnum
 from models.pokemon_model import PokemonModel
 from toolbox.i18n import I18n
+from toolbox.init import PATH
 from views.common.layer import Layer
 
 
@@ -29,7 +31,7 @@ class StatLayer(Layer):
 
         super().__init__()
 
-        self._background = cocos.sprite.Sprite('img/battle/stats.png', anchor=(0, 0))
+        self._background = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/battle/stats.png', anchor=(0, 0)))
         self.add(self._background)
 
         stats = {stat: pokemon.stats[stat] for stat in StatEnum}

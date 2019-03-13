@@ -1,8 +1,10 @@
 import typing
 
 import cocos
+import pyglet
 from cocos.actions import *
 
+from toolbox.init import PATH
 from views.common.key_enum import KeyEnum
 from views.common.layer import Layer
 
@@ -17,11 +19,12 @@ class Dialog(Layer):
 
         super().__init__()
 
-        self._background = cocos.sprite.Sprite('img/common/dialog_background.png', anchor=(0, 0))
+        self._background = cocos.sprite.Sprite(
+            pyglet.image.load(PATH + '/assets/img/common/dialog_background.png'), anchor=(0, 0))
         self._background.position = (0, 0)
         self.add(self._background)
 
-        self._cursor = cocos.sprite.Sprite('img/common/cursor.png')
+        self._cursor = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/common/cursor.png'))
         self._cursor.position = (625, 15)
         self._cursor.do(Repeat(MoveBy((0, 5), 0.5) + MoveBy((0, -5), 0.5)))
         self._cursor.visible = False

@@ -1,9 +1,11 @@
 import cocos
+import pyglet
 from cocos.actions import *
 
 from models.settings.language_enum import LanguageEnum
 from models.settings.settings_model import SettingsModel
 from toolbox.i18n import I18n
+from toolbox.init import PATH
 from views.common.key_enum import KeyEnum
 
 
@@ -30,9 +32,10 @@ class ActionsLayer(cocos.layer.Layer):
         self._actions = []
 
         self._selected_language = settings.language.index
-        language = cocos.sprite.Sprite('img/main_menu/single_line_action.jpg')
+        language = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/main_menu/single_line_action.jpg'))
         language.position = (320, 355)
-        language_selected = cocos.sprite.Sprite('img/main_menu/single_line_action_selected.jpg')
+        language_selected = cocos.sprite.Sprite(
+            pyglet.image.load(PATH + '/assets/img/main_menu/single_line_action_selected.jpg'))
         language.add(language_selected, name=ActionsLayer.SELECTED_SPRITE)
         language_text = cocos.text.Label(I18n().get("SETTINGS.LANGUAGE"), bold=True, color=(0, 0, 0, 255))
         language_text.position = (-180, -5)
@@ -41,11 +44,11 @@ class ActionsLayer(cocos.layer.Layer):
                                           color=(0, 0, 0, 255))
         language_value.position = (70, -5)
         language.add(language_value, name=ActionsLayer.LANGUAGE_VALUE)
-        language_left_arrow = cocos.sprite.Sprite('img/common/cursor.png')
+        language_left_arrow = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/common/cursor.png'))
         language_left_arrow.do(RotateBy(90, 0))
         language_left_arrow.position = (40, 0)
         language.add(language_left_arrow)
-        language_right_arrow = cocos.sprite.Sprite('img/common/cursor.png')
+        language_right_arrow = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/common/cursor.png'))
         language_right_arrow.do(RotateBy(-90, 0))
         language_right_arrow.position = (170, 0)
         language.add(language_right_arrow)
@@ -53,9 +56,10 @@ class ActionsLayer(cocos.layer.Layer):
         self._actions.append(language)
         self.add(language, name=str(ActionsLayer.LANGUAGE))
 
-        cancel = cocos.sprite.Sprite('img/main_menu/single_little_line_action.jpg')
+        cancel = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/main_menu/single_little_line_action.jpg'))
         cancel.position = (320, 50)
-        cancel_selected = cocos.sprite.Sprite('img/main_menu/single_little_line_action_selected.jpg')
+        cancel_selected = cocos.sprite.Sprite(
+            pyglet.image.load(PATH + '/assets/img/main_menu/single_little_line_action_selected.jpg'))
         cancel.add(cancel_selected, name=ActionsLayer.SELECTED_SPRITE)
         cancel_text = cocos.text.Label(I18n().get("SETTINGS.CANCEL"), bold=True, color=(0, 0, 0, 255))
         cancel_text.position = (-cancel_text.element.content_width / 2, -5)

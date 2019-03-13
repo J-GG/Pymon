@@ -1,6 +1,9 @@
 import random
 
 import cocos
+import pyglet
+
+from toolbox.init import PATH
 
 
 class BackgroundLayer(cocos.layer.Layer):
@@ -17,6 +20,6 @@ class BackgroundLayer(cocos.layer.Layer):
 
         super().__init__()
 
-        self._background = cocos.sprite.Sprite(
-            'img/battle/backgrounds/{0}'.format((random.choice(BackgroundLayer.BATTLE_BACKGROUND))))
+        self._background = cocos.sprite.Sprite(pyglet.image.load(
+            PATH + '/assets/img/battle/backgrounds/{0}'.format((random.choice(BackgroundLayer.BATTLE_BACKGROUND)))))
         self.add(self._background)

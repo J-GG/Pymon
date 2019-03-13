@@ -2,10 +2,12 @@ import typing
 from math import ceil
 
 import cocos
+import pyglet
 from cocos.actions import *
 
 from models.enumerations.stat_enum import StatEnum
 from models.pokemon_model import PokemonModel
+from toolbox.init import PATH
 from views.common.layer import Layer
 from views.common.text import Text
 from .hp_bar_color_enum import HPBarColorEnum
@@ -39,7 +41,7 @@ class HUDLayer(Layer):
         self._name.position = -self._name.width, 0
         self.add(self._name, z=1)
 
-        self._level_txt = cocos.sprite.Sprite('img/battle/hud/level.png')
+        self._level_txt = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/battle/hud/level.png'))
         self._level_txt.position = 5, -2
         self.add(self._level_txt, z=1)
 
@@ -47,7 +49,7 @@ class HUDLayer(Layer):
         self._level.position = 17, 0
         self.add(self._level, z=1)
 
-        self._hp_bar = cocos.sprite.Sprite('img/battle/hud/hp_bar.png')
+        self._hp_bar = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/battle/hud/hp_bar.png'))
         self._hp_bar.position = -6, -12
         self.add(self._hp_bar)
 
@@ -61,7 +63,8 @@ class HUDLayer(Layer):
         self._hp_bar_content = {color: [] for color in HPBarColorEnum}
         for i in range(HUDLayer.HP_BAR_SIZE):
             for color in HPBarColorEnum:
-                hp_pixel = cocos.sprite.Sprite('img/battle/hud/hp_bar_{0}.png'.format(color.name))
+                hp_pixel = cocos.sprite.Sprite(
+                    pyglet.image.load(PATH + '/assets/img/battle/hud/hp_bar_{0}.png'.format(color.name)))
                 hp_pixel.position = -23 + i, -12
                 hp_pixel.visible = True if color == self._bar_color and i < self._hp_bar_size else False
                 self._hp_bar_content[color].append(hp_pixel)
@@ -72,7 +75,7 @@ class HUDLayer(Layer):
         self._hp.position = -20, -24
         self.add(self._hp, z=1)
 
-        self._xp_bar = cocos.sprite.Sprite('img/battle/hud/xp_bar.png')
+        self._xp_bar = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/battle/hud/xp_bar.png'))
         self._xp_bar.position = -10, -37
         self.add(self._xp_bar)
 
@@ -81,7 +84,8 @@ class HUDLayer(Layer):
         self._xp_bar_size = HUDLayer.XP_BAR_SIZE * (pokemon.experience - xp_current_lvl) // (
                 pokemon.experience_for_next_level - xp_current_lvl)
         for i in range(HUDLayer.XP_BAR_SIZE):
-            self._xp_bar_content.append(cocos.sprite.Sprite('img/battle/hud/xp_bar_blue.png'))
+            self._xp_bar_content.append(
+                cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/battle/hud/xp_bar_blue.png')))
             self._xp_bar_content[i].position = -56 + i, -37
             self._xp_bar_content[i].visible = False if i > self._xp_bar_size else True
             self.add(self._xp_bar_content[i], z=1)
