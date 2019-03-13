@@ -3,9 +3,9 @@ import typing
 import cocos
 import pyglet
 from cocos.actions import *
+from pyglet.window import key as keys
 
 from toolbox.init import PATH
-from views.common.key_enum import KeyEnum
 from views.common.layer import Layer
 
 
@@ -109,7 +109,7 @@ class Dialog(Layer):
 
         event_handled = False
 
-        if key == KeyEnum.ENTER.value and self._cursor.visible:
+        if key == keys.ENTER and self._cursor.visible:
             if self._end_index != len(self._split_text):
                 self._start_index = self._end_index
                 self._update_text()

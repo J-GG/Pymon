@@ -1,10 +1,10 @@
 import cocos
 import pyglet
 from cocos.actions import *
+from pyglet.window import key as keys
 
 from models.pokemon_model import PokemonModel
 from toolbox.init import PATH
-from views.common.key_enum import KeyEnum
 from views.common.layer import Layer
 
 
@@ -60,16 +60,16 @@ class MovesLayer(Layer):
 
         event_handled = False
         if self._is_visible:
-            if key == KeyEnum.B.value or (key == KeyEnum.ENTER.value and self._selected == len(self._actions) - 1):
+            if key == keys.B or (key == keys.ENTER and self._selected == len(self._actions) - 1):
                 self.do(CallFunc(self.toggle_apparition) + Delay(0.3) + CallFunc(self.parent.show_actions))
                 event_handled = True
-            elif key == KeyEnum.ENTER.value:
+            elif key == keys.ENTER:
                 self.parent.fight_action(self._pokemon.moves[self._selected])
                 event_handled = True
-            elif key == KeyEnum.UP.value and self._selected > 0:
+            elif key == keys.UP and self._selected > 0:
                 self._selected = self._selected - 1
                 event_handled = True
-            elif key == KeyEnum.DOWN.value and self._selected < len(self._actions) - 1:
+            elif key == keys.DOWN and self._selected < len(self._actions) - 1:
                 self._selected = self._selected + 1
                 event_handled = True
 

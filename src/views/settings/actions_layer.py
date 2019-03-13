@@ -1,12 +1,12 @@
 import cocos
 import pyglet
 from cocos.actions import *
+from pyglet.window import key as keys
 
 from models.settings.language_enum import LanguageEnum
 from models.settings.settings_model import SettingsModel
 from toolbox.i18n import I18n
 from toolbox.init import PATH
-from views.common.key_enum import KeyEnum
 
 
 class ActionsLayer(cocos.layer.Layer):
@@ -92,23 +92,23 @@ class ActionsLayer(cocos.layer.Layer):
 
         event_handled = False
 
-        if key == KeyEnum.UP.value and self._choice > 0:
+        if key == keys.UP and self._choice > 0:
             self._choice -= 1
             event_handled = True
-        elif key == KeyEnum.DOWN.value and self._choice < len(ActionsLayer.ACTIONS) - 1:
+        elif key == keys.DOWN and self._choice < len(ActionsLayer.ACTIONS) - 1:
             self._choice += 1
             event_handled = True
-        elif self._choice == ActionsLayer.LANGUAGE and (key == KeyEnum.LEFT.value or key == KeyEnum.RIGHT.value):
-            if key == KeyEnum.LEFT.value:
+        elif self._choice == ActionsLayer.LANGUAGE and (key == keys.LEFT or key == keys.RIGHT):
+            if key == keys.LEFT:
                 self._selected_language = self._selected_language - 1 if self._selected_language > 0 else len(
                     LanguageEnum) - 1
-            elif key == KeyEnum.RIGHT.value:
+            elif key == keys.RIGHT:
                 self._selected_language = self._selected_language + 1 if self._selected_language < len(
                     LanguageEnum) - 1 else 0
             self.get(str(ActionsLayer.LANGUAGE)).get(ActionsLayer.LANGUAGE_VALUE).element.text = I18n().get(
                 "SETTINGS.LANGUAGE.{0}".format(LanguageEnum.from_index(self._selected_language).name))
             event_handled = True
-        elif key == KeyEnum.ENTER.value:
+        elif key == keys.ENTER:
             if self._choice == ActionsLayer.CANCEL:
                 new_settings = {LanguageEnum: LanguageEnum.from_index(self._selected_language)}
                 self.parent.cancel_settings(new_settings)

@@ -2,11 +2,11 @@ import typing
 
 import cocos
 import pyglet
+from pyglet.window import key as keys
 
 from models.game_state_model import GameStateModel
 from toolbox.i18n import I18n
 from toolbox.init import PATH
-from views.common.key_enum import KeyEnum
 
 
 class ActionsLayer(cocos.layer.Layer):
@@ -120,13 +120,13 @@ class ActionsLayer(cocos.layer.Layer):
 
         event_handled = False
 
-        if key == KeyEnum.UP.value and self._choice > 0 and (self._game_state or self._choice > 1):
+        if key == keys.UP and self._choice > 0 and (self._game_state or self._choice > 1):
             self._choice -= 1
             event_handled = True
-        elif key == KeyEnum.DOWN.value and self._choice < len(ActionsLayer.ACTIONS) - 1:
+        elif key == keys.DOWN and self._choice < len(ActionsLayer.ACTIONS) - 1:
             self._choice += 1
             event_handled = True
-        elif key == KeyEnum.ENTER.value:
+        elif key == keys.ENTER:
             if not self._key_pressed_handled:
                 if self._choice == ActionsLayer.CONTINUE:
                     self.parent.continue_game()

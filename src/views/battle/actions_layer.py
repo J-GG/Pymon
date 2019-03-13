@@ -1,11 +1,11 @@
 import cocos
 import pyglet
 from cocos.actions import *
+from pyglet.window import key as keys
 
 from toolbox.i18n import I18n
 from toolbox.init import PATH
 from views.battle.action_enum import ActionEnum
-from views.common.key_enum import KeyEnum
 from views.common.layer import Layer
 
 
@@ -67,13 +67,13 @@ class ActionsLayer(Layer):
         event_handled = False
 
         if self._is_visible:
-            if key == KeyEnum.UP.value and self._selected.value < 3:
+            if key == keys.UP and self._selected.value < 3:
                 self._selected = ActionEnum(self._selected.value + 1)
                 event_handled = True
-            elif key == KeyEnum.DOWN.value and self._selected.value > 0:
+            elif key == keys.DOWN and self._selected.value > 0:
                 self._selected = ActionEnum(self._selected.value - 1)
                 event_handled = True
-            elif key == KeyEnum.ENTER.value:
+            elif key == keys.ENTER:
                 if self._selected == ActionEnum.FIGHT:
                     self.toggle_apparition()
                     self.parent.show_moves()
