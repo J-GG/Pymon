@@ -3,9 +3,10 @@ import pyglet
 
 from models.pokemon_model import PokemonModel
 from toolbox.init import PATH
+from views.common.layer import Layer
 
 
-class PokemonLayer(cocos.layer.Layer):
+class PokemonLayer(Layer):
     """The player's pokemon"""
 
     def __init__(self, players_pokemon: PokemonModel) -> None:

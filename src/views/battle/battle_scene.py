@@ -18,6 +18,7 @@ from views.common.dialog import Dialog
 from .actions_layer import ActionsLayer
 from .background_layer import BackgroundLayer
 from .fade_layer import FadeLayer
+from .go_pokemon_layer import GoPokemonLayer
 from .hud_layer import HUDLayer
 from .moves_layer import MovesLayer
 from .opponent_hud_layer import OpponentHUDLayer
@@ -86,11 +87,9 @@ class BattleScene(cocos.scene.Scene):
 
         self._dialog = Dialog()
         self._dialog.do(Delay(BattleScene.TRANSITION_DURATION + BattleScene.TRAVELING_DURATION / 2 + 0.2)
-                        + FadeOut(0)
-                        + Delay(BattleScene.ZOOM_OUT_DURATION - 0.2)
-                        )
+                        + FadeOut(0))
         self._dialog.set_text(I18n().get("BATTLE.WILD").format(self._opponent_pokemon.nickname))
-        self.add(self._dialog, z=50)
+        self.add(self._dialog, z=75)
 
         self._opponent_pokemonLayer = OpponentPokemonLayer(self._opponent_pokemon)
         self._opponent_pokemonLayer.scale = 2
@@ -110,43 +109,50 @@ class BattleScene(cocos.scene.Scene):
                       )
         self.add(self._fade, z=100)
 
-        self._pokemon = PokemonLayer(self._players_pokemon)
-        self._pokemon.scale = 2.5
-        self._pokemon.position = (150, 150)
-        self._pokemon.do(
-            Delay(BattleScene.TRANSITION_DURATION + BattleScene.TRAVELING_DURATION * 2 / 3)
-            + (ScaleTo(2, BattleScene.ZOOM_OUT_DURATION) | MoveTo((460, 370), BattleScene.ZOOM_OUT_DURATION))
-        )
-        self.add(self._pokemon)
-
-        self.do(
-            Delay(BattleScene.TRANSITION_DURATION + BattleScene.TRAVELING_DURATION)
-            + CallFunc(self._start)
-        )
-
-    def _start(self) -> None:
-        """Show the pokemon information."""
-
         self._opponent_hud = OpponentHUDLayer(self._opponent_pokemon)
         self._opponent_hud.position = (350, 370)
-        self._opponent_hud.do(FadeOut(0) + FadeIn(0.5))
+        self._opponent_hud.opacity = 0
+        self._opponent_hud.do(Delay(BattleScene.TRANSITION_DURATION + BattleScene.TRAVELING_DURATION)
+                              + FadeIn(0.5))
         self.add(self._opponent_hud, z=50)
 
         self._hud = HUDLayer(self._players_pokemon)
         self._hud.position = (420, 180)
-        self._hud.do(FadeOut(0) + FadeIn(0.5))
+        self._hud.opacity = 0
         self.add(self._hud, z=50)
 
-        self._dialog.do(FadeIn(0.5))
-
         self._actions = ActionsLayer()
-        self._actions.do(FadeOut(0) + FadeIn(0.5))
         self.add(self._actions)
 
         self._moves = MovesLayer(self._players_pokemon)
         self.add(self._moves)
 
-        self.show_actions()
+        self._go_pokemon = GoPokemonLayer()
+        self.add(self._go_pokemon, z=60)
+
+        self._pokemon = PokemonLayer(self._players_pokemon)
+        self._pokemon.scale = 2
+        self._pokemon.position = (450, 350)
+        self._pokemon.opacity = 0
+        self.add(self._pokemon)
+
+        self.do(
+            Delay(BattleScene.TRANSITION_DURATION + BattleScene.TRAVELING_DURATION)
+            + CallFunc(self._send_pokemon)
+        )
+
+    def _send_pokemon(self) -> None:
+        """Show the player's pokemon."""
+
+        self._go_pokemon.animation()
+
+        self._dialog.do(FadeIn(0.5))
+        self._dialog.set_text(I18n().get("BATTLE.GO_POKEMON").format(self._players_pokemon.nickname))
+
+        self._pokemon.do(Delay(0.5) + FadeIn(0.5))
+        self._hud.do(Delay(0.8) + FadeIn(0.5))
+
+        self.do(Delay(1.4) + CallFunc(self.show_actions))
 
     def show_actions(self) -> None:
         """Ask the player to choose an action."""
