@@ -149,8 +149,8 @@ class BattleScene(cocos.scene.Scene):
         self._dialog.do(FadeIn(0.5))
         self._dialog.set_text(I18n().get("BATTLE.GO_POKEMON").format(self._players_pokemon.nickname))
 
-        self._pokemon.do(Delay(0.5) + FadeIn(0.5))
-        self._hud.do(Delay(0.8) + FadeIn(0.5))
+        self._pokemon.do(Delay(1.6) + FadeIn(0.5))
+        self._hud.do(Delay(1.6) + FadeIn(0.5))
 
         self.do(Delay(1.4) + CallFunc(self.show_actions))
 
