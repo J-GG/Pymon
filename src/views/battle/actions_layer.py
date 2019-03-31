@@ -78,6 +78,9 @@ class ActionsLayer(Layer):
                     self.toggle_apparition()
                     self.parent.show_moves()
                     event_handled = True
+                elif self._selected == ActionEnum.PKMN:
+                    self.parent.show_infos()
+                    event_handled = True
                 elif self._selected == ActionEnum.RUN:
                     self.toggle_apparition()
                     self.parent.run_action()

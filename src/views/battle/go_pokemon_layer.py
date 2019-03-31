@@ -23,7 +23,7 @@ class GoPokemonLayer(cocos.layer.Layer):
             0.5,
             loop=False)
         )
-        self._trainer.scale = 1.25
+        self._trainer.scale = 1.75
         self._trainer.position = -self._trainer.width / 2, -self._trainer.height / 2
         self.add(self._trainer)
 
@@ -39,14 +39,14 @@ class GoPokemonLayer(cocos.layer.Layer):
         self._trainer.kill()
         self._trainer = cocos.sprite.Sprite(pyglet.image.Animation.from_image_sequence(
             GoPokemonLayer.TRAINER_GRID,
-            0.1,
+            0.08,
             loop=False)
         )
-        self._trainer.scale = 1.25
-        self._trainer.position = (60, 90)
+        self._trainer.scale = 1.75
+        self._trainer.position = self._trainer.width / 3.2, self._trainer.height / 3.2
         self.add(self._trainer)
 
         self._trainer.do(
-            Delay(0.8) + MoveTo((-self._trainer.width, 0), 1))
+            Delay(0.6) + MoveTo((-self._trainer.width, 0), 1))
 
         self._light.do(Delay(0.9) + FadeIn(0.4) + Delay(0.5) + FadeOut(0.3))

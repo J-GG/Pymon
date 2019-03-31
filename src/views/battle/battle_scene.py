@@ -5,6 +5,7 @@ import typing
 import cocos
 from cocos.actions import *
 
+from models.battle.battle_model import BattleModel
 from models.battle.fight_action_model import FightActionModel
 from models.battle.run_action_model import RunActionModel
 from models.enumerations.move_category_enum import MoveCategoryEnum
@@ -15,6 +16,7 @@ from models.pokemon_model import PokemonModel
 from toolbox.game import Game
 from toolbox.i18n import I18n
 from views.common.dialog import Dialog
+from views.common.stat_layer import StatLayer
 from .actions_layer import ActionsLayer
 from .background_layer import BackgroundLayer
 from .fade_layer import FadeLayer
@@ -24,7 +26,6 @@ from .moves_layer import MovesLayer
 from .opponent_hud_layer import OpponentHUDLayer
 from .opponent_pokemon_layer import OpponentPokemonLayer
 from .pokemon_layer import PokemonLayer
-from .stat_layer import StatLayer
 from .transition_layer import TransitionLayer
 
 
@@ -46,18 +47,17 @@ class BattleScene(cocos.scene.Scene):
     TRAVELING_DURATION = 2
     ZOOM_OUT_DURATION = 1
 
-    def __init__(self, battle_controller, players_pokemon: PokemonModel, opponent_pokemon: PokemonModel) -> None:
+    def __init__(self, battle_controller, battle: BattleModel) -> None:
         """Create a battle scene.
 
         :param battle_controller: The controller to be called to manage.
-        :param players_pokemon: The player's pokemon.
-        :param opponent_pokemon: The opponent pokemon.
+        :param battle: The data of the battle.
         """
 
         super().__init__()
         self._battle_controller = battle_controller
-        self._players_pokemon = players_pokemon
-        self._opponent_pokemon = opponent_pokemon
+        self._players_pokemon = battle.players_pokemon
+        self._opponent_pokemon = battle.opponent_pokemon
 
         transition_class = getattr(importlib.import_module("cocos.scenes.transitions"),
                                    random.choice(BattleScene.BATTLE_TRANSITIONS))
@@ -146,13 +146,16 @@ class BattleScene(cocos.scene.Scene):
 
         self._go_pokemon.animation()
 
-        self._dialog.do(FadeIn(0.5))
-        self._dialog.set_text(I18n().get("BATTLE.GO_POKEMON").format(self._players_pokemon.nickname))
+        self._dialog.set_text("")
+        self._dialog.do(FadeIn(0.4) |
+                        (Delay(0.2) + CallFunc(self._dialog.set_text,
+                                               I18n().get("BATTLE.GO_POKEMON").format(
+                                                   self._players_pokemon.nickname))))
 
         self._pokemon.do(Delay(1.6) + FadeIn(0.5))
-        self._hud.do(Delay(1.6) + FadeIn(0.5))
+        self._hud.do(Delay(2) + FadeIn(0.5))
 
-        self.do(Delay(1.4) + CallFunc(self.show_actions))
+        self.do(Delay(2.2) + CallFunc(self.show_actions))
 
     def show_actions(self) -> None:
         """Ask the player to choose an action."""
@@ -174,14 +177,12 @@ class BattleScene(cocos.scene.Scene):
 
         self._moves.toggle_apparition()
 
-        self._battle_controller.round(self._players_pokemon, self._opponent_pokemon,
-                                      FightActionModel(self._players_pokemon, self._opponent_pokemon, move))
+        self._battle_controller.round(FightActionModel(self._players_pokemon, self._opponent_pokemon, move))
 
     def run_action(self) -> None:
         """The player selected to run. It is transmitted to the controller."""
 
-        self._battle_controller.round(self._players_pokemon, self._opponent_pokemon,
-                                      RunActionModel(self._players_pokemon, self._opponent_pokemon))
+        self._battle_controller.round(RunActionModel(self._players_pokemon, self._opponent_pokemon))
 
     def _successful_run(self) -> None:
         """The attempt to run is successful. The battle is over."""
@@ -282,8 +283,7 @@ class BattleScene(cocos.scene.Scene):
             self._opponent_pokemonLayer.do(MoveBy((200, 0), 0.5))
 
         self._dialog.set_text(I18n().get("BATTLE.KO").format(pokemon.nickname),
-                              lambda: self._battle_controller.pokemon_ko(pokemon, self._players_pokemon,
-                                                                         self._opponent_pokemon))
+                              lambda: self._battle_controller.pokemon_ko(pokemon))
 
     def player_won_fight(self, xp_points: int, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
         """The player's pokemon defeated the opponent. They gain some XP.
@@ -345,3 +345,8 @@ class BattleScene(cocos.scene.Scene):
         self._dialog.set_text([I18n().get("BATTLE.OUT_OF_POKEMON").format(Game().game_state.player.name),
                                I18n().get("BATTLE.WHITED_OUT").format(Game().game_state.player.name)],
                               self._battle_controller.lost_battle)
+
+    def show_infos(self) -> None:
+        """Show the PKMN information scene."""
+
+        self._battle_controller.infos_pkmn()
