@@ -33,7 +33,6 @@ class ActionsLayer(cocos.layer.Layer):
 
         super().__init__()
 
-        self._key_pressed_handled = False
         self._game_state = game_state
         self._actions = []
 
@@ -127,15 +126,13 @@ class ActionsLayer(cocos.layer.Layer):
             self._choice += 1
             event_handled = True
         elif key == keys.ENTER:
-            if not self._key_pressed_handled:
-                if self._choice == ActionsLayer.CONTINUE:
-                    self.parent.continue_game()
-                elif self._choice == ActionsLayer.NEW_GAME:
-                    self.parent.new_game()
-                else:
-                    self.parent.settings()
-                self._key_pressed_handled = True
-                event_handled = True
+            if self._choice == ActionsLayer.CONTINUE:
+                self.parent.continue_game()
+            elif self._choice == ActionsLayer.NEW_GAME:
+                self.parent.new_game()
+            else:
+                self.parent.settings()
+            event_handled = True
 
         self._update_screen()
 

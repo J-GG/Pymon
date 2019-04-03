@@ -50,7 +50,9 @@ class BattleController(metaclass=Singleton):
             self._fight_action(first_action)
 
         if isinstance(second_action, FightActionModel) and second_action.attacker.hp > 0:
-            self._fight_action(second_action)
+            if not isinstance(first_action, RunActionModel) or (
+                    isinstance(first_action, RunActionModel) and not first_action.is_run_successful()):
+                self._fight_action(second_action)
 
         self._battle_scene.round(first_action, second_action)
 

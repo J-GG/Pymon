@@ -4,6 +4,7 @@ from cocos.actions import *
 from pyglet.window import key as keys
 
 from models.pokemon_model import PokemonModel
+from toolbox.i18n import I18n
 from toolbox.init import PATH
 from views.common.layer import Layer
 
@@ -30,13 +31,18 @@ class MovesLayer(Layer):
         self.update_moves()
 
         self._actions[len(self._actions)] = cocos.sprite.Sprite(
-            pyglet.image.load(PATH + '/assets/img/battle/moves/return.png'))
+            pyglet.image.load(PATH + '/assets/img/common/buttons/small_right.png'))
         self._actions[len(self._actions) - 1].position = 615 + self._actions[len(self._actions) - 1].width, 90
         self.add(self._actions[len(self._actions) - 1])
 
-        selected_sprite = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/battle/moves/selected_return.png'))
+        selected_sprite = cocos.sprite.Sprite(
+            pyglet.image.load(PATH + '/assets/img/common/buttons/selected_small_right.png'))
         selected_sprite.visible = False
         self._actions[len(self._actions) - 1].add(selected_sprite, name=MovesLayer.SELECTED_SPRITE)
+
+        text = cocos.text.Label(I18n().get("BATTLE.MOVE_RETURN"), anchor_y="top", font_size=30)
+        text.position = (-text.element.content_width / 2 + 3, text.element.content_height / 2 - 2)
+        self._actions[len(self._actions) - 1].add(text)
 
     def _update_selected_action(self) -> None:
         """Show the selected sprite of the selected action."""

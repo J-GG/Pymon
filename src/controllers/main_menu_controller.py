@@ -1,3 +1,4 @@
+from models.battle.battle_model import BattleModel
 from models.game_state_model import GameStateModel
 from toolbox.game import Game
 from toolbox.singleton import Singleton
@@ -17,14 +18,15 @@ class MainMenuController(metaclass=Singleton):
 
         from controllers.battle_controller import BattleController
         Game().game_state.start_time()
-        BattleController().battle()
+        BattleController().battle(BattleModel())
 
     def new_game(self) -> None:
         """Start a new game."""
 
-        from controllers.battle_controller import BattleController
         Game().game_state = GameStateModel()
-        BattleController().battle()
+        # BattleController().battle(BattleModel())
+        from controllers.pkmn_infos_controller import PkmnInfosController
+        PkmnInfosController().show_pkmn_infos(Game().game_state.player.pokemons[0])
 
     def settings(self) -> None:
         """Set the settings."""

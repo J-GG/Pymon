@@ -2,8 +2,9 @@ import cocos
 import pyglet
 from cocos.scenes.transitions import *
 
+from controllers.pkmn_infos_controller import PkmnInfosController
 from models.pokemon_model import PokemonModel
-from toolbox.i18n import I18n
+from toolbox.game import Game
 from toolbox.init import PATH
 from views.common.stat_layer import StatLayer
 from views.common.text import Text
@@ -15,21 +16,26 @@ class PkmnInfosScene(cocos.scene.Scene):
 
     SELECTED_SPRITE = "SELECTED_SPRITE"
 
-    def __init__(self, pokemon: PokemonModel) -> None:
+    def __init__(self, pkmn_infos_controller: PkmnInfosController, pokemon: PokemonModel,
+                 replace: bool = False) -> None:
         """Create a PKMN infos scene.
 
+        :param pkmn_infos_controller: The controller.
         :param pokemon : The Pokemon the information is to be displayed.
+        :param replace: Whether the scene should replace the previous one or not.
         """
 
         super().__init__()
+
+        self._pkmn_infos_controller = pkmn_infos_controller
+        self._pokemon = pokemon
 
         self._background = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/pkmn_infos/background.jpg'),
                                                anchor=(0, 0))
         self._background.position = (0, 0)
         self.add(self._background)
 
-        self._pokemon_name = cocos.text.Label(I18n().get("POKEMON.{0}".format(pokemon.nickname)), bold=True,
-                                              color=(0, 0, 0, 255), font_size=15)
+        self._pokemon_name = cocos.text.Label(pokemon.nickname, bold=True, color=(0, 0, 0, 255), font_size=15)
         self._pokemon_name.position = (
             cocos.director.director.get_window_size()[0] / 2 - self._pokemon_name.element.content_width / 2, 450)
         self.add(self._pokemon_name)
@@ -104,7 +110,29 @@ class PkmnInfosScene(cocos.scene.Scene):
             cocos.director.director.get_window_size()[0] / 2 + level_sprite.width / 2 - self._level.width / 2, 152)
         self.add(self._level)
 
-        self._actions = ActionsLayer()
+        self._actions = ActionsLayer(pokemon)
         self.add(self._actions)
 
-        cocos.director.director.push(FadeTransition(self))
+        if replace:
+            cocos.director.director.replace(FadeTransition(self))
+        else:
+            cocos.director.director.push(FadeTransition(self))
+
+    def cancel(self) -> None:
+        """Return to the previous scene."""
+
+        last_scene = cocos.director.director.scene_stack[len(cocos.director.director.scene_stack) - 1]
+        cocos.director.director.pop()
+        cocos.director.director.replace(FadeTransition(last_scene))
+
+    def previous(self) -> None:
+        """Show the previous pokemon."""
+
+        self._pkmn_infos_controller.show_pkmn_infos(
+            Game().game_state.player.pokemons[Game().game_state.player.pokemons.index(self._pokemon) - 1], True)
+
+    def next(self) -> None:
+        """Show the next pokemon."""
+
+        self._pkmn_infos_controller.show_pkmn_infos(
+            Game().game_state.player.pokemons[Game().game_state.player.pokemons.index(self._pokemon) + 1], True)

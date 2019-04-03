@@ -113,8 +113,8 @@ class HUDLayer(Layer):
                 i += 1
             self._hp_bar_size = new_hp_bar_size
 
-        self._hp.do(Delay(HUDLayer.HP_UPDATE_DURATION + 0.1) + CallFunc(self._update_hp_number, self._pokemon.hp,
-                                                                        self._pokemon.stats[StatEnum.HP]))
+        self.do(Delay(HUDLayer.HP_UPDATE_DURATION + 0.1) + CallFunc(self._update_hp_number, self._pokemon.hp,
+                                                                    self._pokemon.stats[StatEnum.HP]))
 
     def _update_hp_number(self, hp: int, max_hp: int) -> None:
         """Update the textual number of HP.
