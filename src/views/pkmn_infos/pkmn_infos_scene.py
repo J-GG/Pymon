@@ -5,6 +5,7 @@ from cocos.scenes.transitions import *
 from controllers.pkmn_infos_controller import PkmnInfosController
 from models.pokemon_model import PokemonModel
 from toolbox.game import Game
+from toolbox.i18n import I18n
 from toolbox.init import PATH
 from views.common.stat_layer import StatLayer
 from views.common.text import Text
@@ -62,8 +63,36 @@ class PkmnInfosScene(cocos.scene.Scene):
         self.add(self._pokemon_sprite)
 
         self._stats = StatLayer(pokemon, None)
-        self._stats.position = (20, 200)
+        self._stats.position = (5, 200)
         self.add(self._stats)
+
+        self._experience_background = cocos.sprite.Sprite(
+            pyglet.image.load(PATH + '/assets/img/pkmn_infos/experience_background.png'), anchor=(0, 0))
+        self._experience_background.opacity = 125
+        self._experience_background.position = (0, 90)
+        self.add(self._experience_background)
+        experience_gained_text = cocos.text.Label(I18n().get("POKEMON_INFOS.EXPERIENCE_POINTS"),
+                                                  anchor_x="left", anchor_y="center", bold=True)
+        experience_gained_text.position = (
+            5, self._experience_background.height / 2 + experience_gained_text.element.content_height / 2 + 2.5)
+        self._experience_background.add(experience_gained_text)
+        experience_gained = cocos.text.Label(str(pokemon.experience), anchor_x="center", anchor_y="center", bold=True)
+        experience_gained.position = (5 + experience_gained_text.element.content_width + (
+                self._experience_background.width - experience_gained_text.element.content_width) / 2,
+                                      self._experience_background.height / 2 + experience_gained.element.content_height / 2 + 2.5)
+        self._experience_background.add(experience_gained)
+
+        experience_next_text = cocos.text.Label(I18n().get("POKEMON_INFOS.NEXT_LEVEL"),
+                                                anchor_x="left", anchor_y="center", bold=True)
+        experience_next_text.position = (
+            5, self._experience_background.height / 2 - experience_next_text.element.content_height / 2 - 2.5)
+        self._experience_background.add(experience_next_text)
+        experience_next = cocos.text.Label(str(pokemon.experience_for_next_level - pokemon.experience),
+                                           anchor_x="center", anchor_y="center", bold=True)
+        experience_next.position = (5 + experience_gained_text.element.content_width + (
+                self._experience_background.width - experience_gained_text.element.content_width) / 2,
+                                    self._experience_background.height / 2 - experience_next.element.content_height / 2 - 2.5)
+        self._experience_background.add(experience_next)
 
         self._moves = []
         for index, move in enumerate(pokemon.moves):
