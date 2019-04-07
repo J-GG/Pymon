@@ -5,12 +5,14 @@ from controllers.pkmn_infos_controller import PkmnInfosController
 from models.battle.battle_model import BattleModel
 from models.battle.fight_action_model import FightActionModel
 from models.battle.run_action_model import RunActionModel
+from models.battle.shift_action_model import ShiftActionModel
 from models.enumerations.staged_stat_enum import StagedStatEnum
 from models.enumerations.stat_enum import StatEnum
 from models.pokemon_model import PokemonModel
 from toolbox.game import Game
 from toolbox.singleton import Singleton
 from views.battle.battle_scene import BattleScene
+from views.pkmn_infos.pkmn_infos_type_enum import PkmnInfosTypeEnum
 
 
 class BattleController(metaclass=Singleton):
@@ -25,16 +27,15 @@ class BattleController(metaclass=Singleton):
         self._battle = battle
         self._battle_scene = BattleScene(self, battle)
 
-    def round(self, players_action: typing.Union[FightActionModel, RunActionModel]) -> None:
+    def round(self, players_action: typing.Union[FightActionModel, RunActionModel, ShiftActionModel]) -> None:
         """Plays the round of the battle.
 
         :param players_action: The action chosen by the player.
         """
 
-        opponent_action = FightActionModel(self._battle.opponent_pokemon, self._battle.players_pokemon,
-                                           self._battle.opponent_pokemon.moves[0])
+        opponent_action = FightActionModel(self._battle, False, self._battle.opponent_pokemon.moves[0])
 
-        if isinstance(players_action, RunActionModel):
+        if isinstance(players_action, (RunActionModel, ShiftActionModel)):
             first_action, second_action = players_action, opponent_action
         else:
             player_speed = self._battle.players_pokemon.stats[StatEnum.SPEED] * StagedStatEnum.SPEED.get_multiplier(
@@ -48,6 +49,8 @@ class BattleController(metaclass=Singleton):
 
         if isinstance(first_action, FightActionModel):
             self._fight_action(first_action)
+        elif isinstance(first_action, ShiftActionModel):
+            first_action.shift(self._battle)
 
         if isinstance(second_action, FightActionModel) and second_action.attacker.hp > 0:
             if not isinstance(first_action, RunActionModel) or (
@@ -103,10 +106,14 @@ class BattleController(metaclass=Singleton):
 
         MainMenuController().show_menu()
 
-    def infos_pkmn(self) -> None:
-        """Show the PKMN information scene."""
+    def infos_pkmn(self, pkmn_infos_type: PkmnInfosTypeEnum) -> None:
+        """Show the PKMN information scene.
 
-        PkmnInfosController().show_pkmn_infos(self._battle.players_pokemon)
+        :param pkmn_infos_type: The type of scene. Affects the information
+        displayed and the interactions.
+        """
+
+        PkmnInfosController().show_pkmn_infos(pkmn_infos_type, self._battle.players_pokemon, battle=self._battle)
 
     def lost_battle(self) -> None:
         """The player lost the battle. His game state is erased."""

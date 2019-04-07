@@ -28,15 +28,19 @@ class HUDLayer(Layer):
     XP_BAR_SIZE = 93
     XP_UPDATE_DURATION = 1
 
-    def __init__(self, pokemon: PokemonModel) -> None:
+    def __init__(self, pokemon: PokemonModel, forced_hp: int = None) -> None:
         """Create a new HUD showing the player's pokemon's information.
+        The ``hp`` parameter is only useful if the current number of HP is
+        different from the displayed one.
 
         :param pokemon: The player's pokemon.
+        :param forced_hp: The number of HP to display.
         """
 
         super().__init__()
         self._pokemon = pokemon
 
+        hp = forced_hp if forced_hp else pokemon.hp
         self._name = Text(pokemon.nickname)
         self._name.position = -self._name.width, 0
         self.add(self._name, z=1)
@@ -58,7 +62,7 @@ class HUDLayer(Layer):
                 self._bar_color = color
                 break
 
-        self._hp_bar_size = ceil(HUDLayer.HP_BAR_SIZE * pokemon.hp / pokemon.stats[StatEnum.HP])
+        self._hp_bar_size = ceil(HUDLayer.HP_BAR_SIZE * hp / pokemon.stats[StatEnum.HP])
 
         self._hp_bar_content = {color: [] for color in HPBarColorEnum}
         for i in range(HUDLayer.HP_BAR_SIZE):
@@ -71,7 +75,7 @@ class HUDLayer(Layer):
 
                 self.add(self._hp_bar_content[color][i], z=1)
 
-        self._hp = Text("{0}/{1}".format(pokemon.hp, pokemon.stats[StatEnum.HP]))
+        self._hp = Text("{0}/{1}".format(hp, pokemon.stats[StatEnum.HP]))
         self._hp.position = -20, -24
         self.add(self._hp, z=1)
 

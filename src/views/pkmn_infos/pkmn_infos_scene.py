@@ -3,6 +3,7 @@ import pyglet
 from cocos.scenes.transitions import *
 
 from controllers.pkmn_infos_controller import PkmnInfosController
+from models.battle.battle_model import BattleModel
 from models.pokemon_model import PokemonModel
 from toolbox.game import Game
 from toolbox.i18n import I18n
@@ -10,6 +11,7 @@ from toolbox.init import PATH
 from views.common.stat_layer import StatLayer
 from views.common.text import Text
 from views.pkmn_infos.actions_layer import ActionsLayer
+from .pkmn_infos_type_enum import PkmnInfosTypeEnum
 
 
 class PkmnInfosScene(cocos.scene.Scene):
@@ -17,19 +19,24 @@ class PkmnInfosScene(cocos.scene.Scene):
 
     SELECTED_SPRITE = "SELECTED_SPRITE"
 
-    def __init__(self, pkmn_infos_controller: PkmnInfosController, pokemon: PokemonModel,
-                 replace: bool = False) -> None:
+    def __init__(self, pkmn_infos_controller: PkmnInfosController, pkmn_infos_type: PkmnInfosTypeEnum,
+                 pokemon: PokemonModel, replace: bool = False, battle: BattleModel = None) -> None:
         """Create a PKMN infos scene.
 
         :param pkmn_infos_controller: The controller.
+        :param pkmn_infos_type: The type of scene. Affects the information
+        displayed and the interactions.
         :param pokemon : The Pokemon the information is to be displayed.
         :param replace: Whether the scene should replace the previous one or not.
+        :param battle: The battle model if it is for a shift.
         """
 
         super().__init__()
 
         self._pkmn_infos_controller = pkmn_infos_controller
+        self._pkmn_infos_type = pkmn_infos_type
         self._pokemon = pokemon
+        self._battle = battle
 
         self._background = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/pkmn_infos/background.jpg'),
                                                anchor=(0, 0))
@@ -139,7 +146,7 @@ class PkmnInfosScene(cocos.scene.Scene):
             cocos.director.director.get_window_size()[0] / 2 + level_sprite.width / 2 - self._level.width / 2, 152)
         self.add(self._level)
 
-        self._actions = ActionsLayer(pokemon)
+        self._actions = ActionsLayer(pkmn_infos_type, pokemon, battle)
         self.add(self._actions)
 
         if replace:
@@ -157,11 +164,30 @@ class PkmnInfosScene(cocos.scene.Scene):
     def previous(self) -> None:
         """Show the previous pokemon."""
 
-        self._pkmn_infos_controller.show_pkmn_infos(
-            Game().game_state.player.pokemons[Game().game_state.player.pokemons.index(self._pokemon) - 1], True)
+        self._pkmn_infos_controller.show_pkmn_infos(self._pkmn_infos_type,
+                                                    Game().game_state.player.pokemons[
+                                                        Game().game_state.player.pokemons.index(self._pokemon) - 1],
+                                                    True,
+                                                    self._battle)
 
     def next(self) -> None:
         """Show the next pokemon."""
 
-        self._pkmn_infos_controller.show_pkmn_infos(
-            Game().game_state.player.pokemons[Game().game_state.player.pokemons.index(self._pokemon) + 1], True)
+        self._pkmn_infos_controller.show_pkmn_infos(self._pkmn_infos_type,
+                                                    Game().game_state.player.pokemons[
+                                                        Game().game_state.player.pokemons.index(self._pokemon) + 1],
+                                                    True,
+                                                    self._battle)
+
+    def shift(self, pokemon: PokemonModel) -> None:
+        """Return to the battle scene and shift the current pokemon with the
+        specified one.
+
+        :param pokemon: The pokemon to be sent to the battle field.
+        """
+
+        last_scene = cocos.director.director.scene_stack[len(cocos.director.director.scene_stack) - 1]
+        cocos.director.director.pop()
+        cocos.director.director.replace(FadeTransition(last_scene))
+
+        self._pkmn_infos_controller.shift(pokemon)

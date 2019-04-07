@@ -2,6 +2,7 @@ from models.battle.battle_model import BattleModel
 from models.game_state_model import GameStateModel
 from toolbox.game import Game
 from toolbox.singleton import Singleton
+from views.pkmn_infos.pkmn_infos_type_enum import PkmnInfosTypeEnum
 
 
 class MainMenuController(metaclass=Singleton):
@@ -24,9 +25,10 @@ class MainMenuController(metaclass=Singleton):
         """Start a new game."""
 
         Game().game_state = GameStateModel()
+        # from controllers.battle_controller import BattleController
         # BattleController().battle(BattleModel())
         from controllers.pkmn_infos_controller import PkmnInfosController
-        PkmnInfosController().show_pkmn_infos(Game().game_state.player.pokemons[0])
+        PkmnInfosController().show_pkmn_infos(PkmnInfosTypeEnum.NORMAL, Game().game_state.player.pokemons[0])
 
     def settings(self) -> None:
         """Set the settings."""

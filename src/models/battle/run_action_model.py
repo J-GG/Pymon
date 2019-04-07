@@ -8,7 +8,7 @@ class RunActionModel:
     """Represents the attempt to run from a battle."""
 
     def __init__(self, pokemon: PokemonModel, opponent_pokemon: PokemonModel) -> None:
-        """
+        """Create a new run action.
 
         :param pokemon: The pokemon trying to escape.
         :param opponent_pokemon: The other pokemon.

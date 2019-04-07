@@ -40,6 +40,7 @@ class BattleModel:
 
         :param players_pokemon: The player's fighting pokemon.
         """
+        self._players_pokemon = players_pokemon
 
     @property
     def opponent_pokemon(self) -> PokemonModel:
@@ -53,3 +54,17 @@ class BattleModel:
 
         :param opponent_pokemon: The opponent fighting pokemon.
         """
+
+        self._opponent_pokemon = opponent_pokemon
+
+    def shift_players_pokemon(self, players_pokemon: PokemonModel) -> PokemonModel:
+        """Shift the player's pokemon with the specified one and return the
+        previously fighting pokemon.
+        
+        :param players_pokemon: The player's fighting pokemon.
+        """
+
+        previous_pokemon = self.players_pokemon
+        self._players_pokemon = players_pokemon
+
+        return previous_pokemon

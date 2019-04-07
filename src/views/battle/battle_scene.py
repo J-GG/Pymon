@@ -8,6 +8,7 @@ from cocos.actions import *
 from models.battle.battle_model import BattleModel
 from models.battle.fight_action_model import FightActionModel
 from models.battle.run_action_model import RunActionModel
+from models.battle.shift_action_model import ShiftActionModel
 from models.enumerations.move_category_enum import MoveCategoryEnum
 from models.enumerations.move_effectiveness_enum import MoveEffectivenessEnum
 from models.enumerations.stat_enum import StatEnum
@@ -17,6 +18,7 @@ from toolbox.game import Game
 from toolbox.i18n import I18n
 from views.common.dialog import Dialog
 from views.common.stat_layer import StatLayer
+from views.pkmn_infos.pkmn_infos_type_enum import PkmnInfosTypeEnum
 from .actions_layer import ActionsLayer
 from .background_layer import BackgroundLayer
 from .fade_layer import FadeLayer
@@ -56,8 +58,7 @@ class BattleScene(cocos.scene.Scene):
 
         super().__init__()
         self._battle_controller = battle_controller
-        self._players_pokemon = battle.players_pokemon
-        self._opponent_pokemon = battle.opponent_pokemon
+        self._battle = battle
 
         transition_class = getattr(importlib.import_module("cocos.scenes.transitions"),
                                    random.choice(BattleScene.BATTLE_TRANSITIONS))
@@ -88,10 +89,10 @@ class BattleScene(cocos.scene.Scene):
         self._dialog = Dialog()
         self._dialog.do(Delay(BattleScene.TRANSITION_DURATION + BattleScene.TRAVELING_DURATION / 2 + 0.2)
                         + FadeOut(0))
-        self._dialog.set_text(I18n().get("BATTLE.WILD").format(self._opponent_pokemon.nickname))
+        self._dialog.set_text(I18n().get("BATTLE.WILD").format(self._battle.opponent_pokemon.nickname))
         self.add(self._dialog, z=75)
 
-        self._opponent_pokemonLayer = OpponentPokemonLayer(self._opponent_pokemon)
+        self._opponent_pokemonLayer = OpponentPokemonLayer(self._battle.opponent_pokemon)
         self._opponent_pokemonLayer.scale = 2
         self._opponent_pokemonLayer.position = (720, 380)
         self._opponent_pokemonLayer.do(Delay(BattleScene.TRANSITION_DURATION * 2 / 3)
@@ -109,37 +110,56 @@ class BattleScene(cocos.scene.Scene):
                       )
         self.add(self._fade, z=100)
 
-        self._opponent_hud = OpponentHUDLayer(self._opponent_pokemon)
+        self._opponent_hud = OpponentHUDLayer(self._battle.opponent_pokemon)
         self._opponent_hud.position = (350, 370)
         self._opponent_hud.opacity = 0
         self._opponent_hud.do(Delay(BattleScene.TRANSITION_DURATION + BattleScene.TRAVELING_DURATION)
                               + FadeIn(0.5))
         self.add(self._opponent_hud, z=50)
 
-        self._hud = HUDLayer(self._players_pokemon)
-        self._hud.position = (420, 180)
-        self._hud.opacity = 0
-        self.add(self._hud, z=50)
-
         self._actions = ActionsLayer()
         self.add(self._actions)
 
-        self._moves = MovesLayer(self._players_pokemon)
+        self._moves = MovesLayer(self._battle.players_pokemon)
         self.add(self._moves)
 
         self._go_pokemon = GoPokemonLayer()
         self.add(self._go_pokemon, z=60)
 
-        self._pokemon = PokemonLayer(self._players_pokemon)
-        self._pokemon.scale = 2
-        self._pokemon.position = (450, 350)
+        self._hud = None
+        self._pokemon = None
+        self._add_pkmn()
         self._pokemon.opacity = 0
-        self.add(self._pokemon)
+        self._hud.opacity = 0
 
         self.do(
             Delay(BattleScene.TRANSITION_DURATION + BattleScene.TRAVELING_DURATION)
             + CallFunc(self._send_pokemon)
         )
+
+    def _add_pkmn(self, forced_hp: int = None) -> None:
+        """Add the pokemon layer and the HUD layer.
+
+        The ``forced_hp`` parameter is only useful if the current number of HP is
+        different from the displayed one.
+
+        :param forced_hp: The number of HP to display.
+        """
+
+        if self._pokemon:
+            self.remove(self._pokemon)
+
+        self._pokemon = PokemonLayer(self._battle.players_pokemon)
+        self._pokemon.scale = 2
+        self._pokemon.position = (450, 350)
+        self.add(self._pokemon)
+
+        if self._hud:
+            self.remove(self._hud)
+
+        self._hud = HUDLayer(self._battle.players_pokemon, forced_hp)
+        self._hud.position = (420, 180)
+        self.add(self._hud, z=50)
 
     def _send_pokemon(self) -> None:
         """Show the player's pokemon."""
@@ -150,7 +170,7 @@ class BattleScene(cocos.scene.Scene):
         self._dialog.do(FadeIn(0.4) |
                         (Delay(0.2) + CallFunc(self._dialog.set_text,
                                                I18n().get("BATTLE.GO_POKEMON").format(
-                                                   self._players_pokemon.nickname))))
+                                                   self._battle.players_pokemon.nickname))))
 
         self._pokemon.do(Delay(1.6) + FadeIn(0.5))
         self._hud.do(Delay(2) + FadeIn(0.5))
@@ -160,7 +180,7 @@ class BattleScene(cocos.scene.Scene):
     def show_actions(self) -> None:
         """Ask the player to choose an action."""
 
-        self._dialog.set_text(I18n().get("BATTLE.WHAT_WILL_DO").format(self._players_pokemon.nickname))
+        self._dialog.set_text(I18n().get("BATTLE.WHAT_WILL_DO").format(self._battle.players_pokemon.nickname))
 
         self._actions.toggle_apparition()
 
@@ -177,12 +197,13 @@ class BattleScene(cocos.scene.Scene):
 
         self._moves.toggle_apparition()
 
-        self._battle_controller.round(FightActionModel(self._players_pokemon, self._opponent_pokemon, move))
+        self._battle_controller.round(
+            FightActionModel(self._battle, True, move))
 
     def run_action(self) -> None:
         """The player selected to run. It is transmitted to the controller."""
 
-        self._battle_controller.round(RunActionModel(self._players_pokemon, self._opponent_pokemon))
+        self._battle_controller.round(RunActionModel(self._battle.players_pokemon, self._battle.opponent_pokemon))
 
     def _successful_run(self) -> None:
         """The attempt to run is successful. The battle is over."""
@@ -214,10 +235,27 @@ class BattleScene(cocos.scene.Scene):
                 self._successful_run()
             else:
                 self._dialog.set_text(I18n().get("BATTLE.FAILED_RUN"), callback)
+        elif isinstance(action, ShiftActionModel):
+            hp = action.pokemon.hp - next_action.get_effects().hp if isinstance(next_action,
+                                                                                FightActionModel) else None
+
+            self._actions.do(CallFunc(self._actions.toggle_apparition))
+            self._go_pokemon.flash(True)
+            self._dialog.set_text(I18n().get("BATTLE.COME_BACK").format(action.previous_pokemon.nickname))
+            self._pokemon.do(Delay(1.5) + CallFunc(self._add_pkmn, hp))
+            self._dialog.do(Delay(1.5)
+                            + CallFunc(self._dialog.set_text,
+                                       I18n().get("BATTLE.GO_POKEMON").format(action.pokemon.nickname)))
+
+            self.remove(self._moves)
+            self._moves = MovesLayer(action.pokemon)
+            self.add(self._moves)
+
+            self.do(Delay(3) + CallFunc(callback))
         elif isinstance(action, FightActionModel):
             self._dialog.set_text(
                 I18n().get("BATTLE.MOVE_USED").format(action.attacker.nickname, action.move.move.name))
-            if action.attacker == self._players_pokemon:
+            if action.attacker == self._battle.players_pokemon:
                 self._pokemon.do(Delay(0.5) + MoveBy((15, 15), 0.10) + MoveBy((-15, -15), 0.10)
                                  + (CallFunc(self._opponent_hud.update_hp) | CallFunc(self._moves.update_moves)))
             else:
@@ -277,7 +315,7 @@ class BattleScene(cocos.scene.Scene):
         :param pokemon: The pokemon who fainted.
         """
 
-        if pokemon == self._players_pokemon:
+        if pokemon == self._battle.players_pokemon:
             self._pokemon.do(MoveBy((-200, -200), 0.5))
         else:
             self._opponent_pokemonLayer.do(MoveBy((200, 0), 0.5))
@@ -293,7 +331,7 @@ class BattleScene(cocos.scene.Scene):
         the stats increase for each level.
         """
 
-        self._dialog.set_text(I18n().get("BATTLE.GAINED_XP").format(self._players_pokemon.nickname, xp_points),
+        self._dialog.set_text(I18n().get("BATTLE.GAINED_XP").format(self._battle.players_pokemon.nickname, xp_points),
                               lambda: self.experience_gained(gained_levels))
 
     def experience_gained(self, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
@@ -304,8 +342,9 @@ class BattleScene(cocos.scene.Scene):
         """
 
         if len(gained_levels) > 0:
-            self._hud.do(CallFunc(self._hud.update_xp, gained_levels[self._players_pokemon.level - len(gained_levels)])
-                         + Delay(HUDLayer.XP_UPDATE_DURATION) + CallFunc(self._level_up, gained_levels))
+            self._hud.do(
+                CallFunc(self._hud.update_xp, gained_levels[self._battle.players_pokemon.level - len(gained_levels)])
+                + Delay(HUDLayer.XP_UPDATE_DURATION) + CallFunc(self._level_up, gained_levels))
         else:
             self._hud.do(CallFunc(self._hud.update_xp) +
                          Delay(HUDLayer.XP_UPDATE_DURATION + 0.5) + CallFunc(self._battle_controller.won_battle))
@@ -319,7 +358,7 @@ class BattleScene(cocos.scene.Scene):
 
         self._hud.reset_xp_bar()
         self._stats.kill()
-        del gained_levels[self._players_pokemon.level - len(gained_levels)]
+        del gained_levels[self._battle.players_pokemon.level - len(gained_levels)]
         self.experience_gained(gained_levels)
 
     def _level_up(self, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
@@ -330,12 +369,12 @@ class BattleScene(cocos.scene.Scene):
         the stats increase for each level.
         """
 
-        self._stats = StatLayer(self._players_pokemon, gained_levels)
+        self._stats = StatLayer(self._battle.players_pokemon, gained_levels)
         self._stats.position = (490, 70)
         self.add(self._stats, z=100)
 
-        self._dialog.set_text(I18n().get("BATTLE.LEVEL_UP").format(self._players_pokemon.nickname,
-                                                                   self._players_pokemon.level - (
+        self._dialog.set_text(I18n().get("BATTLE.LEVEL_UP").format(self._battle.players_pokemon.nickname,
+                                                                   self._battle.players_pokemon.level - (
                                                                            len(gained_levels) - 1)),
                               lambda: self._continue_experience_gained(gained_levels))
 
@@ -349,4 +388,4 @@ class BattleScene(cocos.scene.Scene):
     def show_infos(self) -> None:
         """Show the PKMN information scene."""
 
-        self._battle_controller.infos_pkmn()
+        self._battle_controller.infos_pkmn(PkmnInfosTypeEnum.SHIFT)
