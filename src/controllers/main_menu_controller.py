@@ -28,7 +28,7 @@ class MainMenuController(metaclass=Singleton):
         # from controllers.battle_controller import BattleController
         # BattleController().battle(BattleModel())
         from controllers.pkmn_infos_controller import PkmnInfosController
-        PkmnInfosController().show_pkmn_infos(PkmnInfosTypeEnum.NORMAL, Game().game_state.player.pokemons[0])
+        PkmnInfosController().show_pkmn_infos(PkmnInfosTypeEnum.SHIFT, Game().game_state.player.pokemons[0])
 
     def settings(self) -> None:
         """Set the settings."""

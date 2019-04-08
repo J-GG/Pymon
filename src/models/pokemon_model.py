@@ -51,7 +51,7 @@ class PokemonModel:
 
         self._stats = dict()
         self._update_stats()
-        self._hp = hp if hp else self._stats[StatEnum.HP]
+        self._hp = hp if hp is not None else self._stats[StatEnum.HP]
 
         self._staged_stats = dict()
         for staged_stat in StagedStatEnum:
@@ -252,6 +252,6 @@ class PokemonModel:
         """Fully heal the pokemon. Set the HP to the max and reset the staged 
         stats.
         """
-        
+
         self._hp = self.stats[StatEnum.HP]
         self._staged_stats = {stat: 0 for stat in StagedStatEnum}

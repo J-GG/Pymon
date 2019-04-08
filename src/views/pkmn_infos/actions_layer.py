@@ -32,24 +32,26 @@ class ActionsLayer(Layer):
 
         self._pokemon = pokemon
         self._available_actions = pkmn_infos_type.value.copy()
-        if ActionEnum.SHIFT in self._available_actions and battle is not None and battle.players_pokemon == pokemon:
+        if ActionEnum.SHIFT in self._available_actions and (
+                (battle is not None and battle.players_pokemon == pokemon) or pokemon.hp <= 0):
             self._available_actions.remove(ActionEnum.SHIFT)
+        if ActionEnum.PREVIOUS in self._available_actions and Game().game_state.player.pokemons.index(pokemon) == 0:
+            self._available_actions.remove(ActionEnum.PREVIOUS)
+        if ActionEnum.NEXT and Game().game_state.player.pokemons.index(pokemon) == len(
+                Game().game_state.player.pokemons) - 1:
+            self._available_actions.remove(ActionEnum.NEXT)
+
         self._selected_action = self._available_actions.index(ActionEnum.CANCEL)
         self._actions = {}
 
         if ActionEnum.PREVIOUS in self._available_actions:
-            self._has_previous = True if Game().game_state.player.pokemons.index(pokemon) != 0 else False
             previous = cocos.sprite.Sprite(
-                pyglet.image.load(
-                    PATH + '/assets/img/common/buttons/{0}small_left.png'.format(
-                        "" if self._has_previous else "disabled_")),
-                anchor=(0, 0))
+                pyglet.image.load(PATH + '/assets/img/common/buttons/small_left.png'), anchor=(0, 0))
             selected_previous = cocos.sprite.Sprite(
                 pyglet.image.load(PATH + '/assets/img/common/buttons/selected_small_left.png'), anchor=(0, 0))
             selected_previous.visible = False
             previous.add(selected_previous, name=ActionsLayer.SELECTED_SPRITE)
-            previous_text = cocos.text.Label(I18n().get("POKEMON_INFOS.PREVIOUS"), font_size=20,
-                                             color=(255, 255, 255, 255) if self._has_previous else (125, 125, 125, 255))
+            previous_text = cocos.text.Label(I18n().get("POKEMON_INFOS.PREVIOUS"), font_size=20)
             previous_text.position = (previous.width / 2 - previous_text.element.content_width / 1.5,
                                       previous.height / 2 - previous_text.element.content_height / 4)
             previous.add(previous_text)
@@ -57,8 +59,9 @@ class ActionsLayer(Layer):
             self._actions[ActionEnum.PREVIOUS] = previous
 
         if ActionEnum.SHIFT in self._available_actions:
-            shift = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/common/buttons/small_center_red.png'),
-                                        anchor=(0, 0))
+            shift = cocos.sprite.Sprite(pyglet.image.load(
+                PATH + '/assets/img/common/buttons/small_center_red.png'),
+                anchor=(0, 0))
             shift.position = (cocos.director.director.get_window_size()[0] / 2 - shift.width - 5, 0)
             selected_shift = cocos.sprite.Sprite(
                 pyglet.image.load(PATH + '/assets/img/common/buttons/selected_small_center_red.png'), anchor=(0, 0))
@@ -89,20 +92,14 @@ class ActionsLayer(Layer):
             self._actions[ActionEnum.CANCEL] = cancel
 
         if ActionEnum.NEXT in self._available_actions:
-            self._has_next = True if Game().game_state.player.pokemons.index(pokemon) != len(
-                Game().game_state.player.pokemons) - 1 else False
             next = cocos.sprite.Sprite(
-                pyglet.image.load(
-                    PATH + '/assets/img/common/buttons/{0}small_right.png'.format(
-                        "" if self._has_next else "disabled_")),
-                anchor=(0, 0))
+                pyglet.image.load(PATH + '/assets/img/common/buttons/small_right.png'), anchor=(0, 0))
             next.position = (cocos.director.director.get_window_size()[0] - next.width, -2)
             selected_next = cocos.sprite.Sprite(
                 pyglet.image.load(PATH + '/assets/img/common/buttons/selected_small_right.png'), anchor=(0, 0))
             selected_next.visible = False
             next.add(selected_next, name=ActionsLayer.SELECTED_SPRITE)
-            next_text = cocos.text.Label(I18n().get("POKEMON_INFOS.NEXT"), font_size=20,
-                                         color=(255, 255, 255, 255) if self._has_next else (125, 125, 125, 255))
+            next_text = cocos.text.Label(I18n().get("POKEMON_INFOS.NEXT"), font_size=20)
             next_text.position = (next.width / 2 - next_text.element.content_width / 4,
                                   next.height / 2 - next_text.element.content_height / 4)
             next.add(next_text)
@@ -130,12 +127,10 @@ class ActionsLayer(Layer):
         """
 
         event_handled = False
-        if key == keys.LEFT and self._selected_action > 0 and (self._available_actions[
-                                                                   self._selected_action - 1] != ActionEnum.PREVIOUS or self._has_previous):
+        if key == keys.LEFT and self._selected_action > 0:
             self._selected_action = self._selected_action - 1
             event_handled = True
-        elif key == keys.RIGHT and self._selected_action < len(self._available_actions) - 1 and (
-                self._available_actions[self._selected_action + 1] != ActionEnum.NEXT or self._has_next):
+        elif key == keys.RIGHT and self._selected_action < len(self._available_actions) - 1:
             self._selected_action = self._selected_action + 1
             event_handled = True
         elif key == keys.ENTER:
