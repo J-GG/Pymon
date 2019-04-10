@@ -19,12 +19,14 @@ class ActionsLayer(Layer):
 
     is_event_handler = True
 
-    def __init__(self, pkmn_infos_type: PkmnInfosTypeEnum, pokemon: PokemonModel, battle: BattleModel = None) -> None:
+    def __init__(self, pkmn_infos_type: PkmnInfosTypeEnum, pokemon: PokemonModel, selected_action: ActionEnum = None,
+                 battle: BattleModel = None) -> None:
         """Create a layer with the list of actions and manage their interaction.
 
         :param pkmn_infos_type: The type of scene. Affects the information
         displayed and the interactions.
         :param pokemon: The pokemon whose infos is shown.
+        :param selected_action: The selected action by default.
         :param battle: The battle model if it is for a shift.
         """
 
@@ -41,7 +43,9 @@ class ActionsLayer(Layer):
                 Game().game_state.player.pokemons) - 1:
             self._available_actions.remove(ActionEnum.NEXT)
 
-        self._selected_action = self._available_actions.index(ActionEnum.CANCEL)
+        self._selected_action = self._available_actions.index(
+            selected_action) if selected_action and selected_action in self._available_actions else self._available_actions.index(
+            ActionEnum.CANCEL)
         self._actions = {}
 
         if ActionEnum.PREVIOUS in self._available_actions:
@@ -49,7 +53,6 @@ class ActionsLayer(Layer):
                 pyglet.image.load(PATH + '/assets/img/common/buttons/small_left.png'), anchor=(0, 0))
             selected_previous = cocos.sprite.Sprite(
                 pyglet.image.load(PATH + '/assets/img/common/buttons/selected_small_left.png'), anchor=(0, 0))
-            selected_previous.visible = False
             previous.add(selected_previous, name=ActionsLayer.SELECTED_SPRITE)
             previous_text = cocos.text.Label(I18n().get("POKEMON_INFOS.PREVIOUS"), font_size=20)
             previous_text.position = (previous.width / 2 - previous_text.element.content_width / 1.5,
@@ -65,7 +68,6 @@ class ActionsLayer(Layer):
             shift.position = (cocos.director.director.get_window_size()[0] / 2 - shift.width - 5, 0)
             selected_shift = cocos.sprite.Sprite(
                 pyglet.image.load(PATH + '/assets/img/common/buttons/selected_small_center_red.png'), anchor=(0, 0))
-            selected_shift.visible = False
             shift.add(selected_shift, name=ActionsLayer.SELECTED_SPRITE)
             shift_text = cocos.text.Label(I18n().get("POKEMON_INFOS.SHIFT"), font_size=14)
             shift_text.position = (shift.width / 2 - shift_text.element.content_width / 2,
@@ -97,7 +99,6 @@ class ActionsLayer(Layer):
             next.position = (cocos.director.director.get_window_size()[0] - next.width, -2)
             selected_next = cocos.sprite.Sprite(
                 pyglet.image.load(PATH + '/assets/img/common/buttons/selected_small_right.png'), anchor=(0, 0))
-            selected_next.visible = False
             next.add(selected_next, name=ActionsLayer.SELECTED_SPRITE)
             next_text = cocos.text.Label(I18n().get("POKEMON_INFOS.NEXT"), font_size=20)
             next_text.position = (next.width / 2 - next_text.element.content_width / 4,
@@ -105,6 +106,8 @@ class ActionsLayer(Layer):
             next.add(next_text)
             self.add(next)
             self._actions[ActionEnum.NEXT] = next
+
+        self._update_screen()
 
     def _update_screen(self) -> None:
         """update the selected action."""

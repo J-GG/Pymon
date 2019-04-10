@@ -13,6 +13,7 @@ from toolbox.init import PATH
 from views.common.stat_layer import StatLayer
 from views.common.text import Text
 from views.pkmn_infos.actions_layer import ActionsLayer
+from .action_enum import ActionEnum
 from .pkmn_infos_type_enum import PkmnInfosTypeEnum
 
 
@@ -22,7 +23,8 @@ class PkmnInfosScene(cocos.scene.Scene):
     SELECTED_SPRITE = "SELECTED_SPRITE"
 
     def __init__(self, pkmn_infos_controller: PkmnInfosController, pkmn_infos_type: PkmnInfosTypeEnum,
-                 pokemon: PokemonModel, replace: bool = False, battle: BattleModel = None,
+                 pokemon: PokemonModel, selected_action: ActionEnum = None, replace: bool = False,
+                 battle: BattleModel = None,
                  cancel_callback: typing.Callable = None) -> None:
         """Create a PKMN infos scene.
 
@@ -30,6 +32,7 @@ class PkmnInfosScene(cocos.scene.Scene):
         :param pkmn_infos_type: The type of scene. Affects the information
         displayed and the interactions.
         :param pokemon : The Pokemon the information is to be displayed.
+        :param selected_action: The selected action by default.
         :param replace: Whether the scene should replace the previous one or not.
         :param battle: The battle model if it is for a shift.
         :param cancel_callback: The function to call if the player chooses to
@@ -152,7 +155,7 @@ class PkmnInfosScene(cocos.scene.Scene):
             cocos.director.director.get_window_size()[0] / 2 + level_sprite.width / 2 - self._level.width / 2, 152)
         self.add(self._level)
 
-        self._actions = ActionsLayer(pkmn_infos_type, pokemon, battle)
+        self._actions = ActionsLayer(pkmn_infos_type, pokemon, selected_action, battle)
         self.add(self._actions)
 
         if replace:
@@ -176,6 +179,7 @@ class PkmnInfosScene(cocos.scene.Scene):
         self._pkmn_infos_controller.show_pkmn_infos(self._pkmn_infos_type,
                                                     Game().game_state.player.pokemons[
                                                         Game().game_state.player.pokemons.index(self._pokemon) - 1],
+                                                    ActionEnum.PREVIOUS,
                                                     True,
                                                     self._battle,
                                                     self._cancel_callback)
@@ -186,6 +190,7 @@ class PkmnInfosScene(cocos.scene.Scene):
         self._pkmn_infos_controller.show_pkmn_infos(self._pkmn_infos_type,
                                                     Game().game_state.player.pokemons[
                                                         Game().game_state.player.pokemons.index(self._pokemon) + 1],
+                                                    ActionEnum.NEXT,
                                                     True,
                                                     self._battle,
                                                     self._cancel_callback)
