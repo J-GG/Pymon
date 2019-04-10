@@ -33,20 +33,39 @@ class Dialog(Layer):
         self._label = cocos.text.Label("")
         self.add(self._label)
 
+        self._choices_background = cocos.sprite.Sprite(
+            pyglet.image.load(PATH + '/assets/img/common/dialog_choices_background.png'), anchor=(0, 0))
+        self._choices_background.position = (
+            cocos.director.director.get_window_size()[0] - self._choices_background.width - 20, 80)
+        self._choices_background.visible = False
+        self.add(self._choices_background)
+
+        self._choices_cursor = cocos.sprite.Sprite(
+            pyglet.image.load(PATH + '/assets/img/common/cursor_white.png'), anchor=(0, 0))
+        self._choices_cursor.do(RotateBy(-90, 0))
+        self._choices_cursor.visible = False
+        self.add(self._choices_cursor)
+
+        self._choices_labels = []
+
         self._text = []
         self._text_index = 0
         self._start_index = 0
         self._end_index = 0
+        self._choices = None
+        self._selected_choice = None
         self._callback = None
         self._split_text = []
 
-    def set_text(self, text: typing.Union[str, typing.List[str]], callback: typing.Callable = None) -> None:
+    def set_text(self, text: typing.Union[str, typing.List[str]], callback: typing.Callable = None,
+                 choices: typing.List[str] = None) -> None:
         """Set the text to be displayed.
 
         :param text: The text or a list of texts to be displayed.
             If it is a list, the player is required to press enter between
             each message.
-        :param callback: The function called when the user finished reading
+        :param callback: The function called when the user finished reading.
+        :param choices: The list of choices the player can choose among.
         the text.
         """
 
@@ -55,6 +74,8 @@ class Dialog(Layer):
         self._split_text = self._text[self._text_index].split(" ")
         self._start_index = 0
         self._end_index = 0
+        self._selected_choice = None
+        self._choices = choices
         self._callback = callback
         self._update_text()
 
@@ -69,6 +90,11 @@ class Dialog(Layer):
         self._cursor.visible = False if not self._callback else True
 
         self._label = self._get_label(self._start_index)
+
+        if self._choices and self._end_index == len(self._split_text):
+            self._show_choices()
+            self._selected_choice = 0
+            self._update_choice()
 
         self._label.position = (10, 30)
         self.add(self._label)
@@ -97,6 +123,25 @@ class Dialog(Layer):
                                     width=cocos.director.director.get_window_size()[0] - 10,
                                     multiline=True)
 
+    def _show_choices(self) -> None:
+        """Show the list of choices to the player."""
+
+        self._choices_background.visible = True
+
+        for index, choice_text in enumerate(self._choices):
+            choice_label = cocos.text.Label(choice_text)
+            choice_label.position = (cocos.director.director.get_window_size()[0] - 60, 130 - index * 30)
+            self._choices_labels.append(choice_label)
+            self.add(choice_label)
+
+    def _update_choice(self) -> None:
+        """Update the position of the cursor."""
+
+        self._choices_cursor.visible = True
+        self._choices_cursor.position = (
+            cocos.director.director.get_window_size()[0] - self._choices_background.width + 5,
+            130 - self._selected_choice * 30 - 3)
+
     def on_key_press(self, key, modifiers) -> bool:
         """Manage the key press event.
 
@@ -122,8 +167,25 @@ class Dialog(Layer):
             else:
                 self._cursor.visible = False
                 if self._callback:
-                    self._callback()
-
+                    if self._selected_choice is None:
+                        self._callback()
+                    else:
+                        self._choices_cursor.visible = False
+                        self._choices_background.visible = False
+                        for choice in self._choices_labels:
+                            self.remove(choice)
+                        self._choices_labels = []
+                        
+                        self._callback(self._selected_choice)
+            event_handled = True
+        elif key == keys.UP and self._selected_choice is not None:
+            self._selected_choice = 0 if self._selected_choice <= 1 else self._selected_choice - 1
+            self._update_choice()
+            event_handled = True
+        elif key == keys.DOWN and self._selected_choice is not None:
+            self._selected_choice = len(self._choices) - 1 if self._selected_choice >= len(
+                self._choices) - 2 else self._selected_choice + 1
+            self._update_choice()
             event_handled = True
 
         return event_handled
