@@ -1,3 +1,5 @@
+import typing
+
 from models.learned_move_model import LearnedMoveModel
 from models.pokemon_model import PokemonModel
 from toolbox.data.moves import moves
@@ -12,19 +14,19 @@ class BattleModel:
         """Create a new battle."""
 
         self._players_pokemon = self._first_players_pokemon_available(Game().game_state.player.pokemons)
-        self._opponent_pokemon = PokemonModel(pokemons["BULBASAUR"], pokemons["BULBASAUR"].name, 5,
+        self._opponent_pokemon = PokemonModel(pokemons["BULBASAUR"], pokemons["BULBASAUR"].name, 100,
                                               [LearnedMoveModel(moves["VINE_WHIP"], moves["VINE_WHIP"].default_pp,
                                                                 moves["VINE_WHIP"].default_pp),
                                                LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp,
                                                                 moves["GROWL"].default_pp)])
 
-    def _first_players_pokemon_available(self, pokemons) -> PokemonModel:
+    def _first_players_pokemon_available(self, pokemons: typing.List[PokemonModel]) -> PokemonModel:
         """Get the first pokemon of the list who can fight.
         
-        :return: A ``PokemonModel``.
+        :return: A  list of ``PokemonModel``.
         """
 
-        for pokemon in Game().game_state.player.pokemons:
+        for pokemon in pokemons:
             if pokemon.hp > 0:
                 return pokemon
 

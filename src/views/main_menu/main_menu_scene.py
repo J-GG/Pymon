@@ -1,10 +1,7 @@
-import typing
-
 import cocos
 from cocos.scenes.transitions import *
 
 from controllers.main_menu_controller import MainMenuController
-from models.game_state_model import GameStateModel
 from .actions_layer import ActionsLayer
 from .background_layer import BackgroundLayer
 
@@ -14,11 +11,10 @@ class MainMenuScene(cocos.scene.Scene):
     starting a new game, continuing an existing one and modifying the
     settings."""
 
-    def __init__(self, main_menu_controller: MainMenuController,
-                 game_state: typing.Union[None, GameStateModel]) -> None:
+    def __init__(self, main_menu_controller: MainMenuController) -> None:
         """Create the main menu scene.
 
-        :param game_state: The game state of the saved game if any.
+        :param main_menu_controller: The controller of the main menu.
         """
 
         super().__init__()
@@ -27,7 +23,7 @@ class MainMenuScene(cocos.scene.Scene):
         self._background = BackgroundLayer()
         self.add(self._background)
 
-        self._actions = ActionsLayer(game_state)
+        self._actions = ActionsLayer()
         self.add(self._actions)
 
         cocos.director.director.replace(FadeTransition(self))

@@ -1,10 +1,8 @@
-import typing
-
 import cocos
 import pyglet
 from pyglet.window import key as keys
 
-from models.game_state_model import GameStateModel
+from toolbox.game import Game
 from toolbox.i18n import I18n
 from toolbox.init import PATH
 
@@ -25,18 +23,15 @@ class ActionsLayer(cocos.layer.Layer):
 
     is_event_handler = True
 
-    def __init__(self, game_state: typing.Union[None, GameStateModel]) -> None:
-        """Create the list of actions available in the main menu.
-
-        :param game_state: The game state of the saved game.
-        """
+    def __init__(self) -> None:
+        """Create the list of actions available in the main menu."""
 
         super().__init__()
 
-        self._game_state = game_state
+        self._game_state = None if Game().game_state.time == 0 else Game().game_state
         self._actions = []
 
-        continue_file = "multi_line_action" if game_state else "multi_line_action_disabled"
+        continue_file = "multi_line_action" if self._game_state else "multi_line_action_disabled"
         continue_sprite = cocos.sprite.Sprite(
             pyglet.image.load(PATH + '/assets/img/main_menu/{0}.jpg'.format(continue_file)))
         continue_sprite.position = (320, 355)
@@ -46,24 +41,24 @@ class ActionsLayer(cocos.layer.Layer):
         continue_text = cocos.text.Label(I18n().get("MAIN_MENU.CONTINUE"), bold=True, color=(0, 0, 0, 255))
         continue_text.position = (-180, 60)
         continue_sprite.add(continue_text)
-        if game_state:
+        if self._game_state:
             player = cocos.text.Label(I18n().get("MAIN_MENU.PLAYER"), bold=True, color=(16, 173, 231, 255))
             player.position = (-130, 30)
             continue_sprite.add(player)
-            player_name = cocos.text.Label(game_state.player.name, bold=True, color=(16, 173, 231, 255),
+            player_name = cocos.text.Label(self._game_state.player.name, bold=True, color=(16, 173, 231, 255),
                                            anchor_x="right")
             player_name.position = (70, 30)
             continue_sprite.add(player_name)
             time = cocos.text.Label(I18n().get("MAIN_MENU.TIME"), bold=True, color=(16, 173, 231, 255))
             time.position = (-130, 0)
             continue_sprite.add(time)
-            hours = int(game_state.time // 3600)
-            minutes = int((game_state.time - (hours * 3600)) // 60)
+            hours = int(self._game_state.time // 3600)
+            minutes = int((self._game_state.time - (hours * 3600)) // 60)
             time_value = cocos.text.Label("{:02d}:{:02d}".format(hours, minutes), bold=True, color=(16, 173, 231, 255),
                                           anchor_x="right")
             time_value.position = (70, 0)
             continue_sprite.add(time_value)
-            for index, pokemon in enumerate(game_state.player.pokemons):
+            for index, pokemon in enumerate(self._game_state.player.pokemons):
                 pokemon_sprite = cocos.sprite.Sprite(
                     pyglet.image.load(PATH + '/assets/img/pokemon/mini/{0}.png'.format(pokemon.species.id.lower())))
                 pokemon_sprite.scale = 0.7
@@ -94,7 +89,7 @@ class ActionsLayer(cocos.layer.Layer):
         self.add(settings)
         self._actions.append(settings)
 
-        self._choice = 0 if game_state else 1
+        self._choice = 0 if self._game_state else 1
         self._update_screen()
 
     def _update_screen(self) -> None:

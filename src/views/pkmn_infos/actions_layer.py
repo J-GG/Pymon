@@ -31,7 +31,7 @@ class ActionsLayer(Layer):
         super().__init__()
 
         self._pokemon = pokemon
-        self._available_actions = pkmn_infos_type.value.copy()
+        self._available_actions = pkmn_infos_type.actions.copy()
         if ActionEnum.SHIFT in self._available_actions and (
                 (battle is not None and battle.players_pokemon == pokemon) or pokemon.hp <= 0):
             self._available_actions.remove(ActionEnum.SHIFT)
@@ -74,7 +74,7 @@ class ActionsLayer(Layer):
             self.add(shift)
             self._actions[ActionEnum.SHIFT] = shift
 
-        if ActionEnum.CANCEL in pkmn_infos_type.value:
+        if ActionEnum.CANCEL in self._available_actions:
             cancel = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/common/buttons/small_center.png'),
                                          anchor=(0, 0))
             cancel_position_x = cocos.director.director.get_window_size()[0] / 2

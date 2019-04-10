@@ -210,8 +210,8 @@ class BattleScene(cocos.scene.Scene):
 
         self._dialog.set_text(I18n().get("BATTLE.SUCCESSFUL_RUN"), lambda: self._battle_controller.run())
 
-    def round(self, first_action: typing.Union[FightActionModel, RunActionModel],
-              second_action: typing.Union[FightActionModel, RunActionModel]) -> None:
+    def round(self, first_action: typing.Union[FightActionModel, RunActionModel, ShiftActionModel],
+              second_action: typing.Union[FightActionModel, RunActionModel, ShiftActionModel]) -> None:
         """Play the actions.
 
         :param first_action: The first action.
@@ -220,8 +220,8 @@ class BattleScene(cocos.scene.Scene):
 
         self._do_action(first_action, second_action)
 
-    def _do_action(self, action: typing.Union[FightActionModel, RunActionModel],
-                   next_action: typing.Union[FightActionModel, RunActionModel] = None):
+    def _do_action(self, action: typing.Union[FightActionModel, RunActionModel, ShiftActionModel],
+                   next_action: typing.Union[FightActionModel, RunActionModel, ShiftActionModel] = None):
         """Perform the specified action.
 
         :param action: The action to play.
@@ -385,7 +385,37 @@ class BattleScene(cocos.scene.Scene):
                                I18n().get("BATTLE.WHITED_OUT").format(Game().game_state.player.name)],
                               self._battle_controller.lost_battle)
 
+    def ask_player_shift_pokemon(self) -> None:
+        """The player's pokemon fainted. Ask him if he wants to shift."""
+
+        self._dialog.set_text([I18n().get("BATTLE.USE_NEXT")],
+                              callback=lambda
+                                  choice: self.show_infos_shift_pokemon_out() if choice == 0 else self._successful_run(),
+                              choices=[I18n().get("COMMON.YES"), I18n().get("COMMON.NO")])
+
+    def show_infos_shift_pokemon_out(self) -> None:
+        """Show the PKMN information scene."""
+
+        self._battle_controller.infos_pkmn(PkmnInfosTypeEnum.SHIFT_POKEMON_OUT,
+                                           cancel_callback=self.ask_player_shift_pokemon)
+
     def show_infos(self) -> None:
         """Show the PKMN information scene."""
 
         self._battle_controller.infos_pkmn(PkmnInfosTypeEnum.SHIFT)
+
+    def shift_players_pokemon(self, action: ShiftActionModel) -> None:
+        """Shift the player's pokemon
+
+        :param action: The ``ShiftActionModel``.
+        """
+
+        self._go_pokemon.flash()
+        self._pokemon.do(Delay(1.5) + CallFunc(self._add_pkmn))
+        self._dialog.set_text(I18n().get("BATTLE.GO_POKEMON").format(action.pokemon.nickname))
+
+        self.remove(self._moves)
+        self._moves = MovesLayer(action.pokemon)
+        self.add(self._moves)
+
+        self.do(Delay(2) + CallFunc(self.show_actions))

@@ -93,7 +93,9 @@ class BattleController(metaclass=Singleton):
         """
 
         if pokemon_ko == self._battle.players_pokemon:
-            if Game().game_state.player.has_conscious_pokemon:
+            if Game().game_state.player.has_conscious_pokemon():
+                self._battle_scene.ask_player_shift_pokemon()
+            else:
                 self._battle_scene.player_lost_battle()
         else:
             wild_pokemon = 1
@@ -106,14 +108,26 @@ class BattleController(metaclass=Singleton):
 
         MainMenuController().show_menu()
 
-    def infos_pkmn(self, pkmn_infos_type: PkmnInfosTypeEnum) -> None:
+    def infos_pkmn(self, pkmn_infos_type: PkmnInfosTypeEnum, cancel_callback: typing.Callable = None) -> None:
         """Show the PKMN information scene.
 
         :param pkmn_infos_type: The type of scene. Affects the information
         displayed and the interactions.
+        :param cancel_callback: The function to call if the player chooses to
+        cancel.
         """
 
-        PkmnInfosController().show_pkmn_infos(pkmn_infos_type, self._battle.players_pokemon, battle=self._battle)
+        PkmnInfosController().show_pkmn_infos(pkmn_infos_type, self._battle.players_pokemon, battle=self._battle,
+                                              cancel_callback=cancel_callback)
+
+    def shift_players_pokemon(self, shift_action: ShiftActionModel) -> None:
+        """Shift the player's pokemon.
+
+        :param shift_action: The ``ShiftActionModel``.
+        """
+
+        shift_action.shift(self._battle)
+        self._battle_scene.shift_players_pokemon(shift_action)
 
     def lost_battle(self) -> None:
         """The player lost the battle. His game state is erased."""

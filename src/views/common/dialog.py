@@ -94,7 +94,7 @@ class Dialog(Layer):
         if self._choices and self._end_index == len(self._split_text):
             self._show_choices()
             self._selected_choice = 0
-            self._update_choice()
+            self._update_choices_cursor()
 
         self._label.position = (10, 30)
         self.add(self._label)
@@ -127,6 +127,7 @@ class Dialog(Layer):
         """Show the list of choices to the player."""
 
         self._choices_background.visible = True
+        self._cursor.visible = False
 
         for index, choice_text in enumerate(self._choices):
             choice_label = cocos.text.Label(choice_text)
@@ -134,7 +135,7 @@ class Dialog(Layer):
             self._choices_labels.append(choice_label)
             self.add(choice_label)
 
-    def _update_choice(self) -> None:
+    def _update_choices_cursor(self) -> None:
         """Update the position of the cursor."""
 
         self._choices_cursor.visible = True
@@ -146,6 +147,8 @@ class Dialog(Layer):
         """Manage the key press event.
 
         Show the next part of the text if there is some left by pressing ENTER.
+        Call the callback function if there is some and send the potential
+        answer to the question.
 
         :param key: The pressed key.
         :param modifiers: The pressed modifiers.
@@ -169,23 +172,23 @@ class Dialog(Layer):
                 if self._callback:
                     if self._selected_choice is None:
                         self._callback()
-                    else:
-                        self._choices_cursor.visible = False
-                        self._choices_background.visible = False
-                        for choice in self._choices_labels:
-                            self.remove(choice)
-                        self._choices_labels = []
-                        
-                        self._callback(self._selected_choice)
+        elif key == keys.ENTER and not self._cursor.visible and self._choices:
+            self._choices_cursor.visible = False
+            self._choices_background.visible = False
+            for choice in self._choices_labels:
+                self.remove(choice)
+            self._choices_labels = []
+
+            self._callback(self._selected_choice)
             event_handled = True
         elif key == keys.UP and self._selected_choice is not None:
             self._selected_choice = 0 if self._selected_choice <= 1 else self._selected_choice - 1
-            self._update_choice()
+            self._update_choices_cursor()
             event_handled = True
         elif key == keys.DOWN and self._selected_choice is not None:
             self._selected_choice = len(self._choices) - 1 if self._selected_choice >= len(
                 self._choices) - 2 else self._selected_choice + 1
-            self._update_choice()
+            self._update_choices_cursor()
             event_handled = True
 
         return event_handled

@@ -46,4 +46,5 @@ class Persistence:
     def delete(cls) -> None:
         """Remove the file."""
 
-        os.remove(Persistence.DATA_PATH + cls.FILE_NAME)
+        if os.path.isfile(Persistence.DATA_PATH + cls.FILE_NAME):
+            os.remove(Persistence.DATA_PATH + cls.FILE_NAME)

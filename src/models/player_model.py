@@ -1,9 +1,6 @@
 import typing
 
-from models.learned_move_model import LearnedMoveModel
 from models.pokemon_model import PokemonModel
-from toolbox.data.moves import moves
-from toolbox.data.pokemon import pokemons
 
 
 class PlayerModel:
@@ -15,28 +12,6 @@ class PlayerModel:
         super().__init__()
         self._name = "John"
         self._pokemons = []
-        self._pokemons.append(PokemonModel(pokemons["PIKACHU"], pokemons["PIKACHU"].name, 50, [
-            LearnedMoveModel(moves["TAIL_WHIP"], moves["TAIL_WHIP"].default_pp, moves["TAIL_WHIP"].default_pp),
-            LearnedMoveModel(moves["THUNDER_SHOCK"], moves["THUNDER_SHOCK"].default_pp,
-                             moves["THUNDER_SHOCK"].default_pp),
-            LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp, moves["GROWL"].default_pp),
-        ]))
-        self._pokemons.append(PokemonModel(pokemons["BULBASAUR"], pokemons["BULBASAUR"].name, 5, [
-            LearnedMoveModel(moves["TACKLE"], moves["TACKLE"].default_pp, moves["TACKLE"].default_pp),
-            LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp, moves["GROWL"].default_pp),
-            LearnedMoveModel(moves["VINE_WHIP"], moves["VINE_WHIP"].default_pp, moves["VINE_WHIP"].default_pp),
-            LearnedMoveModel(moves["VINE_WHIP"], moves["VINE_WHIP"].default_pp, moves["VINE_WHIP"].default_pp),
-        ], 0))
-        self._pokemons.append(PokemonModel(pokemons["IVYSAUR"], pokemons["IVYSAUR"].name, 5, [
-            LearnedMoveModel(moves["TACKLE"], moves["TACKLE"].default_pp, moves["TACKLE"].default_pp),
-            LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp, moves["GROWL"].default_pp),
-            LearnedMoveModel(moves["VINE_WHIP"], moves["VINE_WHIP"].default_pp, moves["VINE_WHIP"].default_pp),
-        ]))
-        self._pokemons.append(PokemonModel(pokemons["BULBASAUR"], pokemons["BULBASAUR"].name, 5, [
-            LearnedMoveModel(moves["TACKLE"], moves["TACKLE"].default_pp, moves["TACKLE"].default_pp),
-            LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp, moves["GROWL"].default_pp),
-            LearnedMoveModel(moves["VINE_WHIP"], moves["VINE_WHIP"].default_pp, moves["VINE_WHIP"].default_pp),
-        ]))
 
     @property
     def name(self) -> str:
@@ -78,7 +53,7 @@ class PlayerModel:
         :return: True if the player has still conscious pokemon.
         """
 
-        for pokemon in pokemons:
+        for pokemon in self._pokemons:
             if pokemon.hp > 0:
                 return True
 

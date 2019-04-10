@@ -1,3 +1,5 @@
+import typing
+
 import cocos
 import pyglet
 from cocos.scenes.transitions import *
@@ -20,7 +22,8 @@ class PkmnInfosScene(cocos.scene.Scene):
     SELECTED_SPRITE = "SELECTED_SPRITE"
 
     def __init__(self, pkmn_infos_controller: PkmnInfosController, pkmn_infos_type: PkmnInfosTypeEnum,
-                 pokemon: PokemonModel, replace: bool = False, battle: BattleModel = None) -> None:
+                 pokemon: PokemonModel, replace: bool = False, battle: BattleModel = None,
+                 cancel_callback: typing.Callable = None) -> None:
         """Create a PKMN infos scene.
 
         :param pkmn_infos_controller: The controller.
@@ -29,6 +32,8 @@ class PkmnInfosScene(cocos.scene.Scene):
         :param pokemon : The Pokemon the information is to be displayed.
         :param replace: Whether the scene should replace the previous one or not.
         :param battle: The battle model if it is for a shift.
+        :param cancel_callback: The function to call if the player chooses to
+        cancel.
         """
 
         super().__init__()
@@ -37,6 +42,7 @@ class PkmnInfosScene(cocos.scene.Scene):
         self._pkmn_infos_type = pkmn_infos_type
         self._pokemon = pokemon
         self._battle = battle
+        self._cancel_callback = cancel_callback
 
         self._background = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/pkmn_infos/background.jpg'),
                                                anchor=(0, 0))
@@ -161,6 +167,9 @@ class PkmnInfosScene(cocos.scene.Scene):
         cocos.director.director.pop()
         cocos.director.director.replace(FadeTransition(last_scene))
 
+        if self._cancel_callback:
+            self._cancel_callback()
+
     def previous(self) -> None:
         """Show the previous pokemon."""
 
@@ -168,7 +177,8 @@ class PkmnInfosScene(cocos.scene.Scene):
                                                     Game().game_state.player.pokemons[
                                                         Game().game_state.player.pokemons.index(self._pokemon) - 1],
                                                     True,
-                                                    self._battle)
+                                                    self._battle,
+                                                    self._cancel_callback)
 
     def next(self) -> None:
         """Show the next pokemon."""
@@ -177,7 +187,8 @@ class PkmnInfosScene(cocos.scene.Scene):
                                                     Game().game_state.player.pokemons[
                                                         Game().game_state.player.pokemons.index(self._pokemon) + 1],
                                                     True,
-                                                    self._battle)
+                                                    self._battle,
+                                                    self._cancel_callback)
 
     def shift(self, pokemon: PokemonModel) -> None:
         """Return to the battle scene and shift the current pokemon with the
@@ -190,4 +201,6 @@ class PkmnInfosScene(cocos.scene.Scene):
         cocos.director.director.pop()
         cocos.director.director.replace(FadeTransition(last_scene))
 
-        self._pkmn_infos_controller.shift(pokemon)
+        round = True if self._pkmn_infos_type == PkmnInfosTypeEnum.SHIFT else False
+
+        self._pkmn_infos_controller.shift(pokemon, round)
