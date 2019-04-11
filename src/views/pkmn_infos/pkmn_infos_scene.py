@@ -6,7 +6,6 @@ from cocos.scenes.transitions import *
 
 from controllers.pkmn_infos_controller import PkmnInfosController
 from models.battle.battle_model import BattleModel
-from models.learned_move_model import LearnedMoveModel
 from models.move_model import MoveModel
 from models.pokemon_model import PokemonModel
 from toolbox.game import Game
@@ -172,17 +171,3 @@ class PkmnInfosScene(cocos.scene.Scene):
         round = True if self._pkmn_infos_type == PkmnInfosTypeEnum.SHIFT else False
 
         self._pkmn_infos_controller.shift(pokemon, round)
-
-    def forget_move(self, move_to_forget: LearnedMoveModel, new_move: MoveModel) -> None:
-        """Forget the learned move to learn the new one.
-
-        :param move_to_forget: The ``LearnedMoveModel`` to forget.
-        :param new_move: The ``MoveModel`` to learn.
-        """
-
-        last_scene = cocos.director.director.scene_stack[len(cocos.director.director.scene_stack) - 1]
-        cocos.director.director.pop()
-        cocos.director.director.replace(FadeTransition(last_scene))
-
-        if self._cancel_callback:
-            self._cancel_callback()
