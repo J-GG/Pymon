@@ -147,6 +147,11 @@ class ActionsLayer(Layer):
 
             self.add(move_sprite)
             if pkmn_infos_type == PkmnInfosTypeEnum.NEW_MOVE:
+                if move == new_move:
+                    new = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/pkmn_infos/new.png'.format(type)))
+                    new.position = (-move_sprite.width / 2 + 8, -move_sprite.height / 2 + 8)
+                    move_sprite.add(new)
+
                 self._actions[self._available_actions[index]] = move_sprite
 
         self._update_screen()
