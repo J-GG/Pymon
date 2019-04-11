@@ -33,6 +33,6 @@ with open(PATH + "/assets/data/pokemon.json") as file:
         experience_function = ExperienceFunctionEnum[pokemon[POKEMON_EXPERIENCE_FUNCTION]]
         moves_by_lvl_up = dict()
         for (lvl, movesList) in pokemon[POKEMON_MOVES_BY_LVL_UP].items():
-            moves_by_lvl_up[lvl] = [moves[move] for move in movesList]
+            moves_by_lvl_up[int(lvl)] = [moves[move] for move in movesList]
 
         pokemons[id] = PokemonSpeciesModel(id, type, moves_by_lvl_up, base_stats, base_experience, experience_function)

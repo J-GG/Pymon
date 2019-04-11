@@ -91,7 +91,7 @@ class Dialog(Layer):
 
         self._label = self._get_label(self._start_index)
 
-        if self._choices and self._end_index == len(self._split_text):
+        if self._choices and self._end_index == len(self._split_text) and len(self._text) == self._text_index + 1:
             self._show_choices()
             self._selected_choice = 0
             self._update_choices_cursor()
@@ -172,6 +172,7 @@ class Dialog(Layer):
                 if self._callback:
                     if self._selected_choice is None:
                         self._callback()
+            event_handled = True
         elif key == keys.ENTER and not self._cursor.visible and self._choices:
             self._choices_cursor.visible = False
             self._choices_background.visible = False

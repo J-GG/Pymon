@@ -6,6 +6,8 @@ from cocos.scenes.transitions import *
 
 from controllers.pkmn_infos_controller import PkmnInfosController
 from models.battle.battle_model import BattleModel
+from models.learned_move_model import LearnedMoveModel
+from models.move_model import MoveModel
 from models.pokemon_model import PokemonModel
 from toolbox.game import Game
 from toolbox.i18n import I18n
@@ -20,11 +22,9 @@ from .pkmn_infos_type_enum import PkmnInfosTypeEnum
 class PkmnInfosScene(cocos.scene.Scene):
     """Display the information about a Pokemon."""
 
-    SELECTED_SPRITE = "SELECTED_SPRITE"
-
     def __init__(self, pkmn_infos_controller: PkmnInfosController, pkmn_infos_type: PkmnInfosTypeEnum,
                  pokemon: PokemonModel, selected_action: ActionEnum = None, replace: bool = False,
-                 battle: BattleModel = None,
+                 battle: BattleModel = None, new_move: MoveModel = None,
                  cancel_callback: typing.Callable = None) -> None:
         """Create a PKMN infos scene.
 
@@ -35,6 +35,7 @@ class PkmnInfosScene(cocos.scene.Scene):
         :param selected_action: The selected action by default.
         :param replace: Whether the scene should replace the previous one or not.
         :param battle: The battle model if it is for a shift.
+        :param new_move: The new move to learn if any.
         :param cancel_callback: The function to call if the player chooses to
         cancel.
         """
@@ -110,37 +111,6 @@ class PkmnInfosScene(cocos.scene.Scene):
                                     self._experience_background.height / 2 - experience_next.element.content_height / 2 - 2.5)
         self._experience_background.add(experience_next)
 
-        self._moves = []
-        for index, move in enumerate(pokemon.moves):
-            move_sprite = cocos.sprite.Sprite(
-                pyglet.image.load(PATH + '/assets/img/battle/moves/{0}.png'.format(move.move.type.name.lower())))
-            move_sprite.position = (
-                cocos.director.director.get_window_size()[0] - move_sprite.width / 2, 350 - 40 * index)
-
-            selected_sprite = cocos.sprite.Sprite(pyglet.image.load(
-                PATH + '/assets/img/battle/moves/selected_{0}.png'.format(move.move.type.name.lower())))
-            selected_sprite.visible = False
-            move_sprite.add(selected_sprite, name=PkmnInfosScene.SELECTED_SPRITE)
-
-            name = cocos.text.Label(move.move.name, font_size=9, anchor_x="left", anchor_y="center",
-                                    color=(0, 0, 0, 255), bold=True)
-            name.position = -57, 8
-            move_sprite.add(name)
-
-            pp = cocos.text.Label("PP {0}/{1}".format(move.current_pp, move.pp),
-                                  font_size=9, anchor_x="left", anchor_y="center", bold=True)
-            pp.position = (-15, -8)
-            move_sprite.add(pp)
-
-            type = cocos.sprite.Sprite(
-                pyglet.image.load(PATH + '/assets/img/common/types/{0}.png'.format(move.move.type.name.lower())))
-            type.position = (-35, -8)
-            type.scale = 0.9
-            move_sprite.add(type)
-
-            self._moves.append(move_sprite)
-            self.add(move_sprite)
-
         self._level = Text(str(pokemon.level))
         self._level.scale = 1.5
 
@@ -155,7 +125,7 @@ class PkmnInfosScene(cocos.scene.Scene):
             cocos.director.director.get_window_size()[0] / 2 + level_sprite.width / 2 - self._level.width / 2, 152)
         self.add(self._level)
 
-        self._actions = ActionsLayer(pkmn_infos_type, pokemon, selected_action, battle)
+        self._actions = ActionsLayer(pkmn_infos_type, pokemon, selected_action, battle, new_move)
         self.add(self._actions)
 
         if replace:
@@ -163,15 +133,18 @@ class PkmnInfosScene(cocos.scene.Scene):
         else:
             cocos.director.director.push(FadeTransition(self))
 
-    def cancel(self) -> None:
-        """Return to the previous scene."""
+    def cancel(self, *args) -> None:
+        """Return to the previous scene.
+
+        :param args: The arguments to send to the callback function.
+        """
 
         last_scene = cocos.director.director.scene_stack[len(cocos.director.director.scene_stack) - 1]
         cocos.director.director.pop()
         cocos.director.director.replace(FadeTransition(last_scene))
 
         if self._cancel_callback:
-            self._cancel_callback()
+            self._cancel_callback(*args)
 
     def previous(self) -> None:
         """Show the previous pokemon."""
@@ -209,3 +182,17 @@ class PkmnInfosScene(cocos.scene.Scene):
         round = True if self._pkmn_infos_type == PkmnInfosTypeEnum.SHIFT else False
 
         self._pkmn_infos_controller.shift(pokemon, round)
+
+    def forget_move(self, move_to_forget: LearnedMoveModel, new_move: MoveModel) -> None:
+        """Forget the learned move to learn the new one.
+
+        :param move_to_forget: The ``LearnedMoveModel`` to forget.
+        :param new_move: The ``MoveModel`` to learn.
+        """
+
+        last_scene = cocos.director.director.scene_stack[len(cocos.director.director.scene_stack) - 1]
+        cocos.director.director.pop()
+        cocos.director.director.replace(FadeTransition(last_scene))
+
+        if self._cancel_callback:
+            self._cancel_callback()

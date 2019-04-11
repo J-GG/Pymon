@@ -8,6 +8,8 @@ from models.battle.run_action_model import RunActionModel
 from models.battle.shift_action_model import ShiftActionModel
 from models.enumerations.staged_stat_enum import StagedStatEnum
 from models.enumerations.stat_enum import StatEnum
+from models.learned_move_model import LearnedMoveModel
+from models.move_model import MoveModel
 from models.pokemon_model import PokemonModel
 from toolbox.game import Game
 from toolbox.singleton import Singleton
@@ -98,7 +100,7 @@ class BattleController(metaclass=Singleton):
             else:
                 self._battle_scene.player_lost_battle()
         else:
-            wild_pokemon = 1
+            wild_pokemon = 1 if self._battle.is_wild_pokemon else 1.5
             experience_gained = (wild_pokemon * pokemon_ko.species.base_experience * pokemon_ko.level) // 7
             gained_levels = self._battle.players_pokemon.gain_experience(experience_gained)
             self._battle_scene.player_won_fight(experience_gained, gained_levels)
@@ -108,17 +110,19 @@ class BattleController(metaclass=Singleton):
 
         MainMenuController().show_menu()
 
-    def infos_pkmn(self, pkmn_infos_type: PkmnInfosTypeEnum, cancel_callback: typing.Callable = None) -> None:
+    def infos_pkmn(self, pkmn_infos_type: PkmnInfosTypeEnum, new_move: MoveModel = None,
+                   cancel_callback: typing.Callable = None) -> None:
         """Show the PKMN information scene.
 
         :param pkmn_infos_type: The type of scene. Affects the information
         displayed and the interactions.
+        :param new_move: The new move to learn if any.
         :param cancel_callback: The function to call if the player chooses to
         cancel.
         """
 
         PkmnInfosController().show_pkmn_infos(pkmn_infos_type, self._battle.players_pokemon, battle=self._battle,
-                                              cancel_callback=cancel_callback)
+                                              new_move=new_move, cancel_callback=cancel_callback)
 
     def shift_players_pokemon(self, shift_action: ShiftActionModel) -> None:
         """Shift the player's pokemon.
@@ -128,6 +132,21 @@ class BattleController(metaclass=Singleton):
 
         shift_action.shift(self._battle)
         self._battle_scene.shift_players_pokemon(shift_action)
+
+    def forget_move(self, gained_levels: typing.Dict[int, typing.Dict], new_move: MoveModel,
+                    move_to_forget: [LearnedMoveModel]) -> None:
+        """Replace the move to forget with the new move.
+
+        :param gained_levels: A dictionary with the gained levels as well as
+        the stats increase for each level and the new moves.
+        :param new_move: The new ``MoveModel`` to learn.
+        :param move_to_forget: The ``LearnedMoveModel`` the player wants to
+        forget or None if he doesn't want.
+        """
+
+        self._battle.players_pokemon.moves[self._battle.players_pokemon.moves.index(move_to_forget)] = LearnedMoveModel(
+            new_move)
+        self._battle_scene.learn_move(gained_levels, new_move, move_to_forget)
 
     def lost_battle(self) -> None:
         """The player lost the battle. His game state is erased."""

@@ -4,7 +4,7 @@ from models.move_model import MoveModel
 class LearnedMoveModel:
     """A move learned by a pokemon."""
 
-    def __init__(self, move: MoveModel, pp: int, current_pp: int = None) -> None:
+    def __init__(self, move: MoveModel, pp: int = None, current_pp: int = None) -> None:
         """Create a new learned move.
 
         :param move: The ``Move`` it refers to.
@@ -13,8 +13,8 @@ class LearnedMoveModel:
         """
 
         self._move = move
-        self._pp = pp
-        self._current_pp = current_pp if current_pp else pp
+        self._pp = pp if pp else move.default_pp
+        self._current_pp = current_pp if current_pp else move.default_pp
 
     @property
     def move(self) -> MoveModel:

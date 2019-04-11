@@ -11,8 +11,8 @@ from models.battle.run_action_model import RunActionModel
 from models.battle.shift_action_model import ShiftActionModel
 from models.enumerations.move_category_enum import MoveCategoryEnum
 from models.enumerations.move_effectiveness_enum import MoveEffectivenessEnum
-from models.enumerations.stat_enum import StatEnum
 from models.learned_move_model import LearnedMoveModel
+from models.move_model import MoveModel
 from models.pokemon_model import PokemonModel
 from toolbox.game import Game
 from toolbox.i18n import I18n
@@ -323,7 +323,7 @@ class BattleScene(cocos.scene.Scene):
         self._dialog.set_text(I18n().get("BATTLE.KO").format(pokemon.nickname),
                               lambda: self._battle_controller.pokemon_ko(pokemon))
 
-    def player_won_fight(self, xp_points: int, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
+    def player_won_fight(self, xp_points: int, gained_levels: typing.Dict[int, typing.Dict]) -> None:
         """The player's pokemon defeated the opponent. They gain some XP.
 
         :param xp_points: The total number of gained xp points.
@@ -334,7 +334,7 @@ class BattleScene(cocos.scene.Scene):
         self._dialog.set_text(I18n().get("BATTLE.GAINED_XP").format(self._battle.players_pokemon.nickname, xp_points),
                               lambda: self.experience_gained(gained_levels))
 
-    def experience_gained(self, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
+    def experience_gained(self, gained_levels: typing.Dict[int, typing.Dict]) -> None:
         """Update the XP bar.
 
         :param gained_levels: A dictionary with the gained levels as well as
@@ -342,26 +342,15 @@ class BattleScene(cocos.scene.Scene):
         """
 
         if len(gained_levels) > 0:
-            self._hud.do(
-                CallFunc(self._hud.update_xp, gained_levels[self._battle.players_pokemon.level - len(gained_levels)])
-                + Delay(HUDLayer.XP_UPDATE_DURATION) + CallFunc(self._level_up, gained_levels))
+            self._hud.do(CallFunc(self._hud.update_xp, next(iter(gained_levels.values())))
+                         + Delay(HUDLayer.XP_UPDATE_DURATION)
+                         + CallFunc(self._level_up, gained_levels))
         else:
-            self._hud.do(CallFunc(self._hud.update_xp) +
-                         Delay(HUDLayer.XP_UPDATE_DURATION + 0.5) + CallFunc(self._battle_controller.won_battle))
+            self._hud.do(CallFunc(self._hud.update_xp)
+                         + Delay(HUDLayer.XP_UPDATE_DURATION + 0.5)
+                         + CallFunc(self._battle_controller.won_battle))
 
-    def _continue_experience_gained(self, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
-        """After leveling up, reset the XP bar and keep updating it.
-
-        :param gained_levels: A dictionary with the gained levels as well as
-        the stats increase for each level.
-        """
-
-        self._hud.reset_xp_bar()
-        self._stats.kill()
-        del gained_levels[self._battle.players_pokemon.level - len(gained_levels)]
-        self.experience_gained(gained_levels)
-
-    def _level_up(self, gained_levels: typing.Dict[int, typing.Dict[StatEnum, int]]) -> None:
+    def _level_up(self, gained_levels: typing.Dict[int, typing.Dict]) -> None:
         """The pokemon has leveled up. Show a message to the player , the stat
         increase and a possible new move to learn.
 
@@ -374,9 +363,139 @@ class BattleScene(cocos.scene.Scene):
         self.add(self._stats, z=100)
 
         self._dialog.set_text(I18n().get("BATTLE.LEVEL_UP").format(self._battle.players_pokemon.nickname,
-                                                                   self._battle.players_pokemon.level - (
-                                                                           len(gained_levels) - 1)),
+                                                                   next(iter(gained_levels.keys()))),
                               lambda: self._continue_experience_gained(gained_levels))
+
+    def _continue_experience_gained(self, gained_levels: typing.Dict[int, typing.Dict]) -> None:
+        """After leveling up, remove the stat increase panel.
+
+        :param gained_levels: A dictionary with the gained levels as well as
+        the stats increase for each level.
+        """
+
+        if self._stats:
+            self._stats.kill()
+            self._stats = None
+        self._hud.reset_xp_bar()
+
+        if next(iter(gained_levels.values()))["moves"]:
+            self._new_move_to_learn(gained_levels)
+        else:
+            del gained_levels[next(iter(gained_levels.keys()))]
+            self.experience_gained(gained_levels)
+
+    def _new_move_to_learn(self, gained_levels: typing.Dict[int, typing.Dict]) -> None:
+        """After leveling up, suggest the player to learn new moves.
+
+        :param gained_levels: A dictionary with the gained levels as well as
+        the stats increase for each level and the new moves.
+        """
+
+        new_move = next(iter(gained_levels.values()))["moves"][0]
+        del gained_levels[next(iter(gained_levels.keys()))]["moves"][0]
+
+        just_learned = False
+        for learnedMove in self._battle.players_pokemon.moves:
+            if learnedMove.move == new_move:
+                just_learned = True
+                break
+
+        if just_learned:
+            self.learn_move(gained_levels, new_move)
+        else:
+            self._dialog.set_text(
+                [I18n().get("BATTLE.WANTS_NEW_MOVE").format(self._battle.players_pokemon.nickname, new_move.name),
+                 I18n().get("BATTLE.TOO_MANY_MOVES").format(self._battle.players_pokemon.nickname),
+                 I18n().get("BATTLE.SHOULD_FORGET_MOVE").format(new_move.name)],
+                lambda answer: self._confirmation_not_learn_move(gained_levels,
+                                                                 new_move) if answer == 1 else self._show_infos_new_move(
+                    gained_levels,
+                    new_move),
+                choices=[I18n().get("COMMON.YES"), I18n().get("COMMON.NO")])
+
+    def learn_move(self, gained_levels: typing.Dict[int, typing.Dict], new_move: MoveModel,
+                   forgot_move: LearnedMoveModel = None):
+        """The pokemon learned a new move.
+
+        :param gained_levels: A dictionary with the gained levels as well as
+        the stats increase for each level and the new moves.
+        :param new_move: The move the player chose not to learn.
+        :param forgot_move: The ``LearnedMoveModel`` the player decided
+        """
+
+        if forgot_move:
+            self._dialog.set_text(
+                I18n().get("BATTLE.REPLACE_MOVE").format(self._battle.players_pokemon.nickname, forgot_move.move.name,
+                                                         new_move.name),
+                lambda: self._continue_experience_gained(gained_levels))
+        else:
+            self._dialog.set_text(
+                I18n().get("BATTLE.MOVE_LEARNED").format(self._battle.players_pokemon.nickname, new_move.name),
+                lambda: self._continue_experience_gained(gained_levels))
+
+    def _didnt_learn_move(self, gained_levels: typing.Dict[int, typing.Dict], new_move: MoveModel) -> None:
+        """After leveling up, the player didn't want to learn the new move.
+
+        :param gained_levels: A dictionary with the gained levels as well as
+        the stats increase for each level and the new moves.
+        :param new_move: The move the player chose not to learn.
+        """
+
+        self._dialog.set_text(
+            I18n().get("BATTLE.DIDNT_LEARN_MOVE").format(self._battle.players_pokemon.nickname, new_move.name),
+            lambda: self._continue_experience_gained(gained_levels))
+
+    def _show_infos_new_move(self, gained_levels: typing.Dict[int, typing.Dict], new_move: MoveModel) -> None:
+        """The players wants to learn the new move. Show the PKMN infos scene
+        to choose which move to forget.
+
+        :param gained_levels: A dictionary with the gained levels as well as
+        the stats increase for each level and the new moves.
+        :param new_move: The new move to learn.
+        """
+
+        self._battle_controller.infos_pkmn(PkmnInfosTypeEnum.NEW_MOVE, new_move=new_move,
+                                           cancel_callback=lambda move_to_forget=None: self._result_infos_new_move(
+                                               gained_levels,
+                                               new_move, move_to_forget))
+
+    def _confirmation_not_learn_move(self, gained_levels: typing.Dict[int, typing.Dict], new_move: MoveModel) -> None:
+        """Ask the player to confirm he doesn't want to learn the new move.
+
+        :param gained_levels: A dictionary with the gained levels as well as
+        the stats increase for each level and the new moves.
+        :param new_move: The new ``MoveModel`` to learn.
+        """
+
+        self._dialog.set_text(
+            I18n().get("BATTLE.CONFIRMATION_NOT_LEARN_MOVE").format(new_move.name),
+            lambda answer: self._didnt_learn_move(gained_levels,
+                                                  new_move) if answer == 0 else self._show_infos_new_move(gained_levels,
+                                                                                                          new_move),
+            choices=[I18n().get("COMMON.YES"), I18n().get("COMMON.NO")])
+
+    def _result_infos_new_move(self, gained_levels: typing.Dict[int, typing.Dict], new_move: MoveModel,
+                               move_to_forget: [LearnedMoveModel]) -> None:
+        """Ask the player to confirm he doesn't want to learn the new move.
+
+        :param gained_levels: A dictionary with the gained levels as well as
+        the stats increase for each level and the new moves.
+        :param new_move: The new ``MoveModel`` to learn.
+        :param move_to_forget: The ``LearnedMoveModel`` the player wants to
+        forget or None if he doesn't want.
+        """
+
+        if not move_to_forget:
+            self._confirmation_not_learn_move(gained_levels, new_move)
+        else:
+            move = move_to_forget[0]
+            self._dialog.set_text(I18n().get("BATTLE.FORGET_MOVE").format(move.move.name, new_move.name),
+                                  callback=lambda answer: self._battle_controller.forget_move(gained_levels,
+                                                                                              new_move,
+                                                                                              move) if answer == 0 else self._show_infos_new_move(
+                                      gained_levels,
+                                      new_move),
+                                  choices=[I18n().get("COMMON.YES"), I18n().get("COMMON.NO")])
 
     def player_lost_battle(self) -> None:
         """The player lost the battle. Display a message."""
@@ -394,7 +513,8 @@ class BattleScene(cocos.scene.Scene):
                               choices=[I18n().get("COMMON.YES"), I18n().get("COMMON.NO")])
 
     def show_infos_shift_pokemon_out(self) -> None:
-        """Show the PKMN information scene."""
+        """Show the PKMN information scene to let the player choose a new
+        PKMN to send after his pokemon got defeated."""
 
         self._battle_controller.infos_pkmn(PkmnInfosTypeEnum.SHIFT_POKEMON_OUT,
                                            cancel_callback=self.ask_player_shift_pokemon)

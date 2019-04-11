@@ -122,7 +122,7 @@ class PokemonModel:
         self._staged_stats = staged_stats
 
     @property
-    def moves(self) -> [LearnedMoveModel]:
+    def moves(self) -> typing.List[LearnedMoveModel]:
         """Get the moves the pokemon has learned.
 
         :return: A list of ``LearnedMove``.
@@ -131,7 +131,7 @@ class PokemonModel:
         return self._moves
 
     @moves.setter
-    def moves(self, moves: [LearnedMoveModel]) -> None:
+    def moves(self, moves: typing.List[LearnedMoveModel]) -> None:
         """Set the moves the pokemon has learned.
 
         :param moves: A list of ``LearnedMove``.
@@ -216,20 +216,30 @@ class PokemonModel:
         next level, the pokemon levels up.
 
         :param experience_gained: The number of experience points gained.
-        :return A dictionary of levels with the stats increase.
+        :return A dictionary of levels with the stats increase and the moves
+        which can be learned.
         """
 
         self.experience += experience_gained
         gained_levels = dict()
         while self.experience >= self._experience_for_next_level:
-            gained_levels[self.level] = dict()
             old_stats = self._stats.copy()
             self.level += 1
+            gained_levels[self.level] = dict()
             self._update_stats()
             self._update_experience_for_next_level()
 
             for stat in StatEnum:
-                gained_levels[self.level - 1][stat] = self.stats[stat] - old_stats[stat]
+                gained_levels[self.level][stat] = self.stats[stat] - old_stats[stat]
+
+            gained_levels[self.level]["moves"] = self.species.moves_by_lvl_up[
+                self.level] if self.level in self.species.moves_by_lvl_up else []
+
+            if len(self._moves) < 4:
+                for move in gained_levels[self.level]["moves"]:
+                    self._moves.append(LearnedMoveModel(move, move.default_pp, move.default_pp))
+                    if len(self._moves) >= 4:
+                        break
 
         return gained_levels
 

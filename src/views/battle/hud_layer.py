@@ -153,7 +153,7 @@ class HUDLayer(Layer):
                             self._hp_bar_content[c][i].visible = True if c == self._bar_color else False
                 break
 
-    def update_xp(self, level_up_stats: typing.Dict[StatEnum, int] = None) -> None:
+    def update_xp(self, level_up_stats: typing.Union[typing.Dict, None] = None) -> None:
         """Update the size of the XP bar and update the number of HP after
         leveling up.
 

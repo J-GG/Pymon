@@ -14,7 +14,7 @@ class BattleModel:
         """Create a new battle."""
 
         self._players_pokemon = self._first_players_pokemon_available(Game().game_state.player.pokemons)
-        self._opponent_pokemon = PokemonModel(pokemons["BULBASAUR"], pokemons["BULBASAUR"].name, 100,
+        self._opponent_pokemon = PokemonModel(pokemons["BULBASAUR"], pokemons["BULBASAUR"].name, 1,
                                               [LearnedMoveModel(moves["VINE_WHIP"], moves["VINE_WHIP"].default_pp,
                                                                 moves["VINE_WHIP"].default_pp),
                                                LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp,
@@ -70,3 +70,11 @@ class BattleModel:
         self._players_pokemon = players_pokemon
 
         return previous_pokemon
+
+    def is_wild_pokemon(self) -> bool:
+        """Whether the battle is against a wild pokemon or not.
+
+        :return True if the battle is against a wild pokemon.
+        """
+
+        return True

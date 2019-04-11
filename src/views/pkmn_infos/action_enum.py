@@ -12,3 +12,4 @@ class ActionEnum(Enum):
     MOVE_2 = 5
     MOVE_3 = 6
     MOVE_4 = 7
+    NEW_MOVE = 8

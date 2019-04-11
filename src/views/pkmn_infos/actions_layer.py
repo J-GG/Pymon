@@ -3,6 +3,7 @@ import pyglet
 from pyglet.window import key as keys
 
 from models.battle.battle_model import BattleModel
+from models.move_model import MoveModel
 from models.pokemon_model import PokemonModel
 from toolbox.game import Game
 from toolbox.i18n import I18n
@@ -20,7 +21,7 @@ class ActionsLayer(Layer):
     is_event_handler = True
 
     def __init__(self, pkmn_infos_type: PkmnInfosTypeEnum, pokemon: PokemonModel, selected_action: ActionEnum = None,
-                 battle: BattleModel = None) -> None:
+                 battle: BattleModel = None, new_move: MoveModel = None) -> None:
         """Create a layer with the list of actions and manage their interaction.
 
         :param pkmn_infos_type: The type of scene. Affects the information
@@ -28,11 +29,14 @@ class ActionsLayer(Layer):
         :param pokemon: The pokemon whose infos is shown.
         :param selected_action: The selected action by default.
         :param battle: The battle model if it is for a shift.
+        :param new_move: The new move to learn if any.
         """
 
         super().__init__()
 
         self._pokemon = pokemon
+        self._pkmn_infos_type = pkmn_infos_type
+        self._new_move = new_move
         self._available_actions = pkmn_infos_type.actions.copy()
         if ActionEnum.SHIFT in self._available_actions and (
                 (battle is not None and battle.players_pokemon == pokemon) or pokemon.hp <= 0):
@@ -45,7 +49,7 @@ class ActionsLayer(Layer):
 
         self._selected_action = self._available_actions.index(
             selected_action) if selected_action and selected_action in self._available_actions else self._available_actions.index(
-            ActionEnum.CANCEL)
+            pkmn_infos_type.default_action)
         self._actions = {}
 
         if ActionEnum.PREVIOUS in self._available_actions:
@@ -107,6 +111,44 @@ class ActionsLayer(Layer):
             self.add(next)
             self._actions[ActionEnum.NEXT] = next
 
+        list_moves = pokemon.moves + [new_move] if new_move else pokemon.moves
+        for index, move in enumerate(list_moves):
+            name = move.name.capitalize() if isinstance(move, MoveModel) else move.move.name.capitalize()
+            current_pp = move.default_pp if isinstance(move, MoveModel) else move.current_pp
+            max_pp = move.default_pp if isinstance(move, MoveModel) else move.pp
+            type = move.type.name.lower() if isinstance(move, MoveModel) else move.move.type.name.lower()
+            y_position = 170 if isinstance(move, MoveModel) else 350 - 40 * index
+
+            move_sprite = cocos.sprite.Sprite(
+                pyglet.image.load(PATH + '/assets/img/battle/moves/{0}.png'.format(type)))
+            move_sprite.position = (
+                cocos.director.director.get_window_size()[0] - move_sprite.width / 2, y_position)
+
+            selected_sprite = cocos.sprite.Sprite(
+                pyglet.image.load(PATH + '/assets/img/battle/moves/selected_{0}.png'.format(type)))
+            selected_sprite.visible = False
+            move_sprite.add(selected_sprite, name=ActionsLayer.SELECTED_SPRITE)
+
+            name_label = cocos.text.Label(name, font_size=9, anchor_x="left", anchor_y="center", color=(0, 0, 0, 255),
+                                          bold=True)
+            name_label.position = (-57, 8)
+            move_sprite.add(name_label)
+
+            pp = cocos.text.Label("PP {0}/{1}".format(current_pp, max_pp),
+                                  font_size=9, anchor_x="left", anchor_y="center", bold=True)
+            pp.position = (-15, -8)
+            move_sprite.add(pp)
+
+            type = cocos.sprite.Sprite(
+                pyglet.image.load(PATH + '/assets/img/common/types/{0}.png'.format(type)))
+            type.position = (-35, -8)
+            type.scale = 0.9
+            move_sprite.add(type)
+
+            self.add(move_sprite)
+            if pkmn_infos_type == PkmnInfosTypeEnum.NEW_MOVE:
+                self._actions[self._available_actions[index]] = move_sprite
+
         self._update_screen()
 
     def _update_screen(self) -> None:
@@ -131,10 +173,17 @@ class ActionsLayer(Layer):
 
         event_handled = False
         if key == keys.LEFT and self._selected_action > 0:
-            self._selected_action = self._selected_action - 1
+            self._selected_action -= 1
             event_handled = True
         elif key == keys.RIGHT and self._selected_action < len(self._available_actions) - 1:
-            self._selected_action = self._selected_action + 1
+            self._selected_action += 1
+            event_handled = True
+        elif key == keys.UP and self._pkmn_infos_type == PkmnInfosTypeEnum.NEW_MOVE and self._selected_action > 0:
+            self._selected_action -= 1
+            event_handled = True
+        elif key == keys.DOWN and self._pkmn_infos_type == PkmnInfosTypeEnum.NEW_MOVE and self._selected_action < len(
+                self._available_actions) - 1:
+            self._selected_action += 1
             event_handled = True
         elif key == keys.ENTER:
             if self._available_actions[self._selected_action] == ActionEnum.CANCEL:
@@ -148,6 +197,13 @@ class ActionsLayer(Layer):
                 event_handled = True
             elif self._available_actions[self._selected_action] == ActionEnum.SHIFT:
                 self.parent.shift(self._pokemon)
+                event_handled = True
+            elif self._available_actions[self._selected_action] == ActionEnum.NEW_MOVE:
+                self.parent.cancel()
+                event_handled = True
+            elif self._available_actions[self._selected_action] in [ActionEnum.MOVE_1, ActionEnum.MOVE_2,
+                                                                    ActionEnum.MOVE_3, ActionEnum.MOVE_4]:
+                self.parent.cancel([self._pokemon.moves[self._selected_action]])
                 event_handled = True
         elif key == keys.B:
             self.parent.cancel()
