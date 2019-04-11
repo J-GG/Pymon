@@ -147,10 +147,12 @@ class PkmnInfosScene(cocos.scene.Scene):
 
     def next_previous_pokemon(self, selected_action: ActionEnum) -> None:
         """Show the previous or next pokemon."""
+        pokemon_index = Game().game_state.player.pokemons.index(
+            self._pokemon) - 1 if selected_action == ActionEnum.PREVIOUS else Game().game_state.player.pokemons.index(
+            self._pokemon) + 1
 
         self._pkmn_infos_controller.show_pkmn_infos(pkmn_infos_type=self._pkmn_infos_type,
-                                                    pokemon=Game().game_state.player.pokemons[
-                                                        Game().game_state.player.pokemons.index(self._pokemon) - 1],
+                                                    pokemon=Game().game_state.player.pokemons[pokemon_index],
                                                     selected_action=selected_action,
                                                     replace=True,
                                                     battle=self._battle,

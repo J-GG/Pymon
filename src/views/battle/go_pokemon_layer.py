@@ -5,7 +5,7 @@ from cocos.actions import *
 from toolbox.init import PATH
 
 
-class GoPokemonLayer(cocos.layer.Layer):
+class PlayerLayer(cocos.layer.Layer):
     """The animation when the player sends a pokemon"""
 
     TRAINER_CHARSET = pyglet.image.load(PATH + "/assets/img/battle/trainer.png")
@@ -19,7 +19,7 @@ class GoPokemonLayer(cocos.layer.Layer):
         super().__init__()
 
         self._trainer = cocos.sprite.Sprite(pyglet.image.Animation.from_image_sequence(
-            GoPokemonLayer.TRAINER_GRID[:1],
+            PlayerLayer.TRAINER_GRID[:1],
             0.5,
             loop=False)
         )
@@ -51,7 +51,7 @@ class GoPokemonLayer(cocos.layer.Layer):
 
         self._trainer.kill()
         self._trainer = cocos.sprite.Sprite(pyglet.image.Animation.from_image_sequence(
-            GoPokemonLayer.TRAINER_GRID,
+            PlayerLayer.TRAINER_GRID,
             0.08,
             loop=False)
         )

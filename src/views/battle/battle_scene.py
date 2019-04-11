@@ -22,7 +22,7 @@ from views.pkmn_infos.pkmn_infos_type_enum import PkmnInfosTypeEnum
 from .actions_layer import ActionsLayer
 from .background_layer import BackgroundLayer
 from .fade_layer import FadeLayer
-from .go_pokemon_layer import GoPokemonLayer
+from .go_pokemon_layer import PlayerLayer
 from .hud_layer import HUDLayer
 from .moves_layer import MovesLayer
 from .opponent_hud_layer import OpponentHUDLayer
@@ -123,8 +123,8 @@ class BattleScene(cocos.scene.Scene):
         self._moves = MovesLayer(self._battle.players_pokemon)
         self.add(self._moves)
 
-        self._go_pokemon = GoPokemonLayer()
-        self.add(self._go_pokemon, z=60)
+        self._player = PlayerLayer()
+        self.add(self._player, z=60)
 
         self._hud = None
         self._pokemon = None
@@ -164,7 +164,7 @@ class BattleScene(cocos.scene.Scene):
     def _send_pokemon(self) -> None:
         """Show the player's pokemon."""
 
-        self._go_pokemon.animation()
+        self._player.animation()
 
         self._dialog.set_text("")
         self._dialog.do(FadeIn(0.4) |
@@ -240,7 +240,7 @@ class BattleScene(cocos.scene.Scene):
                                                                                 FightActionModel) else None
 
             self._actions.do(CallFunc(self._actions.toggle_apparition))
-            self._go_pokemon.flash(True)
+            self._player.flash(True)
             self._dialog.set_text(I18n().get("BATTLE.COME_BACK").format(action.previous_pokemon.nickname))
             self._pokemon.do(Delay(1.5) + CallFunc(self._add_pkmn, hp))
             self._dialog.do(Delay(1.5)
@@ -530,7 +530,7 @@ class BattleScene(cocos.scene.Scene):
         :param action: The ``ShiftActionModel``.
         """
 
-        self._go_pokemon.flash()
+        self._player.flash()
         self._pokemon.do(Delay(1.5) + CallFunc(self._add_pkmn))
         self._dialog.set_text(I18n().get("BATTLE.GO_POKEMON").format(action.pokemon.nickname))
 

@@ -7,6 +7,7 @@ from cocos.actions import *
 
 from models.enumerations.stat_enum import StatEnum
 from models.pokemon_model import PokemonModel
+from toolbox.game import Game
 from toolbox.init import PATH
 from views.common.layer import Layer
 from views.common.text import Text
@@ -39,6 +40,13 @@ class HUDLayer(Layer):
 
         super().__init__()
         self._pokemon = pokemon
+
+        for index, pkmn in enumerate(Game().game_state.player.pokemons):
+            pokeball = cocos.sprite.Sprite(pyglet.image.load(
+                PATH + '/assets/img/battle/hud/pokeball{0}.png'.format("_ko" if pkmn.hp == 0 else "")))
+            pokeball.position = (-35 + (pokeball.width + 3) * index, pokeball.height + 5)
+
+            self.add(pokeball)
 
         hp = forced_hp if forced_hp else pokemon.hp
         self._name = Text(pokemon.nickname)
