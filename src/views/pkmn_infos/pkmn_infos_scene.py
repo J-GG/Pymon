@@ -146,27 +146,17 @@ class PkmnInfosScene(cocos.scene.Scene):
         if self._cancel_callback:
             self._cancel_callback(*args)
 
-    def previous(self) -> None:
-        """Show the previous pokemon."""
+    def next_previous_pokemon(self, selected_action: ActionEnum) -> None:
+        """Show the previous or next pokemon."""
 
-        self._pkmn_infos_controller.show_pkmn_infos(self._pkmn_infos_type,
-                                                    Game().game_state.player.pokemons[
+        self._pkmn_infos_controller.show_pkmn_infos(pkmn_infos_type=self._pkmn_infos_type,
+                                                    pokemon=Game().game_state.player.pokemons[
                                                         Game().game_state.player.pokemons.index(self._pokemon) - 1],
-                                                    ActionEnum.PREVIOUS,
-                                                    True,
-                                                    self._battle,
-                                                    self._cancel_callback)
-
-    def next(self) -> None:
-        """Show the next pokemon."""
-
-        self._pkmn_infos_controller.show_pkmn_infos(self._pkmn_infos_type,
-                                                    Game().game_state.player.pokemons[
-                                                        Game().game_state.player.pokemons.index(self._pokemon) + 1],
-                                                    ActionEnum.NEXT,
-                                                    True,
-                                                    self._battle,
-                                                    self._cancel_callback)
+                                                    selected_action=selected_action,
+                                                    replace=True,
+                                                    battle=self._battle,
+                                                    new_move=None,
+                                                    cancel_callback=self._cancel_callback)
 
     def shift(self, pokemon: PokemonModel) -> None:
         """Return to the battle scene and shift the current pokemon with the

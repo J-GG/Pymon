@@ -195,10 +195,10 @@ class ActionsLayer(Layer):
                 self.parent.cancel()
                 event_handled = True
             elif self._available_actions[self._selected_action] == ActionEnum.PREVIOUS:
-                self.parent.previous()
+                self.parent.next_previous_pokemon(ActionEnum.PREVIOUS)
                 event_handled = True
             elif self._available_actions[self._selected_action] == ActionEnum.NEXT:
-                self.parent.next()
+                self.parent.next_previous_pokemon(ActionEnum.NEXT)
                 event_handled = True
             elif self._available_actions[self._selected_action] == ActionEnum.SHIFT:
                 self.parent.shift(self._pokemon)
