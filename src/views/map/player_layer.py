@@ -12,12 +12,11 @@ from .player_action_enum import PlayerActionEnum
 class PlayerLayer(cocos.layer.ScrollableLayer):
     """The player on the map."""
 
-    TILE_SIZE = 32
     CHARSET_ROWS = 4
     CHARSET_COLUMNS = 4
+    ANIMATION_DURATION = 0.4
     CHAR_WIDTH = 64
     CHAR_HEIGHT = 64
-    ANIMATION_DURATION = 0.4
 
     charset = pyglet.image.load(PATH + '/assets/map/player.png')
     charset_grid = pyglet.image.ImageGrid(charset, CHARSET_ROWS, CHARSET_COLUMNS, CHAR_WIDTH, CHAR_HEIGHT)
@@ -40,11 +39,11 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
     keyboard = key.KeyStateHandler()
     cocos.director.director.window.push_handlers(keyboard)
 
-    def __init__(self, map_controller, players_position: typing.Tuple[int, int]) -> None:
+    def __init__(self, map_controller, players_position_pixels: typing.Tuple[int, int]) -> None:
         """Create the player layer.
 
         :param map_controller: The map controller.
-        :param players_position: The coordinates of the player on the map.
+        :param players_position: The coordinates of the player on the map in pixels.
         """
 
         super().__init__()
@@ -53,21 +52,13 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
         self._direction = PlayerDirectionEnum.DOWN
         self._time_left_moving = 0
 
-        x = players_position[0]
-        y = players_position[1]
         self._sprite = cocos.sprite.Sprite(PlayerLayer.charset_fix[self.direction])
-        self._sprite.position = (
-            PlayerLayer.TILE_SIZE / 2 + x * PlayerLayer.TILE_SIZE,
-            PlayerLayer.CHAR_HEIGHT / 2 + y * PlayerLayer.TILE_SIZE
-        )
+        self._sprite.position = (players_position_pixels[0], players_position_pixels[1])
         self._sprite.velocity = (0, 0)
         self._sprite.do(PlayerMovement())
         self.add(self._sprite)
 
-        self._final_position = (
-            int(PlayerLayer.TILE_SIZE / 2 + x * PlayerLayer.TILE_SIZE),
-            int(PlayerLayer.CHAR_HEIGHT / 2 + y * PlayerLayer.TILE_SIZE)
-        )
+        self._final_position = (players_position_pixels[0], players_position_pixels[1])
 
     def _move(self, change_direction: bool = False) -> None:
         """Update the player's sprite according to his direction.
@@ -97,14 +88,14 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
             right_left = 1 if self.direction == PlayerDirectionEnum.RIGHT else -1 if self.direction == PlayerDirectionEnum.LEFT else 0
             up_down = 1 if self.direction == PlayerDirectionEnum.UP else -1 if self.direction == PlayerDirectionEnum.DOWN else 0
 
-            vel_x = right_left * PlayerLayer.TILE_SIZE * 1 / (PlayerLayer.ANIMATION_DURATION / (
+            vel_x = right_left * self.parent.parent.TILE_SIZE * 1 / (PlayerLayer.ANIMATION_DURATION / (
                     PlayerLayer.CHARSET_COLUMNS + 1) * PlayerLayer.CHARSET_COLUMNS)
-            vel_y = up_down * PlayerLayer.TILE_SIZE * 1 / (PlayerLayer.ANIMATION_DURATION / (
+            vel_y = up_down * self.parent.parent.TILE_SIZE * 1 / (PlayerLayer.ANIMATION_DURATION / (
                     PlayerLayer.CHARSET_COLUMNS + 1) * PlayerLayer.CHARSET_COLUMNS)
             self._sprite.velocity = (vel_x, vel_y)
             self._final_position = (
-                self._final_position[0] + right_left * PlayerLayer.TILE_SIZE,
-                self._final_position[1] + up_down * PlayerLayer.TILE_SIZE
+                self._final_position[0] + right_left * self.parent.parent.TILE_SIZE,
+                self._final_position[1] + up_down * self.parent.parent.TILE_SIZE
             )
 
     @property
@@ -185,16 +176,14 @@ class PlayerMovement(cocos.actions.Move):
                     direction = PlayerDirectionEnum.DOWN
 
                 self.target.parent.map_controller.action(
-                    self.target.position[0] - PlayerLayer.TILE_SIZE / 2,
-                    self.target.position[1] - PlayerLayer.CHAR_HEIGHT / 2,
+                    self.target.position,
                     self.target.parent.direction,
                     PlayerActionEnum.PLAYER_START_MOVE,
                     **{"new_direction": direction}
                 )
-            elif PlayerLayer.keyboard[key.X]:
+            elif PlayerLayer.keyboard[key.ENTER]:
                 self.target.parent.map_controller.action(
-                    self.target.position[0] - PlayerLayer.TILE_SIZE / 2,
-                    self.target.position[1] - PlayerLayer.CHAR_HEIGHT / 2,
+                    self.target.position,
                     self.target.parent.direction,
                     PlayerActionEnum.ACTION_BUTTON,
                 )
@@ -204,10 +193,10 @@ class PlayerMovement(cocos.actions.Move):
                 self.target.parent.time_left_moving = 0
                 self.target.velocity = (0, 0)
                 self.target.position = self.target.parent.final_position
-                self.target.parent.map_controller.action(self.target.position[0] - PlayerLayer.TILE_SIZE / 2,
-                                                         self.target.position[1] - PlayerLayer.CHAR_HEIGHT / 2,
-                                                         self.target.parent.direction,
-                                                         PlayerActionEnum.PLAYER_END_MOVE
-                                                         )
+                self.target.parent.map_controller.action(
+                    self.target.position,
+                    self.target.parent.direction,
+                    PlayerActionEnum.PLAYER_END_MOVE
+                )
 
         self.target.parent.parent.set_focus(self.target.x, self.target.y)

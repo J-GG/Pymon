@@ -10,9 +10,11 @@ class MapScene(cocos.scene.Scene):
     """The scene displaying a map on which the player can move.
 
     - PLAYER_LAYER_NAME: The name of the layer where the player's sprite must be added.
+    - TILE_SIZE: The width and height of a tile in pixels.
     """
 
     PLAYER_LAYER_NAME = "PLAYER"
+    TILE_SIZE = 32
 
     def __init__(self, map_controller, map: cocos.tiles.Resource, players_position: typing.Tuple[int, int]) -> None:
         """Create the map scene.
@@ -20,7 +22,8 @@ class MapScene(cocos.scene.Scene):
         Add all the layers of the map and the player.
 
         :param map_controller: The controller of the maps.
-        :param: players_position: The tile coordinates of the player's position.
+        :param map: The map.
+        :param players_position: The tile coordinates of the player's position.
         """
 
         super().__init__()
@@ -33,10 +36,13 @@ class MapScene(cocos.scene.Scene):
                 if key == MapScene.PLAYER_LAYER_NAME:
                     break
 
-        self._player_layer = PlayerLayer(map_controller, players_position)
+        players_position_pixels = (
+            int(MapScene.TILE_SIZE / 2 + players_position[0] * MapScene.TILE_SIZE),
+            int(PlayerLayer.CHAR_HEIGHT / 2 + players_position[1] * MapScene.TILE_SIZE)
+        )
+        self._player_layer = PlayerLayer(map_controller, players_position_pixels)
         self._scroller.add(self._player_layer)
-        self._scroller.set_focus(PlayerLayer.TILE_SIZE / 2 + players_position[0] * PlayerLayer.TILE_SIZE,
-                                 PlayerLayer.CHAR_HEIGHT / 2 + players_position[1] * PlayerLayer.TILE_SIZE)
+        self._scroller.set_focus(players_position_pixels[0], players_position_pixels[1])
 
         has_passed_player_layer = False
         for key, value in map.contents.items():
