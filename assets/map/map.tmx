@@ -1,6 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="13">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="14">
  <tileset firstgid="1" source="tiles_minimap.tsx"/>
+ <objectgroup id="10" name="PLAYER_END_MOVE">
+  <object id="1" x="416" y="192" width="96" height="96">
+   <properties>
+    <property name="wild_pokemon" value="{&quot;place&quot;:&quot;meadow&quot;,&quot;pokemons&quot;: {&quot;bulbasaur&quot;:{&quot;probability&quot;:90,&quot;level_min&quot;:2,&quot;level_max&quot;:5}, &quot;ivysaur&quot;:{&quot;probability&quot;:10,&quot;level_min&quot;:4,&quot;level_max&quot;:6}}}"/>
+   </properties>
+  </object>
+  <object id="3" x="448" y="512" width="64" height="32">
+   <properties>
+    <property name="wild_pokemon" value="{&quot;place&quot;:&quot;city&quot;,&quot;pokemons&quot;: {&quot;bulbasaur&quot;:{&quot;probability&quot;:100,&quot;level_min&quot;:1,&quot;level_max&quot;:5}}}"/>
+   </properties>
+  </object>
+  <object id="13" x="416" y="480" width="32" height="32">
+   <properties>
+    <property name="pkmn_center_door" type="bool" value="true"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="13" name="ACTION_BUTTON">
+  <object id="9" x="352" y="480" width="32" height="32">
+   <properties>
+    <property name="message" value="MAP.PKMN_CENTER_SIGN"/>
+   </properties>
+  </object>
+  <object id="10" x="448" y="480" width="64" height="32">
+   <properties>
+    <property name="message" value="MAP.PKMN_CENTER_NAME"/>
+   </properties>
+  </object>
+  <object id="11" x="256" y="32" width="32" height="32">
+   <properties>
+    <property name="message" value="MAP.ROUTE_1"/>
+   </properties>
+  </object>
+ </objectgroup>
  <layer id="6" name="background" width="20" height="20">
   <data encoding="csv">
 1,2,5,6,5,6,5,6,13,13,13,13,5,6,5,6,5,6,1,2,
@@ -25,35 +59,6 @@
 5,6,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,13,5,6
 </data>
  </layer>
- <objectgroup id="10" name="PLAYER_END_MOVE">
-  <object id="1" x="416" y="192" width="96" height="96">
-   <properties>
-    <property name="wild_pokemon" value="{&quot;place&quot;:&quot;meadow&quot;,&quot;pokemons&quot;: {&quot;bulbasaur&quot;:{&quot;probability&quot;:90,&quot;level_min&quot;:2,&quot;level_max&quot;:5}, &quot;ivysaur&quot;:{&quot;probability&quot;:10,&quot;level_min&quot;:4,&quot;level_max&quot;:6}}}"/>
-   </properties>
-  </object>
-  <object id="3" x="448" y="512" width="64" height="32">
-   <properties>
-    <property name="wild_pokemon" value="{&quot;place&quot;:&quot;city&quot;,&quot;pokemons&quot;: {&quot;bulbasaur&quot;:{&quot;probability&quot;:100,&quot;level_min&quot;:1,&quot;level_max&quot;:5}}}"/>
-   </properties>
-  </object>
- </objectgroup>
- <objectgroup id="13" name="ACTION_BUTTON">
-  <object id="9" x="352" y="480" width="32" height="32">
-   <properties>
-    <property name="message" value="MAP.PKMN_CENTER_SIGN"/>
-   </properties>
-  </object>
-  <object id="10" x="448" y="480" width="64" height="32">
-   <properties>
-    <property name="message" value="MAP.PKMN_CENTER_NAME"/>
-   </properties>
-  </object>
-  <object id="11" x="256" y="32" width="32" height="32">
-   <properties>
-    <property name="message" value="MAP.ROUTE_1"/>
-   </properties>
-  </object>
- </objectgroup>
  <layer id="12" name="PLAYER" width="20" height="20">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
