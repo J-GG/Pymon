@@ -95,3 +95,26 @@ class MapScene(cocos.scene.Scene):
             if reverse:
                 callback = lambda: self._scroller.remove("pkmn_center_door")
                 self.do(Delay(0.3) + CallFunc(callback))
+
+    def tall_grass(self, x: int, y: int) -> None:
+        """Animate a tall grass.
+
+        :param x: The x coordinates of the player.
+        :param y: The y coordinates of the player.
+        """
+
+        tileset = pyglet.image.load(PATH + "/assets/map/tall_grass.png")
+        tileset_grid = pyglet.image.ImageGrid(tileset, 1, 3, MapScene.TILE_SIZE, tileset.height)
+        tileset_anim = pyglet.image.Animation.from_image_sequence(
+            tileset_grid,
+            0.1,
+            loop=False
+        )
+        animation = cocos.sprite.Sprite(tileset_anim)
+        animation.position = (x + MapScene.TILE_SIZE / 2, y + tileset.height / 2)
+
+        scrollable_layer = cocos.layer.ScrollableLayer()
+        scrollable_layer.add(animation)
+        self._scroller.add(scrollable_layer, z=2)
+        callback = lambda: self._scroller.remove(scrollable_layer)
+        self.do(Delay(0.4) + CallFunc(callback))
