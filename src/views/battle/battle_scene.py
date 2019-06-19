@@ -4,6 +4,7 @@ import typing
 
 import cocos
 from cocos.actions import *
+from cocos.scenes import FadeTransition
 
 from models.battle.battle_model import BattleModel
 from models.battle.fight_action_model import FightActionModel
@@ -62,7 +63,7 @@ class BattleScene(cocos.scene.Scene):
 
         transition_class = getattr(importlib.import_module("cocos.scenes.transitions"),
                                    random.choice(BattleScene.BATTLE_TRANSITIONS))
-        cocos.director.director.replace(transition_class(self))
+        cocos.director.director.push(transition_class(self))
 
         self._intro()
 
@@ -75,7 +76,7 @@ class BattleScene(cocos.scene.Scene):
             (ScaleTo(3.5, BattleScene.TRANSITION_DURATION * 1 / 3) | FadeOut(BattleScene.TRANSITION_DURATION * 1 / 3)))
         self.add(self._transition, z=100)
 
-        self._background = BackgroundLayer()
+        self._background = BackgroundLayer(self._battle.place)
         self._background.scale = 2
         self._background.position = (160, 240)
         self._background.do(Delay(BattleScene.TRANSITION_DURATION * 2 / 3)
@@ -348,7 +349,12 @@ class BattleScene(cocos.scene.Scene):
         else:
             self._hud.do(CallFunc(self._hud.update_xp)
                          + Delay(HUDLayer.XP_UPDATE_DURATION + 0.5)
-                         + CallFunc(self._battle_controller.won_battle))
+                         + CallFunc(self._pop_scene))
+
+    def _pop_scene(self):
+        last_scene = cocos.director.director.scene_stack[len(cocos.director.director.scene_stack) - 1]
+        cocos.director.director.pop()
+        cocos.director.director.replace(FadeTransition(last_scene))
 
     def _level_up(self, gained_levels: typing.Dict[int, typing.Dict]) -> None:
         """The pokemon has leveled up. Show a message to the player , the stat

@@ -1,3 +1,4 @@
+import random
 import typing
 
 from controllers.main_menu_controller import MainMenuController
@@ -35,7 +36,7 @@ class BattleController(metaclass=Singleton):
         :param players_action: The action chosen by the player.
         """
 
-        opponent_action = FightActionModel(self._battle, False, self._battle.opponent_pokemon.moves[0])
+        opponent_action = FightActionModel(self._battle, False, random.choice(self._battle.opponent_pokemon.moves))
 
         if isinstance(players_action, (RunActionModel, ShiftActionModel)):
             first_action, second_action = players_action, opponent_action

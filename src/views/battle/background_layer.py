@@ -1,5 +1,3 @@
-import random
-
 import cocos
 import pyglet
 
@@ -13,13 +11,18 @@ class BackgroundLayer(cocos.layer.Layer):
         - BATTLE_BACKGROUND: contains all of the background which can be used.
     """
 
-    BATTLE_BACKGROUND = ["bridge.png", "cave.jpg", "city.png", "clearing.png", "forest.png", "meadow.jpg"]
+    BATTLE_BACKGROUND = ["meadow.jpg", "bridge.png", "cave.jpg", "city.png", "clearing.png", "forest.png"]
 
-    def __init__(self) -> None:
-        """Create the background of the battle."""
+    def __init__(self, place: str) -> None:
+        """Create the background of the battle.
+
+        :param place: The place where the battle takes place.
+        """
 
         super().__init__()
 
-        self._background = cocos.sprite.Sprite(pyglet.image.load(
-            PATH + '/assets/img/battle/backgrounds/{0}'.format((random.choice(BackgroundLayer.BATTLE_BACKGROUND)))))
+        file = next((file for file in BackgroundLayer.BATTLE_BACKGROUND if place in file),
+                    BackgroundLayer.BATTLE_BACKGROUND[0])
+        self._background = cocos.sprite.Sprite(
+            pyglet.image.load(PATH + '/assets/img/battle/backgrounds/{0}'.format(file)))
         self.add(self._background)

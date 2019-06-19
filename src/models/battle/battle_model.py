@@ -1,24 +1,22 @@
 import typing
 
-from models.learned_move_model import LearnedMoveModel
 from models.pokemon_model import PokemonModel
-from toolbox.data.moves import moves
-from toolbox.data.pokemon import pokemons
 from toolbox.game import Game
 
 
 class BattleModel:
     """The data representing a battle."""
 
-    def __init__(self) -> None:
-        """Create a new battle."""
+    def __init__(self, opponent_pokemons: typing.List[PokemonModel], place: str) -> None:
+        """Create a new battle.
+
+        :param opponent_pokemons: The list of opponent fighting pokemon.
+        :param place: The place where the battle takes place (i.e. the background).
+        """
 
         self._players_pokemon = self._first_players_pokemon_available(Game().game_state.player.pokemons)
-        self._opponent_pokemon = PokemonModel(pokemons["BULBASAUR"], pokemons["BULBASAUR"].name, 1,
-                                              [LearnedMoveModel(moves["VINE_WHIP"], moves["VINE_WHIP"].default_pp,
-                                                                moves["VINE_WHIP"].default_pp),
-                                               LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp,
-                                                                moves["GROWL"].default_pp)])
+        self._opponent_pokemon = self._first_players_pokemon_available(opponent_pokemons)
+        self._place = place
 
     def _first_players_pokemon_available(self, pokemons: typing.List[PokemonModel]) -> PokemonModel:
         """Get the first pokemon of the list who can fight.
@@ -58,6 +56,15 @@ class BattleModel:
         """
 
         self._opponent_pokemon = opponent_pokemon
+
+    @property
+    def place(self) -> str:
+        """Get the place where the battle takes place.
+
+        :return: The place where the battle takes place.
+        """
+
+        return self._place
 
     def shift_players_pokemon(self, players_pokemon: PokemonModel) -> PokemonModel:
         """Shift the player's pokemon with the specified one and return the
