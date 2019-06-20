@@ -1,6 +1,5 @@
 import cocos
 
-from toolbox.i18n import I18n
 from views.map.map_scene import MapScene
 from views.map.player_direction_enum import PlayerDirectionEnum
 
@@ -32,4 +31,4 @@ class MessageEvent:
             1] * MapScene.TILE_SIZE
 
         if object.px <= facing_x and object.px + object.width >= facing_x + MapScene.TILE_SIZE and object.py <= facing_y and object.py + object.height >= facing_y + MapScene.TILE_SIZE:
-            print(I18n().get(object.properties["message"]))
+            map_scene.message(object.properties["message"])

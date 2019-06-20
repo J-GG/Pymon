@@ -4,7 +4,9 @@ import cocos
 import pyglet
 from cocos.actions import Delay, CallFunc
 
+from toolbox.i18n import I18n
 from toolbox.init import PATH
+from views.common.dialog import Dialog
 from views.map.player_layer import PlayerLayer
 from .player_direction_enum import PlayerDirectionEnum
 
@@ -58,6 +60,10 @@ class MapScene(cocos.scene.Scene):
 
         self.add(self._scroller)
 
+        self._dialog = Dialog()
+        self._dialog.visible = False
+        self.add(self._dialog)
+
         cocos.director.director.replace(self)
 
     def move_player(self, direction: PlayerDirectionEnum) -> None:
@@ -68,33 +74,34 @@ class MapScene(cocos.scene.Scene):
 
         self._player_layer.direction = direction
 
-    def pkmn_center_door(self, x: int, y: int, reverse: bool = False) -> None:
+    def pkmn_center_door(self, x: int, y: int) -> None:
         """Animate the pkmn center door opening or closing.
 
         :param x: The x coordinates of the pkmn center door.
         :param y: The y coordinates of the pkmn center door.
-        :param reverse: True if the door is opening.
         """
 
-        if not reverse or (reverse and "pkmn_center_door" in self._scroller.children_names):
-            tileset = pyglet.image.load(PATH + "/assets/map/pkmn_center_door.png")
-            tileset_grid = pyglet.image.ImageGrid(tileset, 1, 4, MapScene.TILE_SIZE, tileset.height)
-            tileset_anim = pyglet.image.Animation.from_image_sequence(
-                reversed(tileset_grid) if reverse else tileset_grid,
-                0.1,
-                loop=False
-            )
-            animation = cocos.sprite.Sprite(tileset_anim)
-            animation.position = (x + MapScene.TILE_SIZE / 2, y + tileset.height / 2)
+        reverse = True if "pkmn_center_door" in self._scroller.children_names else False
 
-            scrollable_layer = cocos.layer.ScrollableLayer()
-            scrollable_layer.add(animation)
-            if "pkmn_center_door" in self._scroller.children_names:
-                self._scroller.remove("pkmn_center_door")
-            self._scroller.add(scrollable_layer, z=1, name="pkmn_center_door")
-            if reverse:
-                callback = lambda: self._scroller.remove("pkmn_center_door")
-                self.do(Delay(0.3) + CallFunc(callback))
+        tileset = pyglet.image.load(PATH + "/assets/map/pkmn_center_door.png")
+        tileset_grid = pyglet.image.ImageGrid(tileset, 1, 4, MapScene.TILE_SIZE, tileset.height)
+        tileset_anim = pyglet.image.Animation.from_image_sequence(
+            reversed(tileset_grid) if reverse else tileset_grid,
+            0.1,
+            loop=False
+        )
+        animation = cocos.sprite.Sprite(tileset_anim)
+        animation.position = (x + MapScene.TILE_SIZE / 2, y + MapScene.TILE_SIZE + tileset.height / 2)
+
+        scrollable_layer = cocos.layer.ScrollableLayer()
+        scrollable_layer.add(animation)
+
+        if reverse:
+            self._scroller.remove("pkmn_center_door")
+            callback = lambda: self._scroller.remove("pkmn_center_door")
+            self.do(Delay(0.4) + CallFunc(callback))
+
+        self._scroller.add(scrollable_layer, z=1, name="pkmn_center_door")
 
     def tall_grass(self, x: int, y: int) -> None:
         """Animate a tall grass.
@@ -118,3 +125,13 @@ class MapScene(cocos.scene.Scene):
         self._scroller.add(scrollable_layer, z=2)
         callback = lambda: self._scroller.remove(scrollable_layer)
         self.do(Delay(0.4) + CallFunc(callback))
+
+    def message(self, text_key: str) -> None:
+        """Show a message to the player.
+
+        :param text_key: The key of the message.
+        """
+
+        self._dialog.visible = True
+        callback = lambda: setattr(self._dialog, "visible", False)
+        self._dialog.set_text([I18n().get(text_key)], callback)

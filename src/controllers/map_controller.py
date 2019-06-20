@@ -37,15 +37,15 @@ class MapController(metaclass=Singleton):
         x = position[0] - self._map_scene.TILE_SIZE / 2
         y = position[1] - PlayerLayer.CHAR_HEIGHT / 2
 
-        if action == PlayerActionEnum.PLAYER_START_MOVE:
+        if action == PlayerActionEnum.PLAYER_WANT_MOVE:
             MoveEvent(self._map_scene, x, y, direction, kwargs["new_direction"], self._map)
 
         if action.name in self._map.contents:
             resource = self._map.get_resource(action.name)
             objects = resource.get_in_region(x - MapScene.TILE_SIZE,
                                              y - MapScene.TILE_SIZE,
-                                             x + MapScene.TILE_SIZE * 3,
-                                             y + MapScene.TILE_SIZE * 3)
+                                             x + MapScene.TILE_SIZE * 2,
+                                             y + MapScene.TILE_SIZE * 2)
             for object in objects:
                 for property, value in object.properties.items():
                     class_name = property.replace("_", " ").title().replace(" ", "")

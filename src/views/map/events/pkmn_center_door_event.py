@@ -18,7 +18,5 @@ class PkmnCenterDoorEvent:
         :param object: The object containing all the info about the event.
         """
 
-        if object.px <= x and object.px + object.width > x and object.py <= y + MapScene.TILE_SIZE and object.py + object.height > y + MapScene.TILE_SIZE:
+        if object.px <= x and object.px + object.width > x and object.py <= y and object.py + object.height > y:
             map_scene.pkmn_center_door(object.px, object.py)
-        else:
-            map_scene.pkmn_center_door(object.px, object.py, True)

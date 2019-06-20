@@ -14,7 +14,7 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
 
     CHARSET_ROWS = 4
     CHARSET_COLUMNS = 4
-    ANIMATION_DURATION = 0.4
+    ANIMATION_DURATION = 0.2
     CHAR_WIDTH = 64
     CHAR_HEIGHT = 64
 
@@ -127,6 +127,11 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
             self._direction = direction
             self._move(True)
         else:
+            self._map_controller.action(
+                self._sprite.position,
+                direction,
+                PlayerActionEnum.PLAYER_START_MOVE
+            )
             self._move()
 
     @property
@@ -178,7 +183,7 @@ class PlayerMovement(cocos.actions.Move):
                 self.target.parent.map_controller.action(
                     self.target.position,
                     self.target.parent.direction,
-                    PlayerActionEnum.PLAYER_START_MOVE,
+                    PlayerActionEnum.PLAYER_WANT_MOVE,
                     **{"new_direction": direction}
                 )
             elif PlayerLayer.keyboard[key.ENTER]:

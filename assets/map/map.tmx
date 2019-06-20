@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="15" nextobjectid="14">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="20" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="16" nextobjectid="17">
  <tileset firstgid="1" source="tiles_minimap.tsx"/>
  <objectgroup id="10" name="PLAYER_END_MOVE">
   <object id="1" x="416" y="192" width="96" height="96">
@@ -14,7 +14,14 @@
     <property name="wild_pokemon" value="{&quot;place&quot;:&quot;city&quot;,&quot;pokemons&quot;: {&quot;bulbasaur&quot;:{&quot;probability&quot;:100,&quot;level_min&quot;:1,&quot;level_max&quot;:5}}}"/>
    </properties>
   </object>
-  <object id="13" x="416" y="480" width="32" height="32">
+  <object id="13" x="416" y="512" width="32" height="32">
+   <properties>
+    <property name="pkmn_center_door" type="bool" value="true"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="15" name="PLAYER_START_MOVE">
+  <object id="15" x="416" y="512" width="32" height="32">
    <properties>
     <property name="pkmn_center_door" type="bool" value="true"/>
    </properties>
