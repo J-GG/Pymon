@@ -27,7 +27,7 @@ class MainMenuController(metaclass=Singleton):
                                                             moves["VINE_WHIP"].default_pp),
                                            LearnedMoveModel(moves["GROWL"], moves["GROWL"].default_pp,
                                                             moves["GROWL"].default_pp)])]
-        BattleController().battle(BattleModel(opponent_pokemons))
+        BattleController().battle(BattleModel(opponent_pokemons, "meadow"))
 
     def new_game(self) -> None:
         """Start a new game."""

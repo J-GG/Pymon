@@ -1,4 +1,7 @@
+import typing
+
 from models.persistence import Persistence
+from models.settings.controls_enum import ControlsEnum
 from models.settings.language_enum import LanguageEnum
 from toolbox.i18n import I18n
 
@@ -13,6 +16,7 @@ class SettingsModel(Persistence):
 
         super().__init__()
         self._language = LanguageEnum.ENGLISH
+        self._controls = {control: control.value for control in ControlsEnum}
 
     @property
     def language(self) -> LanguageEnum:
@@ -31,6 +35,15 @@ class SettingsModel(Persistence):
         """
 
         self._language = language
+
+    @property
+    def controls(self) -> typing.Dict:
+        """Get the player's controls.
+        
+        :return: The player's controls in a dictionary.
+        """
+
+        return self._controls
 
     def save(self) -> None:
         """Save the model into a file."""

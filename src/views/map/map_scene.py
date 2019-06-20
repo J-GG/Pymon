@@ -36,10 +36,10 @@ class MapScene(cocos.scene.Scene):
         self._map = map
         self._scroller = cocos.layer.ScrollingManager()
 
-        for key, value in map.contents.items():
+        for name, value in map.contents.items():
             if isinstance(value, cocos.tiles.RectMapLayer):
                 self._scroller.add(value, z=1)
-                if key == MapScene.PLAYER_LAYER_NAME:
+                if name == MapScene.PLAYER_LAYER_NAME:
                     break
 
         players_position_pixels = (
@@ -51,11 +51,11 @@ class MapScene(cocos.scene.Scene):
         self._scroller.set_focus(players_position_pixels[0], players_position_pixels[1])
 
         has_passed_player_layer = False
-        for key, value in map.contents.items():
+        for name, value in map.contents.items():
             if has_passed_player_layer and isinstance(value, cocos.tiles.RectMapLayer):
                 self._scroller.add(value, z=3)
 
-            if key == MapScene.PLAYER_LAYER_NAME:
+            if name == MapScene.PLAYER_LAYER_NAME:
                 has_passed_player_layer = True
 
         self.add(self._scroller)

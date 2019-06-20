@@ -1,6 +1,5 @@
 import cocos
 import pyglet
-from pyglet.window import key as keys
 
 from models.battle.battle_model import BattleModel
 from models.move_model import MoveModel
@@ -8,6 +7,7 @@ from models.pokemon_model import PokemonModel
 from toolbox.game import Game
 from toolbox.i18n import I18n
 from toolbox.init import PATH
+from toolbox.keyboard import is_key_left, is_key_right, is_key_down, is_key_up, is_key_action, is_key_cancel
 from views.common.layer import Layer
 from views.pkmn_infos.action_enum import ActionEnum
 from .pkmn_infos_type_enum import PkmnInfosTypeEnum
@@ -177,20 +177,20 @@ class ActionsLayer(Layer):
         """
 
         event_handled = False
-        if key == keys.LEFT and self._selected_action > 0:
+        if is_key_left(key) and self._selected_action > 0:
             self._selected_action -= 1
             event_handled = True
-        elif key == keys.RIGHT and self._selected_action < len(self._available_actions) - 1:
+        elif is_key_right(key) and self._selected_action < len(self._available_actions) - 1:
             self._selected_action += 1
             event_handled = True
-        elif key == keys.UP and self._pkmn_infos_type == PkmnInfosTypeEnum.NEW_MOVE and self._selected_action > 0:
+        elif is_key_up(key) and self._pkmn_infos_type == PkmnInfosTypeEnum.NEW_MOVE and self._selected_action > 0:
             self._selected_action -= 1
             event_handled = True
-        elif key == keys.DOWN and self._pkmn_infos_type == PkmnInfosTypeEnum.NEW_MOVE and self._selected_action < len(
+        elif is_key_down(key) and self._pkmn_infos_type == PkmnInfosTypeEnum.NEW_MOVE and self._selected_action < len(
                 self._available_actions) - 1:
             self._selected_action += 1
             event_handled = True
-        elif key == keys.ENTER:
+        elif is_key_action(key):
             if self._available_actions[self._selected_action] == ActionEnum.CANCEL:
                 self.parent.cancel()
                 event_handled = True
@@ -210,7 +210,7 @@ class ActionsLayer(Layer):
                                                                     ActionEnum.MOVE_3, ActionEnum.MOVE_4]:
                 self.parent.cancel([self._pokemon.moves[self._selected_action]])
                 event_handled = True
-        elif key == keys.B:
+        elif is_key_cancel(key):
             self.parent.cancel()
             event_handled = True
 

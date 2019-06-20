@@ -1,11 +1,11 @@
 import cocos
 import pyglet
 from cocos.actions import *
-from pyglet.window import key as keys
 
 from models.pokemon_model import PokemonModel
 from toolbox.i18n import I18n
 from toolbox.init import PATH
+from toolbox.keyboard import is_key_cancel, is_key_action, is_key_down, is_key_up
 from views.common.layer import Layer
 
 
@@ -66,16 +66,16 @@ class MovesLayer(Layer):
 
         event_handled = False
         if self._is_visible:
-            if key == keys.B or (key == keys.ENTER and self._selected == len(self._actions) - 1):
+            if is_key_cancel(key) or (is_key_action(key) and self._selected == len(self._actions) - 1):
                 self.do(CallFunc(self.toggle_apparition) + Delay(0.3) + CallFunc(self.parent.show_actions))
                 event_handled = True
-            elif key == keys.ENTER:
+            elif is_key_action(key):
                 self.parent.fight_action(self._pokemon.moves[self._selected])
                 event_handled = True
-            elif key == keys.UP and self._selected > 0:
+            elif is_key_up(key) and self._selected > 0:
                 self._selected = self._selected - 1
                 event_handled = True
-            elif key == keys.DOWN and self._selected < len(self._actions) - 1:
+            elif is_key_down(key) and self._selected < len(self._actions) - 1:
                 self._selected = self._selected + 1
                 event_handled = True
 

@@ -3,9 +3,9 @@ import typing
 import cocos
 import pyglet
 from cocos.actions import *
-from pyglet.window import key as keys
 
 from toolbox.init import PATH
+from toolbox.keyboard import is_key_action, is_key_cancel, is_key_up, is_key_down
 from views.common.layer import Layer
 
 
@@ -157,7 +157,7 @@ class Dialog(Layer):
 
         event_handled = False
 
-        if key == keys.ENTER and self._cursor.visible:
+        if (is_key_action(key) or is_key_cancel(key)) and self._cursor.visible:
             if self._end_index != len(self._split_text):
                 self._start_index = self._end_index
                 self._update_text()
@@ -173,7 +173,7 @@ class Dialog(Layer):
                     if self._selected_choice is None:
                         self._callback()
             event_handled = True
-        elif key == keys.ENTER and not self._cursor.visible and self._choices:
+        elif is_key_action(key) and not self._cursor.visible and self._choices:
             self._choices_cursor.visible = False
             self._choices_background.visible = False
             for choice in self._choices_labels:
@@ -182,11 +182,11 @@ class Dialog(Layer):
 
             self._callback(self._selected_choice)
             event_handled = True
-        elif key == keys.UP and self._selected_choice is not None:
+        elif is_key_up(key) and self._selected_choice is not None:
             self._selected_choice = 0 if self._selected_choice <= 1 else self._selected_choice - 1
             self._update_choices_cursor()
             event_handled = True
-        elif key == keys.DOWN and self._selected_choice is not None:
+        elif is_key_down(key) and self._selected_choice is not None:
             self._selected_choice = len(self._choices) - 1 if self._selected_choice >= len(
                 self._choices) - 2 else self._selected_choice + 1
             self._update_choices_cursor()

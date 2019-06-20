@@ -22,6 +22,15 @@ class Game(metaclass=Singleton):
 
         return self._settings
 
+    @settings.setter
+    def settings(self, settings) -> None:
+        """Set the settings.
+
+        :param settings: The ``SettingsModel``.
+        """
+
+        self._settings = settings
+
     @property
     def game_state(self) -> GameStateModel:
         """Get the same state.

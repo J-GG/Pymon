@@ -1,10 +1,10 @@
 import cocos
 import pyglet
 from cocos.actions import *
-from pyglet.window import key as keys
 
 from toolbox.i18n import I18n
 from toolbox.init import PATH
+from toolbox.keyboard import is_key_up, is_key_down, is_key_action
 from views.battle.action_enum import ActionEnum
 from views.common.layer import Layer
 
@@ -67,13 +67,13 @@ class ActionsLayer(Layer):
         event_handled = False
 
         if self._is_visible:
-            if key == keys.UP and self._selected.value < 3:
+            if is_key_up(key) and self._selected.value < 3:
                 self._selected = ActionEnum(self._selected.value + 1)
                 event_handled = True
-            elif key == keys.DOWN and self._selected.value > 0:
+            elif is_key_down(key) and self._selected.value > 0:
                 self._selected = ActionEnum(self._selected.value - 1)
                 event_handled = True
-            elif key == keys.ENTER:
+            elif is_key_action(key):
                 if self._selected == ActionEnum.FIGHT:
                     self.toggle_apparition()
                     self.parent.show_moves()

@@ -1,10 +1,10 @@
 import cocos
 import pyglet
-from pyglet.window import key as keys
 
 from toolbox.game import Game
 from toolbox.i18n import I18n
 from toolbox.init import PATH
+from toolbox.keyboard import is_key_up, is_key_down, is_key_action
 
 
 class ActionsLayer(cocos.layer.Layer):
@@ -68,7 +68,7 @@ class ActionsLayer(cocos.layer.Layer):
         self._actions.append(continue_sprite)
 
         new_game = cocos.sprite.Sprite(pyglet.image.load(PATH + '/assets/img/main_menu/single_line_action.jpg'))
-        new_game.position = (320, 196)
+        new_game.position = (320, 188)
         new_game_selected = cocos.sprite.Sprite(
             pyglet.image.load(PATH + '/assets/img/main_menu/single_line_action_selected.jpg'))
         new_game.add(new_game_selected, name=ActionsLayer.SELECTED_SPRITE)
@@ -114,13 +114,14 @@ class ActionsLayer(cocos.layer.Layer):
 
         event_handled = False
 
-        if key == keys.UP and self._choice > 0 and (self._game_state or self._choice > 1):
+        if is_key_up(key) and self._choice > 0 and (
+                self._game_state or self._choice > 1):
             self._choice -= 1
             event_handled = True
-        elif key == keys.DOWN and self._choice < len(ActionsLayer.ACTIONS) - 1:
+        elif is_key_down(key) and self._choice < len(ActionsLayer.ACTIONS) - 1:
             self._choice += 1
             event_handled = True
-        elif key == keys.ENTER:
+        elif is_key_action(key):
             if self._choice == ActionsLayer.CONTINUE:
                 self.parent.continue_game()
             elif self._choice == ActionsLayer.NEW_GAME:
