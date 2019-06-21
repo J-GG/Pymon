@@ -15,8 +15,8 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
     CHARSET_ROWS = 4
     CHARSET_COLUMNS = 4
     ANIMATION_DURATION = 0.2
-    CHAR_WIDTH = 64
-    CHAR_HEIGHT = 64
+    CHAR_WIDTH = 32
+    CHAR_HEIGHT = 32
 
     charset = pyglet.image.load(PATH + '/assets/map/player.png')
     charset_grid = pyglet.image.ImageGrid(charset, CHARSET_ROWS, CHARSET_COLUMNS, CHAR_WIDTH, CHAR_HEIGHT)
@@ -184,7 +184,7 @@ class PlayerMovement(cocos.actions.Move):
                     self.target.position,
                     self.target.parent.direction,
                     PlayerActionEnum.PLAYER_WANT_MOVE,
-                    **{"new_direction": direction}
+                    new_direction=direction
                 )
             elif PlayerLayer.keyboard[key.ENTER]:
                 self.target.parent.map_controller.action(

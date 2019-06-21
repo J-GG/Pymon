@@ -19,7 +19,7 @@ class MapScene(cocos.scene.Scene):
     """
 
     PLAYER_LAYER_NAME = "PLAYER"
-    TILE_SIZE = 32
+    TILE_SIZE = 16
 
     def __init__(self, map_controller, map: cocos.tiles.Resource, players_position: typing.Tuple[int, int]) -> None:
         """Create the map scene.
