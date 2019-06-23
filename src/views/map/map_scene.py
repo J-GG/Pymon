@@ -74,6 +74,14 @@ class MapScene(cocos.scene.Scene):
 
         self._player_layer.direction = direction
 
+    def player_handles_event(self, handle: bool = True) -> None:
+        """Set whether the player's layer should handle the events.
+
+        :param handle: True if the player's layer should handle the events.
+        """
+
+        self._player_layer.is_event_handler = handle
+
     def pkmn_center_door(self, x: int, y: int) -> None:
         """Animate the pkmn center door opening or closing.
 
@@ -133,5 +141,6 @@ class MapScene(cocos.scene.Scene):
         """
 
         self._dialog.visible = True
-        callback = lambda: setattr(self._dialog, "visible", False)
+        self.player_handles_event(False)
+        callback = lambda: (setattr(self._dialog, "visible", False), self.player_handles_event(True))
         self._dialog.set_text([I18n().get(text_key)], callback)

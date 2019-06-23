@@ -48,6 +48,7 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
 
         super().__init__()
 
+        self._is_event_handler = True
         self._map_controller = map_controller
         self._direction = PlayerDirectionEnum.DOWN
         self._time_left_moving = 0
@@ -117,7 +118,7 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
         return self._direction
 
     @direction.setter
-    def direction(self, direction) -> None:
+    def direction(self, direction: PlayerDirectionEnum) -> None:
         """Set the direction the player is facing.
 
         :param direction: The ``PlayerDirectionEnum``.
@@ -153,13 +154,31 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
         return self._time_left_moving
 
     @time_left_moving.setter
-    def time_left_moving(self, time_left_moving) -> None:
+    def time_left_moving(self, time_left_moving: int) -> None:
         """Set the time left for the player to finish his movement.
 
         :param time_left_moving: The time left in seconds.
         """
 
         self._time_left_moving = time_left_moving
+
+    @property
+    def is_event_handler(self) -> bool:
+        """Get whether the event should be handled.
+
+        :return: True if the event should be handled.
+        """
+
+        return self._is_event_handler
+
+    @is_event_handler.setter
+    def is_event_handler(self, is_event_handler: bool) -> None:
+        """Set whether the event should be handled.
+
+        :param is_event_handler: True if the event should be handled.
+        """
+
+        self._is_event_handler = is_event_handler
 
 
 class PlayerMovement(cocos.actions.Move):
@@ -168,40 +187,41 @@ class PlayerMovement(cocos.actions.Move):
     def step(self, dt: int) -> None:
         super().step(dt)
 
-        if self.target.parent.time_left_moving == 0:
-            if PlayerLayer.keyboard[key.RIGHT] or PlayerLayer.keyboard[key.LEFT] or PlayerLayer.keyboard[key.UP] or \
-                    PlayerLayer.keyboard[key.DOWN]:
-                if PlayerLayer.keyboard[key.UP]:
-                    direction = PlayerDirectionEnum.UP
-                elif PlayerLayer.keyboard[key.LEFT]:
-                    direction = PlayerDirectionEnum.LEFT
-                elif PlayerLayer.keyboard[key.RIGHT]:
-                    direction = PlayerDirectionEnum.RIGHT
-                else:
-                    direction = PlayerDirectionEnum.DOWN
+        if self.target.parent.is_event_handler:
+            if self.target.parent.time_left_moving == 0:
+                if PlayerLayer.keyboard[key.RIGHT] or PlayerLayer.keyboard[key.LEFT] or PlayerLayer.keyboard[key.UP] or \
+                        PlayerLayer.keyboard[key.DOWN]:
+                    if PlayerLayer.keyboard[key.UP]:
+                        direction = PlayerDirectionEnum.UP
+                    elif PlayerLayer.keyboard[key.LEFT]:
+                        direction = PlayerDirectionEnum.LEFT
+                    elif PlayerLayer.keyboard[key.RIGHT]:
+                        direction = PlayerDirectionEnum.RIGHT
+                    else:
+                        direction = PlayerDirectionEnum.DOWN
 
-                self.target.parent.map_controller.action(
-                    self.target.position,
-                    self.target.parent.direction,
-                    PlayerActionEnum.PLAYER_WANT_MOVE,
-                    new_direction=direction
-                )
-            elif PlayerLayer.keyboard[key.ENTER]:
-                self.target.parent.map_controller.action(
-                    self.target.position,
-                    self.target.parent.direction,
-                    PlayerActionEnum.ACTION_BUTTON,
-                )
-        else:
-            self.target.parent.time_left_moving -= dt
-            if self.target.parent.time_left_moving <= 0:
-                self.target.parent.time_left_moving = 0
-                self.target.velocity = (0, 0)
-                self.target.position = self.target.parent.final_position
-                self.target.parent.map_controller.action(
-                    self.target.position,
-                    self.target.parent.direction,
-                    PlayerActionEnum.PLAYER_END_MOVE
-                )
+                    self.target.parent.map_controller.action(
+                        self.target.position,
+                        self.target.parent.direction,
+                        PlayerActionEnum.PLAYER_WANT_MOVE,
+                        new_direction=direction
+                    )
+                elif PlayerLayer.keyboard[key.ENTER]:
+                    self.target.parent.map_controller.action(
+                        self.target.position,
+                        self.target.parent.direction,
+                        PlayerActionEnum.ACTION_BUTTON,
+                    )
+            else:
+                self.target.parent.time_left_moving -= dt
+                if self.target.parent.time_left_moving <= 0:
+                    self.target.parent.time_left_moving = 0
+                    self.target.velocity = (0, 0)
+                    self.target.position = self.target.parent.final_position
+                    self.target.parent.map_controller.action(
+                        self.target.position,
+                        self.target.parent.direction,
+                        PlayerActionEnum.PLAYER_END_MOVE
+                    )
 
-        self.target.parent.parent.set_focus(self.target.x, self.target.y)
+            self.target.parent.parent.set_focus(self.target.x, self.target.y)

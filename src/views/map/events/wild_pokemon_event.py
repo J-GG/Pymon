@@ -58,4 +58,6 @@ class WildPokemonEvent:
                             learned_moves.pop()
 
                 opponent_pokemons = [PokemonModel(pokemon_species, pokemon_species.name, random_level, learned_moves)]
-                BattleController().battle(BattleModel(opponent_pokemons, place))
+                BattleController().battle(BattleModel(opponent_pokemons, place),
+                                          battle_over_callback=map_scene.player_handles_event)
+                map_scene.player_handles_event(False)

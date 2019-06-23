@@ -21,14 +21,16 @@ from views.pkmn_infos.pkmn_infos_type_enum import PkmnInfosTypeEnum
 class BattleController(metaclass=Singleton):
     """Manages the battle."""
 
-    def battle(self, battle: BattleModel) -> None:
+    def battle(self, battle: BattleModel, battle_over_callback: typing.Callable = None) -> None:
         """Starts a battle.
 
         :param battle: The data of the battle.
+        :param battle_over_callback: The function to be called when the battle is over.
         """
 
         self._battle = battle
         self._battle_scene = BattleScene(self, battle)
+        self._battle_over_callback = battle_over_callback
 
     def round(self, players_action: typing.Union[FightActionModel, RunActionModel, ShiftActionModel]) -> None:
         """Plays the round of the battle.
@@ -156,7 +158,9 @@ class BattleController(metaclass=Singleton):
         MainMenuController().show_menu()
 
     def won_battle(self) -> None:
-        """The player won the battle. His game state is saved."""
+        """The player won the battle."""
 
-        Game().game_state.save()
-        MainMenuController().show_menu()
+        self._battle_scene.pop_scene()
+
+        if self._battle_over_callback:
+            self._battle_over_callback()

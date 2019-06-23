@@ -349,9 +349,9 @@ class BattleScene(cocos.scene.Scene):
         else:
             self._hud.do(CallFunc(self._hud.update_xp)
                          + Delay(HUDLayer.XP_UPDATE_DURATION + 0.5)
-                         + CallFunc(self._pop_scene))
+                         + CallFunc(self._battle_controller.won_battle))
 
-    def _pop_scene(self):
+    def pop_scene(self):
         last_scene = cocos.director.director.scene_stack[len(cocos.director.director.scene_stack) - 1]
         cocos.director.director.pop()
         cocos.director.director.replace(FadeTransition(last_scene))
