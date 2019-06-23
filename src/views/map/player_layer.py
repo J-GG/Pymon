@@ -4,6 +4,8 @@ import cocos
 import pyglet
 from pyglet.window import key
 
+from models.settings.controls_enum import ControlsEnum
+from toolbox.game import Game
 from toolbox.init import PATH
 from views.map.player_direction_enum import PlayerDirectionEnum
 from .player_action_enum import PlayerActionEnum
@@ -14,7 +16,7 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
 
     CHARSET_ROWS = 4
     CHARSET_COLUMNS = 4
-    ANIMATION_DURATION = 0.2
+    ANIMATION_DURATION = 0.4
     CHAR_WIDTH = 32
     CHAR_HEIGHT = 32
 
@@ -43,7 +45,7 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
         """Create the player layer.
 
         :param map_controller: The map controller.
-        :param players_position: The coordinates of the player on the map in pixels.
+        :param players_position_pixels: The coordinates of the player on the map in pixels.
         """
 
         super().__init__()
@@ -188,14 +190,21 @@ class PlayerMovement(cocos.actions.Move):
         super().step(dt)
 
         if self.target.parent.is_event_handler:
+            if PlayerLayer.keyboard[Game().settings.controls[ControlsEnum.CANCEL]]:
+                PlayerLayer.ANIMATION_DURATION = 0.2
+            else:
+                PlayerLayer.ANIMATION_DURATION = 0.4
+
             if self.target.parent.time_left_moving == 0:
-                if PlayerLayer.keyboard[key.RIGHT] or PlayerLayer.keyboard[key.LEFT] or PlayerLayer.keyboard[key.UP] or \
-                        PlayerLayer.keyboard[key.DOWN]:
-                    if PlayerLayer.keyboard[key.UP]:
+                if PlayerLayer.keyboard[Game().settings.controls[ControlsEnum.RIGHT]] or PlayerLayer.keyboard[
+                    Game().settings.controls[ControlsEnum.LEFT]] or PlayerLayer.keyboard[
+                    Game().settings.controls[ControlsEnum.UP]] or PlayerLayer.keyboard[
+                    Game().settings.controls[ControlsEnum.DOWN]]:
+                    if PlayerLayer.keyboard[Game().settings.controls[ControlsEnum.UP]]:
                         direction = PlayerDirectionEnum.UP
-                    elif PlayerLayer.keyboard[key.LEFT]:
+                    elif PlayerLayer.keyboard[Game().settings.controls[ControlsEnum.LEFT]]:
                         direction = PlayerDirectionEnum.LEFT
-                    elif PlayerLayer.keyboard[key.RIGHT]:
+                    elif PlayerLayer.keyboard[Game().settings.controls[ControlsEnum.RIGHT]]:
                         direction = PlayerDirectionEnum.RIGHT
                     else:
                         direction = PlayerDirectionEnum.DOWN
@@ -206,7 +215,7 @@ class PlayerMovement(cocos.actions.Move):
                         PlayerActionEnum.PLAYER_WANT_MOVE,
                         new_direction=direction
                     )
-                elif PlayerLayer.keyboard[key.ENTER]:
+                elif PlayerLayer.keyboard[Game().settings.controls[ControlsEnum.ACTION]]:
                     self.target.parent.map_controller.action(
                         self.target.position,
                         self.target.parent.direction,
