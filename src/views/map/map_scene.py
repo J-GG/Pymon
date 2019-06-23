@@ -7,6 +7,7 @@ from cocos.actions import Delay, CallFunc
 from toolbox.i18n import I18n
 from toolbox.init import PATH
 from views.common.dialog import Dialog
+from views.map.events.repeating_event import RepeatingEvent
 from views.map.player_layer import PlayerLayer
 from .player_direction_enum import PlayerDirectionEnum
 
@@ -19,6 +20,7 @@ class MapScene(cocos.scene.Scene):
     """
 
     PLAYER_LAYER_NAME = "PLAYER"
+    REPEATING_LAYER_NAME = "REPEATING"
     TILE_SIZE = 16
 
     def __init__(self, map_controller, map: cocos.tiles.Resource, players_position: typing.Tuple[int, int]) -> None:
@@ -57,6 +59,12 @@ class MapScene(cocos.scene.Scene):
 
             if name == MapScene.PLAYER_LAYER_NAME:
                 has_passed_player_layer = True
+
+        if MapScene.REPEATING_LAYER_NAME in self._map.contents:
+            resource = self._map.get_resource(MapScene.REPEATING_LAYER_NAME)
+
+            for object in resource.objects:
+                RepeatingEvent(self, object)
 
         self.add(self._scroller)
 
@@ -133,6 +141,27 @@ class MapScene(cocos.scene.Scene):
         self._scroller.add(scrollable_layer, z=2)
         callback = lambda: self._scroller.remove(scrollable_layer)
         self.do(Delay(0.4) + CallFunc(callback))
+
+    def repeating_animation(self, x: int, y: int, infos: typing.Dict) -> None:
+        """Animate a tile.
+
+        :param x: The x coordinates of the tile.
+        :param y: The y coordinates of the tile.
+        """
+
+        tileset = pyglet.image.load(PATH + "/assets/map/{0}".format(infos["file"]))
+        tileset_grid = pyglet.image.ImageGrid(tileset, infos["row"], infos["col"], MapScene.TILE_SIZE, tileset.height)
+        tileset_anim = pyglet.image.Animation.from_image_sequence(
+            tileset_grid,
+            0.1,
+            loop=True
+        )
+        animation = cocos.sprite.Sprite(tileset_anim)
+        animation.position = (x + MapScene.TILE_SIZE / 2, y + tileset.height / 2)
+
+        scrollable_layer = cocos.layer.ScrollableLayer()
+        scrollable_layer.add(animation)
+        self._scroller.add(scrollable_layer, z=1)
 
     def message(self, text_key: str) -> None:
         """Show a message to the player.
