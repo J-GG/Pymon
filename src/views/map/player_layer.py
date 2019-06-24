@@ -16,7 +16,9 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
 
     CHARSET_ROWS = 4
     CHARSET_COLUMNS = 4
-    ANIMATION_DURATION = 0.4
+    PLAYER_WALKING = "WALK"
+    PLAYER_RUNNING = "RUN"
+    ANIMATION_DURATION = {PLAYER_RUNNING: .2, PLAYER_WALKING: .4}
     CHAR_WIDTH = 32
     CHAR_HEIGHT = 32
 
@@ -28,12 +30,22 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
             charset_grid[direction.value * CHARSET_ROWS:direction.value * CHARSET_ROWS + 1], 1, loop=False
         )
     charset_anim = dict()
+    charset_anim[PLAYER_WALKING] = dict()
+    charset_anim[PLAYER_RUNNING] = dict()
+
     for direction in PlayerDirectionEnum:
-        charset_anim[direction] = pyglet.image.Animation.from_image_sequence(
+        charset_anim[PLAYER_WALKING][direction] = pyglet.image.Animation.from_image_sequence(
             charset_grid[
             direction.value * CHARSET_ROWS:direction.value * CHARSET_ROWS + CHARSET_COLUMNS] + charset_grid[
                                                                                                direction.value * CHARSET_ROWS:direction.value * CHARSET_ROWS + 1],
-            ANIMATION_DURATION / (CHARSET_COLUMNS + 1),
+            ANIMATION_DURATION[PLAYER_WALKING] / (CHARSET_COLUMNS + 1),
+            loop=False
+        )
+        charset_anim[PLAYER_RUNNING][direction] = pyglet.image.Animation.from_image_sequence(
+            charset_grid[
+            direction.value * CHARSET_ROWS:direction.value * CHARSET_ROWS + CHARSET_COLUMNS] + charset_grid[
+                                                                                               direction.value * CHARSET_ROWS:direction.value * CHARSET_ROWS + 1],
+            ANIMATION_DURATION[PLAYER_RUNNING] / (CHARSET_COLUMNS + 1),
             loop=False
         )
 
@@ -54,6 +66,7 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
         self._map_controller = map_controller
         self._direction = PlayerDirectionEnum.DOWN
         self._time_left_moving = 0
+        self._players_walk = PlayerLayer.PLAYER_WALKING
 
         self._sprite = cocos.sprite.Sprite(PlayerLayer.charset_fix[self.direction])
         self._sprite.position = (players_position_pixels[0], players_position_pixels[1])
@@ -80,20 +93,22 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
             self.add(self._sprite)
             self.time_left_moving = 0
         else:
-            self._sprite = cocos.sprite.Sprite(PlayerLayer.charset_anim[self.direction])
+            self._sprite = cocos.sprite.Sprite(
+                PlayerLayer.charset_anim[self.players_walk][self.direction])
             self._sprite.position = position
             self._sprite.velocity = (0, 0)
             self._sprite.do(PlayerMovement())
             self.add(self._sprite)
-            self.time_left_moving = (PlayerLayer.ANIMATION_DURATION / (
+            self.time_left_moving = (PlayerLayer.ANIMATION_DURATION[self.players_walk] / (
                     PlayerLayer.CHARSET_COLUMNS + 1) * PlayerLayer.CHARSET_COLUMNS)
 
             right_left = 1 if self.direction == PlayerDirectionEnum.RIGHT else -1 if self.direction == PlayerDirectionEnum.LEFT else 0
             up_down = 1 if self.direction == PlayerDirectionEnum.UP else -1 if self.direction == PlayerDirectionEnum.DOWN else 0
 
-            vel_x = right_left * self.parent.parent.TILE_SIZE * 1 / (PlayerLayer.ANIMATION_DURATION / (
+            vel_x = right_left * self.parent.parent.TILE_SIZE * 1 / (
+                    PlayerLayer.ANIMATION_DURATION[self.players_walk] / (
                     PlayerLayer.CHARSET_COLUMNS + 1) * PlayerLayer.CHARSET_COLUMNS)
-            vel_y = up_down * self.parent.parent.TILE_SIZE * 1 / (PlayerLayer.ANIMATION_DURATION / (
+            vel_y = up_down * self.parent.parent.TILE_SIZE * 1 / (PlayerLayer.ANIMATION_DURATION[self.players_walk] / (
                     PlayerLayer.CHARSET_COLUMNS + 1) * PlayerLayer.CHARSET_COLUMNS)
             self._sprite.velocity = (vel_x, vel_y)
             self._final_position = (
@@ -182,6 +197,24 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
 
         self._is_event_handler = is_event_handler
 
+    @property
+    def players_walk(self) -> str:
+        """Get the player's walk.
+
+        :return: ``PLAYER_RUNNING`` if the player is running. ``PLAYER_WALKING`` otherwise.
+        """
+
+        return self._players_walk
+
+    @players_walk.setter
+    def players_walk(self, players_walk: str) -> None:
+        """Set the player's walk.
+
+        :param players_walk: ``PLAYER_RUNNING`` if the player is running. ``PLAYER_WALKING`` otherwise.
+        """
+
+        self._players_walk = players_walk
+
 
 class PlayerMovement(cocos.actions.Move):
     """Manages the player's actions."""
@@ -191,9 +224,9 @@ class PlayerMovement(cocos.actions.Move):
 
         if self.target.parent.is_event_handler:
             if PlayerLayer.keyboard[Game().settings.controls[ControlsEnum.CANCEL]]:
-                PlayerLayer.ANIMATION_DURATION = 0.2
+                self.target.parent.players_walk = PlayerLayer.PLAYER_RUNNING
             else:
-                PlayerLayer.ANIMATION_DURATION = 0.4
+                self.target.parent.players_walk = PlayerLayer.PLAYER_WALKING
 
             if self.target.parent.time_left_moving == 0:
                 if PlayerLayer.keyboard[Game().settings.controls[ControlsEnum.RIGHT]] or PlayerLayer.keyboard[
