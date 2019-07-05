@@ -23,7 +23,8 @@ class MapScene(cocos.scene.Scene):
     REPEATING_LAYER_NAME = "REPEATING"
     TILE_SIZE = 16
 
-    def __init__(self, map_controller, map: cocos.tiles.Resource, players_position: typing.Tuple[int, int]) -> None:
+    def __init__(self, map_controller, map: cocos.tiles.Resource, players_position: typing.Tuple[int, int],
+                 players_direction: PlayerDirectionEnum) -> None:
         """Create the map scene.
 
         Add all the layers of the map and the player.
@@ -31,10 +32,12 @@ class MapScene(cocos.scene.Scene):
         :param map_controller: The controller of the maps.
         :param map: The map.
         :param players_position: The tile coordinates of the player's position.
+        :param players_direction: The direction the player is facing.
         """
 
         super().__init__()
 
+        self._map_controller = map_controller
         self._map = map
         self._scroller = cocos.layer.ScrollingManager()
 
@@ -48,7 +51,7 @@ class MapScene(cocos.scene.Scene):
             int(MapScene.TILE_SIZE / 2 + players_position[0] * MapScene.TILE_SIZE),
             int(PlayerLayer.CHAR_HEIGHT / 2 + players_position[1] * MapScene.TILE_SIZE)
         )
-        self._player_layer = PlayerLayer(map_controller, players_position_pixels)
+        self._player_layer = PlayerLayer(map_controller, players_position_pixels, players_direction)
         self._scroller.add(self._player_layer, z=2)
         self._scroller.set_focus(players_position_pixels[0], players_position_pixels[1])
 
@@ -173,3 +176,13 @@ class MapScene(cocos.scene.Scene):
         self.player_handles_event(False)
         callback = lambda: (setattr(self._dialog, "visible", False), self.player_handles_event(True))
         self._dialog.set_text([I18n().get(text_key)], callback)
+
+    def teleport(self, new_map: str, players_position: typing.Tuple[int, int], direction: PlayerDirectionEnum) -> None:
+        """Change the map.
+
+        :param new_map: The name of the new map (i.e. the name of the file).
+        :param players_position: The tile coordinates of the player's position.
+        :param direction: The direction the player is facing.
+        """
+
+        self._map_controller.load_map(new_map, players_position, direction)

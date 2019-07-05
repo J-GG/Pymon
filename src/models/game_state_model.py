@@ -10,8 +10,9 @@ class GameStateModel(Persistence):
     """Contain all the data of the game."""
 
     FILE_NAME = "game_state"
-    DEFAULT_MAP = PATH + "/assets/map/map.tmx"
-    DEFAULT_PLAYERS_POSITION = (11, 11)
+    DEFAULT_MAP = "town"
+    MAP_PATH = PATH + "/assets/map/{0}.tmx"
+    DEFAULT_PLAYERS_POSITION = (20, 30)
 
     def __init__(self) -> None:
         """Create a new game state."""
@@ -57,6 +58,14 @@ class GameStateModel(Persistence):
         """
 
         self._map = map
+
+    def map_path(self) -> str:
+        """Return the path to the current map file.
+
+        :return: A String representing a path.
+        """
+
+        return GameStateModel.MAP_PATH.format(self.map)
 
     @property
     def map_players_position(self) -> typing.Tuple[int, int]:

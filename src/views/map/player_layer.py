@@ -53,18 +53,20 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
     keyboard = key.KeyStateHandler()
     cocos.director.director.window.push_handlers(keyboard)
 
-    def __init__(self, map_controller, players_position_pixels: typing.Tuple[int, int]) -> None:
+    def __init__(self, map_controller, players_position_pixels: typing.Tuple[int, int],
+                 players_direction: PlayerDirectionEnum) -> None:
         """Create the player layer.
 
         :param map_controller: The map controller.
         :param players_position_pixels: The coordinates of the player on the map in pixels.
+        :param players_direction: The direction the player is facing.
         """
 
         super().__init__()
 
         self._is_event_handler = True
         self._map_controller = map_controller
-        self._direction = PlayerDirectionEnum.DOWN
+        self._direction = players_direction
         self._time_left_moving = 0
         self._players_walk = PlayerLayer.PLAYER_WALKING
 

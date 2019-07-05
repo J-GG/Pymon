@@ -3,6 +3,7 @@ import typing
 
 import cocos
 
+from toolbox.game import Game
 from toolbox.singleton import Singleton
 from views.map.events.move_event import MoveEvent
 from views.map.map_scene import MapScene
@@ -14,15 +15,20 @@ from views.map.player_layer import PlayerLayer
 class MapController(metaclass=Singleton):
     """Manages the maps."""
 
-    def load_map(self, map_file: str, players_position: typing.Tuple[int, int]):
+    def load_map(self, map_file: str, players_position: typing.Tuple[int, int],
+                 players_direction: PlayerDirectionEnum = PlayerDirectionEnum.DOWN):
         """Load the map file.
 
-        :param: map_file: The path to the map file.
+        :param: map_file: The name of the map.
         :param: players_position: The tile coordinates of the player's position.
+        :param players_direction: The direction the player is facing.
         """
 
-        self._map = cocos.tiles.load(map_file)
-        self._map_scene = MapScene(self, self._map, players_position)
+        Game().game_state.map = map_file
+        Game().game_state.map_players_position = players_position
+
+        self._map = cocos.tiles.load(Game().game_state.map_path())
+        self._map_scene = MapScene(self, self._map, Game().game_state.map_players_position, players_direction)
 
     def action(self, position: typing.Tuple[int, int], direction: PlayerDirectionEnum, action: PlayerActionEnum,
                **kwargs) -> None:
