@@ -93,7 +93,7 @@ class PlayerLayer(cocos.layer.ScrollableLayer):
             self._sprite.velocity = (0, 0)
             self._sprite.do(PlayerMovement())
             self.add(self._sprite)
-            self.time_left_moving = 0
+            self.time_left_moving = 0.01
         else:
             self._sprite = cocos.sprite.Sprite(
                 PlayerLayer.charset_anim[self.players_walk][self.direction])

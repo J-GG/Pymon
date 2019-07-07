@@ -1,88 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="45" height="35" tilewidth="16" tileheight="16" infinite="0" nextlayerid="15" nextobjectid="20">
+<map version="1.2" tiledversion="1.2.4" orientation="orthogonal" renderorder="right-down" width="45" height="36" tilewidth="16" tileheight="16" infinite="0" nextlayerid="19" nextobjectid="20">
  <tileset firstgid="1" source="tileset.tsx"/>
  <objectgroup id="14" name="REPEATING">
-  <object id="9" x="368" y="272" width="16" height="16">
+  <object id="9" x="368" y="288" width="16" height="16">
    <properties>
     <property name="animation" value="flowers_yb"/>
    </properties>
   </object>
-  <object id="11" x="384" y="208" width="16" height="16">
+  <object id="11" x="384" y="224" width="16" height="16">
    <properties>
     <property name="animation" value="flowers_yb"/>
    </properties>
   </object>
-  <object id="14" x="288" y="256" width="16" height="16">
+  <object id="14" x="288" y="272" width="16" height="16">
    <properties>
     <property name="animation" value="flowers_yb"/>
    </properties>
   </object>
-  <object id="15" x="240" y="496" width="16" height="16">
+  <object id="15" x="240" y="512" width="16" height="16">
    <properties>
     <property name="animation" value="flowers_ry"/>
    </properties>
   </object>
-  <object id="16" x="208" y="464" width="16" height="16">
+  <object id="16" x="208" y="480" width="16" height="16">
    <properties>
     <property name="animation" value="flowers_ry"/>
    </properties>
   </object>
  </objectgroup>
  <objectgroup id="6" name="ACTION_BUTTON">
-  <object id="1" x="352" y="32" width="16" height="16">
+  <object id="1" x="352" y="48" width="16" height="16">
    <properties>
     <property name="message" value="MAP.ROUTE_1"/>
    </properties>
   </object>
-  <object id="3" x="112" y="416" width="32" height="16">
+  <object id="3" x="112" y="432" width="32" height="16">
    <properties>
     <property name="message" value="MAP.PKMN_CENTER_NAME"/>
    </properties>
   </object>
  </objectgroup>
  <objectgroup id="7" name="PLAYER_START_MOVE">
-  <object id="5" x="96" y="432" width="16" height="16">
+  <object id="5" x="96" y="448" width="16" height="16">
    <properties>
     <property name="pkmn_center_door" type="bool" value="true"/>
    </properties>
   </object>
  </objectgroup>
  <objectgroup id="8" name="PLAYER_END_MOVE">
-  <object id="6" x="96" y="432" width="16" height="16">
+  <object id="6" x="96" y="448" width="16" height="16">
    <properties>
     <property name="pkmn_center_door" type="bool" value="true"/>
    </properties>
   </object>
-  <object id="7" x="128" y="432" width="16" height="16">
+  <object id="7" x="128" y="448" width="16" height="16">
    <properties>
     <property name="tall_grass" type="bool" value="true"/>
     <property name="wild_pokemon" value="{&quot;place&quot;:&quot;city&quot;,&quot;pokemons&quot;:{&quot;bulbasaur&quot;:{&quot;probability&quot;:100,&quot;level_min&quot;:2,&quot;level_max&quot;:4}}}"/>
    </properties>
   </object>
-  <object id="8" x="288" y="208" width="64" height="34">
+  <object id="8" x="288" y="224" width="64" height="34">
    <properties>
     <property name="tall_grass" type="bool" value="true"/>
     <property name="wild_pokemon" value="{&quot;place&quot;:&quot;meadow&quot;,&quot;pokemons&quot;: {&quot;bulbasaur&quot;:{&quot;probability&quot;:90,&quot;level_min&quot;:2,&quot;level_max&quot;:5}, &quot;ivysaur&quot;:{&quot;probability&quot;:10,&quot;level_min&quot;:4,&quot;level_max&quot;:6}}}"/>
    </properties>
   </object>
-  <object id="17" x="352" y="0" width="16" height="16">
+  <object id="17" x="352" y="16" width="16" height="16">
    <properties>
-    <property name="teleport" value="{&quot;map&quot;:&quot;route_1&quot;,&quot;x&quot;:22,&quot;y&quot;:0, &quot;direction&quot;:&quot;UP&quot;}"/>
+    <property name="teleport" value="{&quot;map&quot;:&quot;route_1&quot;,&quot;x&quot;:22,&quot;y&quot;:1, &quot;direction&quot;:&quot;UP&quot;}"/>
    </properties>
   </object>
-  <object id="18" x="368" y="0" width="16" height="16">
+  <object id="18" x="368" y="16" width="16" height="16">
    <properties>
-    <property name="teleport" value="{&quot;map&quot;:&quot;route_1&quot;,&quot;x&quot;:23,&quot;y&quot;:0, &quot;direction&quot;:&quot;UP&quot;}"/>
+    <property name="teleport" value="{&quot;map&quot;:&quot;route_1&quot;,&quot;x&quot;:23,&quot;y&quot;:1, &quot;direction&quot;:&quot;UP&quot;}"/>
    </properties>
   </object>
-  <object id="19" x="384" y="0" width="16" height="16">
+  <object id="19" x="384" y="16" width="16" height="16">
    <properties>
-    <property name="teleport" value="{&quot;map&quot;:&quot;route_1&quot;,&quot;x&quot;:24,&quot;y&quot;:0, &quot;direction&quot;:&quot;UP&quot;}"/>
+    <property name="teleport" value="{&quot;map&quot;:&quot;route_1&quot;,&quot;x&quot;:24,&quot;y&quot;:1, &quot;direction&quot;:&quot;UP&quot;}"/>
    </properties>
   </object>
  </objectgroup>
- <layer id="10" name="ground" width="45" height="35">
+ <layer id="15" name="ground" width="45" height="36">
   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,31,18,32,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 26,26,26,26,26,26,26,26,26,26,39,26,40,26,26,26,26,26,26,26,26,26,39,26,40,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,
 26,26,26,26,26,26,26,26,26,26,39,26,40,26,26,26,26,26,26,26,26,26,39,26,40,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,
 26,26,26,26,26,26,26,26,26,26,39,26,40,26,26,26,26,26,26,26,26,26,39,26,40,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,
@@ -120,8 +121,9 @@
 26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26,26
 </data>
  </layer>
- <layer id="11" name="below" width="45" height="35">
+ <layer id="16" name="below" width="45" height="36">
   <data encoding="csv">
+13,14,13,14,13,14,13,14,13,14,13,14,13,14,13,14,13,14,13,14,13,14,0,0,0,13,14,13,14,13,14,13,14,13,14,13,14,13,14,13,14,13,14,13,14,
 23,24,5,6,5,6,5,6,5,6,5,6,5,6,5,6,5,6,5,6,5,6,0,0,0,5,6,5,6,5,6,5,6,5,6,5,6,5,6,5,6,5,6,23,24,
 15,16,13,14,13,14,13,14,13,14,13,14,13,14,13,14,13,14,13,14,13,14,0,0,0,13,14,13,14,13,14,13,14,13,14,13,14,13,14,13,14,13,14,15,16,
 23,24,21,22,21,22,21,22,21,22,21,22,21,22,21,22,21,22,21,22,21,22,10,0,0,21,22,21,22,21,22,21,22,21,22,21,22,21,22,21,22,21,22,23,24,
@@ -159,8 +161,9 @@
 23,24,23,24,65,66,66,66,66,66,66,66,66,66,66,66,67,23,24,23,24,23,24,23,24,23,24,23,24,23,24,23,24,23,24,23,24,23,24,23,24,23,24,23,24
 </data>
  </layer>
- <layer id="12" name="PLAYER" width="45" height="35">
+ <layer id="17" name="PLAYER" width="45" height="36">
   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -198,8 +201,9 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="13" name="above" width="45" height="35">
+ <layer id="18" name="above" width="45" height="36">
   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
